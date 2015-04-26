@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.diffplug.common.base;
+package com.diffplug.common.rx;
 
 /** These exceptions are designed for checking programming errors (e.g. unexpected default or else clauses). */
 public class Unhandled extends IllegalArgumentException {

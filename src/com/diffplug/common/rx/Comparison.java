@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.diffplug.common.base;
+package com.diffplug.common.rx;
 
 /** Utility class to make reading the result of "compareTo" results a little easier. */
 public enum Comparison {
-	LESSER,
-	EQUAL,
-	GREATER;
+	LESSER, EQUAL, GREATER;
 
 	/** Returns the appropriate T based on the Comparison value. */
 	public <T> T lesserEqualGreater(T lesser, T equal, T greater) {
