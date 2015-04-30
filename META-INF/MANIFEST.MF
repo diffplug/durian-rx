@@ -10,9 +10,8 @@ Bundle-SymbolicName: com.diffplug.durian-rx
 Bundle-Vendor: DiffPlug
 Bundle-Version: 1.0.0.SNAPSHOT
 Created-By: 1.8.0_40 (Oracle Corporation)
-Export-Package: com.diffplug.common.rx;uses:="com.google.common.collect,
- com.google.common.util.concurrent,rx,rx.subjects";version="1.0.0"
-Import-Package: com.diffplug.common.base;version="[1.0.0,2.0.0)",
+Export-Package: com.diffplug.common.rx;version="1.0.0"
+Import-Package: com.diffplug.common.base;version="[1.0.0,2)",
  com.google.common.base;version="[18.0,19)",
  com.google.common.collect;version="[18.0,19)",
  com.google.common.util.concurrent;version="[18.0,19)",
@@ -22,6 +21,4 @@ Import-Package: com.diffplug.common.base;version="[1.0.0,2.0.0)",
  rx.schedulers;version="[1.0,2)",
  rx.subjects;version="[1.0,2)",
  rx.subscriptions;version="[1.0,2)"
-Private-Package: com.diffplug.common.base
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
-Tool: Bnd-2.4.0.201411031534
