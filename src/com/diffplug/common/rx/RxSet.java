@@ -91,4 +91,20 @@ public class RxSet<T> extends RxValue<ImmutableSet<T>> {
 			throw Unhandled.integerException(set.size());
 		}
 	}
+
+	/** Functions for dealing with the impedance mismatch between set and optionals. */
+	public static class OnMultiple {
+		private OnMultiple() {}
+		/** Throws an exception when ImmutableSet is multiple. */
+		public static <T> Function<ImmutableSet<T>, T> error() {
+			return val -> {
+				throw new IllegalArgumentException();
+			};
+		}
+
+		/** Throws an exception when ImmutableSet is multiple. */
+		public static <T> Function<ImmutableSet<T>, T> takeFirst() {
+			return val -> val.asList().get(0);
+		}
+	}
 }
