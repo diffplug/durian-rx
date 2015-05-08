@@ -123,11 +123,35 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	}
 
 	/**
+	 * Creates an Rx instance which will call the given consumer whenever the followed stream
+	 * or future completes with an error.
+	 */
+	public static <T> Rx<T> onFailure(Consumer<Throwable> onFailure) {
+		return new Rx<T>(Consumers.doNothing(), error -> {
+			if (error.isPresent()) {
+				onFailure.accept(error.get());
+			}
+		});
+	}
+
+	/**
 	 * Creates an Rx instance which will call onValue whenever a value is received, 
 	 * is received, or onTerminal when the future or observable completes.
 	 */
 	public static <T> Rx<T> onValueOrTerminate(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminal) {
 		return new Rx<T>(onValue, onTerminal);
+	}
+
+	/**
+	 * Creates an Rx instance which will call onValue whenever a value is received,
+	 * and onFailure whenever an exception is thrown. 
+	 */
+	public static <T> Rx<T> onValueOrFailure(Consumer<T> onValue, Consumer<Throwable> onFailure) {
+		return new Rx<T>(onValue, error -> {
+			if (error.isPresent()) {
+				onFailure.accept(error.get());
+			}
+		});
 	}
 
 	// ///////////
