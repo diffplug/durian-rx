@@ -103,11 +103,16 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		return new Rx<T>(onValue, logErrors);
 	}
 
-	static final Consumer<Optional<Throwable>> logErrors = error -> {
+	private static final Consumer<Optional<Throwable>> logErrors = error -> {
 		if (error.isPresent()) {
 			ErrorHandler.log().handle(error.get());
 		}
 	};
+
+	/** Returns true iff the given Rx is a logging Rx. */
+	boolean isLogging() {
+		return onTerminate == logErrors;
+	}
 
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever the followed stream
@@ -145,7 +150,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	// Static versions
 	public static <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> listener) {
-		return sameThread.subscribe(observable, listener);
+		return getSameThreadExecutor().subscribe(observable, listener);
 	}
 
 	public static <T> Subscription subscribe(Observable<? extends T> observable, Consumer<T> listener) {
@@ -176,14 +181,12 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	// Static versions
 	public static <T> Subscription subscribe(ListenableFuture<? extends T> observable, Rx<T> listener) {
-		return sameThread.subscribe(observable, listener);
+		return getSameThreadExecutor().subscribe(observable, listener);
 	}
 
 	public static <T> Subscription subscribe(ListenableFuture<? extends T> observable, Consumer<T> listener) {
 		return subscribe(observable, Rx.onValue(listener));
 	}
-
-	private static final RxExecutor sameThread = new RxExecutor(MoreExecutors.directExecutor(), Schedulers.immediate());
 
 	/**
 	 * Mechanism for specifying a specific Executor.  A corresponding Scheduler will
@@ -191,7 +194,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	 */
 	public static RxExecutor on(Executor executor) {
 		if (executor == MoreExecutors.directExecutor()) {
-			return sameThread;
+			return getSameThreadExecutor();
 		} else if (executor instanceof HasRxExecutor) {
 			return ((HasRxExecutor) executor).getRxExecutor();
 		} else {
@@ -205,7 +208,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	}
 
 	/*** Marker interface which allows an Executor to specify its own Scheduler. */
-	public interface HasRxExecutor {
+	public interface HasRxExecutor extends Executor {
 		RxExecutor getRxExecutor();
 	}
 
@@ -268,13 +271,28 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		}
 	}
 
-	/** Returns the global tracing policy. */
-	private static RxTracingPolicy getTracingPolicy() {
-		if (tracingPolicy == null) {
-			tracingPolicy = DurianPlugins.get(RxTracingPolicy.class, RxTracingPolicy.NONE);
+	private static RxExecutor getSameThreadExecutor() {
+		if (_sameThread == null) {
+			_sameThread = new RxExecutor(MoreExecutors.directExecutor(), Schedulers.immediate());
 		}
-		return tracingPolicy;
+		return _sameThread;
 	}
 
-	private static RxTracingPolicy tracingPolicy;
+	private static RxExecutor _sameThread;
+
+	/** Returns the global tracing policy. */
+	private static RxTracingPolicy getTracingPolicy() {
+		if (_tracingPolicy == null) {
+			_tracingPolicy = DurianPlugins.get(RxTracingPolicy.class, RxTracingPolicy.NONE);
+		}
+		return _tracingPolicy;
+	}
+
+	private static RxTracingPolicy _tracingPolicy;
+
+	/** Package-private for testing - resets all of the static member variables. */
+	static void resetForTesting() {
+		_sameThread = null;
+		_tracingPolicy = null;
+	}
 }

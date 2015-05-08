@@ -16,18 +16,18 @@
 package com.diffplug.common.rx;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 
-import com.diffplug.common.base.Predicates;
+import com.diffplug.common.base.ErrorHandler;
 import com.diffplug.common.base.StackDumper;
-import com.diffplug.common.base.StringPrinter;
 
 /**
  * Interface which gets called for every subscription through the Rx mechanism, allowing various kinds of tracing.
  * 
- * To enable maximum tracing, set the following system property as such:
- * durian.plugins.com.diffplug.common.rx.RxTracingPolicy = com.diffplug.common.rx.RxTracingPolicy$DumpSubscriptionTrace
+ * To enable tracing for subscription calls, set the following system property:
+ *   durian.plugins.com.diffplug.common.rx.RxTracingPolicy = com.diffplug.common.rx.RxTracingPolicy$LogSubscriptionTrace
+ * Or call
+ *   DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace()).
  */
 public interface RxTracingPolicy {
 	/**
@@ -54,41 +54,40 @@ public interface RxTracingPolicy {
 	 * predicate.  Anytime a subscription throws an error, that error's stacktrace gets dumped, along
 	 * with the stacktrace at the time of the subscription.
 	 */
-	public static class DumpSubscriptionTrace implements RxTracingPolicy {
-		private final Predicate<Object> shouldDump;
-
-		/** Dumps the stack trace of all subscriptions. */
-		public DumpSubscriptionTrace() {
-			this(Predicates.alwaysTrue());
-		}
-
-		/**
-		 * @param shouldDump A Predicate which operates on the observable (IObservable, Observable, or
-		 * ListenableFuture), and returns true iff subscriptions on the observable should be traced.
-		 */
-		public DumpSubscriptionTrace(Predicate<Object> shouldDump) {
-			this.shouldDump = Objects.requireNonNull(shouldDump);
-		}
+	public static class LogSubscriptionTrace implements RxTracingPolicy {
+		/** The BiPredicate which determines which subscriptions should be logged.  By default, any Rx which is logging will be logged. */
+		public static BiPredicate<Object, Rx<?>> shouldLog = (observable, listener) -> listener.isLogging();
 
 		@Override
 		public <T> Rx<T> hook(Object observable, Rx<T> listener) {
-			if (shouldDump.test(observable)) {
-				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(DumpSubscriptionTrace.class, Rx.RxExecutor.class, Rx.class);
+			if (shouldLog.test(observable, listener)) {
+				// capture the stack at the time of the subscription
+				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(LogSubscriptionTrace.class, Rx.RxExecutor.class, Rx.class);
 				return Rx.onValueOrTerminate(listener::onNext, error -> {
 					if (error.isPresent()) {
-						StackDumper.dump(StringPrinter.buildString(printer -> {
-							// dump the stack trace
-							error.get().printStackTrace(printer.toPrintWriter());
-							// then print where it was subscribed
-							printer.println("From a subscription at:");
-						}), subscriptionTrace);
-						listener.onError(error.get());
+						// if there is an error, wrap it in a SubscriptionException and log it
+						SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
+						ErrorHandler.log().handle(subException);
+						// prevent double-logging
+						if (!listener.isLogging()) {
+							listener.onError(subException);
+						}
 					} else {
 						listener.onCompleted();
 					}
 				});
 			} else {
 				return listener;
+			}
+		}
+
+		/** An Exception which has the stack trace of the Rx.subscription() call which created the subscription in which the cause was thrown. */
+		static class SubscriptionException extends Exception {
+			private static final long serialVersionUID = -265762944158637711L;
+			
+			public SubscriptionException(Throwable cause, List<StackTraceElement> stack) {
+				super(cause);
+				setStackTrace(stack.toArray(new StackTraceElement[stack.size()]));
 			}
 		}
 	}
