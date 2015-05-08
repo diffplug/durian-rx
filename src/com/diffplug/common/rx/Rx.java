@@ -95,18 +95,12 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		this.onTerminate = onTerminate;
 	}
 
-	private static final Consumer<Optional<Throwable>> logErrors = error -> {
-		if (error.isPresent()) {
-			ErrorHandler.log().handle(error.get());
-		}
-	};
-
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever a value is received.
 	 * Any errors are sent to ErrorHandler.log().
 	 */
 	public static <T> Rx<T> onValue(Consumer<T> onValue) {
-		return new Rx<T>(onValue, logErrors);
+		return new Rx<T>(onValue, getOnTerminateUnspecified());
 	}
 
 	/**
@@ -222,7 +216,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		private RxExecutor(Executor executor, Scheduler scheduler) {
 			this.executor = executor;
 			this.scheduler = scheduler;
-			this.tracingPolicy = DurianPlugins.get(RxTracingPolicy.class, RxTracingPolicy.NONE);
+			this.tracingPolicy = getTracingPolicy();
 		}
 
 		public <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> untracedListener) {
@@ -267,4 +261,37 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 			return subscribe(future, Rx.onValue(listener));
 		}
 	}
+
+	/** Plugins for the Rx class. RxTracingPolicy is also available. */
+	public interface Plugins {
+		/** Default onTerminate() implementation used for Rx.onValue(). */
+		public interface OnTerminateUnspecified extends Consumer<Optional<Throwable>> {}
+
+		/** Default behavior of onTerminate is to delegate to ErrorHandler.log(). */
+		static void defaultOnTerminateUnspecified(Optional<Throwable> error) {
+			if (error.isPresent()) {
+				ErrorHandler.log().handle(error.get());
+			}
+		}
+	}
+
+	/** Returns the global implementation of onTerminate. */
+	private static Consumer<Optional<Throwable>> getOnTerminateUnspecified() {
+		if (onTerminateUnspecified == null) {
+			onTerminateUnspecified = DurianPlugins.get(Plugins.OnTerminateUnspecified.class, Plugins::defaultOnTerminateUnspecified);
+		}
+		return onTerminateUnspecified;
+	}
+
+	private static Consumer<Optional<Throwable>> onTerminateUnspecified;
+
+	/** Returns the global tracing policy. */
+	private static RxTracingPolicy getTracingPolicy() {
+		if (tracingPolicy == null) {
+			tracingPolicy = DurianPlugins.get(RxTracingPolicy.class, RxTracingPolicy.NONE);
+		}
+		return tracingPolicy;
+	}
+
+	private static RxTracingPolicy tracingPolicy;
 }
