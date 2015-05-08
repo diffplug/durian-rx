@@ -95,6 +95,7 @@ public class RxSet<T> extends RxValue<ImmutableSet<T>> {
 	/** Functions for dealing with the impedance mismatch between set and optionals. */
 	public static class OnMultiple {
 		private OnMultiple() {}
+
 		/** Throws an exception when ImmutableSet is multiple. */
 		public static <T> Function<ImmutableSet<T>, T> error() {
 			return val -> {
