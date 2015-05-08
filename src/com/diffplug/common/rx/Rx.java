@@ -31,6 +31,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 
 import com.diffplug.common.base.Consumers;
+import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.ErrorHandler;
 
 /**
@@ -144,7 +145,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	// Static versions
 	public static <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> listener) {
-		return observable.subscribe(listener);
+		return sameThread.subscribe(observable, listener);
 	}
 
 	public static <T> Subscription subscribe(Observable<? extends T> observable, Consumer<T> listener) {
@@ -182,7 +183,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		return subscribe(observable, Rx.onValue(listener));
 	}
 
-	private static RxExecutor sameThread = new RxExecutor(MoreExecutors.directExecutor(), Schedulers.immediate());
+	private static final RxExecutor sameThread = new RxExecutor(MoreExecutors.directExecutor(), Schedulers.immediate());
 
 	/**
 	 * Mechanism for specifying a specific Executor.  A corresponding Scheduler will
@@ -216,13 +217,16 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	public static class RxExecutor {
 		private final Executor executor;
 		private final Scheduler scheduler;
+		private final RxTracingPolicy tracingPolicy;
 
 		private RxExecutor(Executor executor, Scheduler scheduler) {
 			this.executor = executor;
 			this.scheduler = scheduler;
+			this.tracingPolicy = DurianPlugins.get(RxTracingPolicy.class, RxTracingPolicy.NONE);
 		}
 
-		public <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> listener) {
+		public <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> untracedListener) {
+			Rx<T> listener = tracingPolicy.hook(observable, untracedListener);
 			return observable.observeOn(scheduler).subscribe(listener);
 		}
 
@@ -238,7 +242,8 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 			return subscribe(observable, Rx.onValue(listener));
 		}
 
-		public <T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> listener) {
+		public <T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> untracedListener) {
+			Rx<T> listener = tracingPolicy.hook(future, untracedListener);
 			// when we're unsubscribed, set the flag to false
 			BooleanSubscription sub = BooleanSubscription.create();
 			// add a callback that guards on whether it is still subscribed
