@@ -19,13 +19,6 @@ repositories {
 	mavenLocal()
 }
 
-////////////
-// GRADLE //
-////////////
-task wrapper(type: Wrapper) {
-	gradleVersion VER_GRADLE
-}
-
 //////////
 // JAVA //
 //////////
