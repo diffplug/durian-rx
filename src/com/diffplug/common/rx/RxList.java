@@ -15,6 +15,8 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.List;
+
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -50,5 +52,15 @@ public class RxList<T> extends RxValue<ImmutableList<T>> {
 	/** Removes all instances of the given element. */
 	public void removeAllInstancesOf(T toRemove) {
 		set(ImmutableUtil.remove(selection, toRemove));
+	}
+
+	/** Removes the element at the given index. */
+	public void remove(int oldIdx, T toRemove) {
+		set(ImmutableUtil.remove(selection, oldIdx, toRemove));
+	}
+
+	/** Sets the list to the given list. */
+	public void set(List<T> newSelection) {
+		super.set(ImmutableList.copyOf(newSelection));
 	}
 }

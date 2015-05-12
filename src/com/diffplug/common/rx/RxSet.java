@@ -16,6 +16,7 @@
 package com.diffplug.common.rx;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSet;
@@ -52,6 +53,11 @@ public class RxSet<T> extends RxValue<ImmutableSet<T>> {
 	/** Removes the given value from the set. */
 	public void remove(T value) {
 		set(ImmutableUtil.remove(get(), value));
+	}
+
+	/** Removes the given value from the set. */
+	public void set(Set<T> value) {
+		super.set(ImmutableSet.copyOf(value));
 	}
 
 	/** Returns a mirror of this Set as an RxOptional. */

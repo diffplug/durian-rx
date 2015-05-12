@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.collect.UnmodifiableListIterator;
 
 public class ImmutableUtil {
 	/** Returns an ImmutableList which has had the given elements removed. */
@@ -45,9 +46,25 @@ public class ImmutableUtil {
 		return ImmutableList.copyOf(result);
 	}
 
-	/** Returns an ImmutableList which has had the given elements removed. */
+	/** Returns an ImmutableList which has had all instances of the given object removed. */
 	public static <T> ImmutableList<T> remove(ImmutableList<T> source, T toRemove) {
 		return remove(source, Collections.singleton(toRemove));
+	}
+
+	/** Returns an ImmutableList which has had all instances of the given object removed. */
+	public static <T> ImmutableList<T> remove(ImmutableList<T> source, int idx, T toRemove) {
+		List<T> result = Lists.newArrayListWithCapacity(source.size() - 1);
+		UnmodifiableListIterator<T> iterator = source.listIterator();
+		while (iterator.hasNext()) {
+			T next = iterator.next();
+			if (iterator.previousIndex() == idx) {
+				// if it's the one we're supposed to remove, make sure that it actually was
+				Preconditions.checkArgument(next == toRemove, "Was going to remove %s, but was %s.", toRemove, next);
+			} else {
+				result.add(next);
+			}
+		}
+		return ImmutableList.copyOf(result);
 	}
 
 	/** Returns an ImmutableList which has had the given index replaced with the given value. */
@@ -60,13 +77,18 @@ public class ImmutableUtil {
 	/** Returns an ImmutableList which has added the given value to the end. */
 	public static <T> ImmutableList<T> add(ImmutableList<T> input, int idx, T newValue) {
 		List<T> list = Lists.newArrayListWithCapacity(input.size() + 1);
-		for (int i = 0; i < input.size(); ++i) {
-			// add the new value at the appropriate time
-			if (i == idx) {
-				list.add(newValue);
+		if (idx < input.size()) {
+			for (int i = 0; i < input.size(); ++i) {
+				// add the new value at the appropriate time
+				if (i == idx) {
+					list.add(newValue);
+				}
+				// and add the rest when its their turn
+				list.add(input.get(i));
 			}
-			// and add the rest when its their turn
-			list.add(input.get(i));
+		} else {
+			list.addAll(input);
+			list.add(newValue);
 		}
 		return ImmutableList.copyOf(list);
 	}
