@@ -32,7 +32,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 
 import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.DurianPlugins;
-import com.diffplug.common.base.ErrorHandler;
+import com.diffplug.common.base.Errors;
 
 /**
  * Rx is a class which unifies the listener models of rx.Observable
@@ -105,7 +105,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	private static final Consumer<Optional<Throwable>> logErrors = error -> {
 		if (error.isPresent()) {
-			ErrorHandler.log().handle(error.get());
+			Errors.log().handle(error.get());
 		}
 	};
 

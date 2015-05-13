@@ -18,7 +18,7 @@ package com.diffplug.common.rx;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-import com.diffplug.common.base.ErrorHandler;
+import com.diffplug.common.base.Errors;
 import com.diffplug.common.base.StackDumper;
 
 /**
@@ -67,7 +67,7 @@ public interface RxTracingPolicy {
 					if (error.isPresent()) {
 						// if there is an error, wrap it in a SubscriptionException and log it
 						SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
-						ErrorHandler.log().handle(subException);
+						Errors.log().handle(subException);
 						// prevent double-logging
 						if (!listener.isLogging()) {
 							listener.onError(subException);
