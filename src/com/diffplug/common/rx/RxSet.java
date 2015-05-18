@@ -108,11 +108,11 @@ public class RxSet<T> extends RxValue<ImmutableSet<T>> {
 
 	/** Mutates this set. */
 	public void mutate(Consumer<Set<T>> mutator) {
-		set(ImmutableUtil.mutate(get(), mutator));
+		set(ImmutableMutate.set(get(), mutator));
 	}
 
 	/** Mutates this set. */
 	public <R> R mutateAndReturn(Function<Set<T>, R> mutator) {
-		return ImmutableUtil.mutateAndReturnSet(this, mutator);
+		return ImmutableMutate.setAndReturn(this, mutator);
 	}
 }

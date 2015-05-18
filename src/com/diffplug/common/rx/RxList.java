@@ -48,11 +48,11 @@ public class RxList<T> extends RxValue<ImmutableList<T>> {
 
 	/** Mutates this set. */
 	public void mutate(Consumer<List<T>> mutator) {
-		set(ImmutableUtil.mutate(get(), mutator));
+		set(ImmutableMutate.list(get(), mutator));
 	}
 
 	/** Mutates this set. */
 	public <R> R mutateAndReturn(Function<List<T>, R> mutator) {
-		return ImmutableUtil.mutateAndReturnList(this, mutator);
+		return ImmutableMutate.listAndReturn(this, mutator);
 	}
 }
