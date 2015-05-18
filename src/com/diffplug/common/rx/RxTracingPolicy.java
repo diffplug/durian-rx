@@ -84,7 +84,7 @@ public interface RxTracingPolicy {
 		/** An Exception which has the stack trace of the Rx.subscription() call which created the subscription in which the cause was thrown. */
 		static class SubscriptionException extends Exception {
 			private static final long serialVersionUID = -265762944158637711L;
-			
+
 			public SubscriptionException(Throwable cause, List<StackTraceElement> stack) {
 				super(cause);
 				setStackTrace(stack.toArray(new StackTraceElement[stack.size()]));

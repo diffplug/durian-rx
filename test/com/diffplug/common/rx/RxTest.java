@@ -56,8 +56,7 @@ public class RxTest {
 	}
 
 	/** Hypothetical API: Subscribes the observer to the observable on the executor. */
-	private static <T> Subscription addObserver(Observable<T> observable, Observer<? super T> observer,
-			Executor executor) {
+	private static <T> Subscription addObserver(Observable<T> observable, Observer<? super T> observer, Executor executor) {
 		return observable.observeOn(Schedulers.from(executor)).subscribe(observer);
 	}
 

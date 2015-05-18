@@ -101,8 +101,7 @@ public class RxAndListenableFutureSemantics {
 		private final Box<T> value;
 		private final Box<Optional<Throwable>> terminal;
 
-		private RxAsserter(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminal,
-				Box<T> value, Box<Optional<Throwable>> terminal) {
+		private RxAsserter(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminal, Box<T> value, Box<Optional<Throwable>> terminal) {
 			super(onValue, onTerminal);
 			this.value = value;
 			this.terminal = terminal;
