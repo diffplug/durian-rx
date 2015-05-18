@@ -48,11 +48,11 @@ public class RxMap<K, V> extends RxValue<ImmutableMap<K, V>> {
 
 	/** Mutates this map. */
 	public void mutate(Consumer<Map<K, V>> mutator) {
-		super.set(ImmutableMutate.map(get(), mutator));
+		super.set(Immutable.mutateMap(get(), mutator));
 	}
 
 	/** Mutates this map, and returns a value. */
 	public <R> R mutateAndReturn(Function<Map<K, V>, R> mutator) {
-		return ImmutableMutate.mapAndReturn(this, mutator);
+		return Immutable.mutateMapAndReturn(this, mutator);
 	}
 }

@@ -134,11 +134,11 @@ public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
 
 	/** Mutates this set. */
 	public void mutate(Consumer<List<T>> mutator) {
-		set(ImmutableMutate.list(get(), mutator));
+		set(Immutable.mutateList(get(), mutator));
 	}
 
 	/** Mutates this set. */
 	public <R> R mutateAndReturn(Function<List<T>, R> mutator) {
-		return ImmutableMutate.listAndReturn(this, mutator);
+		return Immutable.mutateListAndReturn(this, mutator);
 	}
 }
