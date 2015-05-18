@@ -30,7 +30,8 @@ import com.google.common.collect.Sets;
 
 import com.diffplug.common.base.GetterSetter;
 
-public class Immutable {
+/** Utilties for manipulating Guava's immutable collections. */
+public class Immutables {
 	/** Returns a mutated version of the given set. */
 	public static <T> ImmutableSet<T> mutateSet(ImmutableSet<T> source, Consumer<Set<T>> mutator) {
 		Set<T> mutable = Sets.newHashSet(source);
