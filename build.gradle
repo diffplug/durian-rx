@@ -1,7 +1,6 @@
 buildscript {
 	repositories {
 		jcenter()
-		mavenLocal()
 	}
 	dependencies {
 		// applies the Eclipse java formatter
@@ -16,7 +15,6 @@ buildscript {
 
 repositories {
 	jcenter()
-	mavenLocal()
 }
 
 //////////
@@ -76,9 +74,9 @@ tasks.eclipse.dependsOn(cleanEclipse)
 apply plugin: 'com.diffplug.gradle.spotless'
 spotless {
 	java {
-		licenseHeaderFile	'spotless.license.java'				// License header file
-		importOrderFile		'spotless.importorder.properties'	// An import ordering file, exported from Eclipse
-		eclipseFormatFile	'spotless.eclipseformat.xml'		// XML file dumped out by the Eclipse formatter
+		licenseHeaderFile	'spotless.license.java'			// License header file
+		importOrderFile		'spotless.importorder'			// An import ordering file, exported from Eclipse
+		eclipseFormatFile	'spotless.eclipseformat.xml'	// XML file dumped out by the Eclipse formatter
 		// Eclipse formatter puts excess whitespace after lambda blocks
 		//    funcThatTakesLambdas(x -> {} , y -> {} )	// what Eclipse does
 		//    funcThatTakesLambdas(x -> {}, y -> {})	// what I wish Eclipse did
@@ -88,6 +86,7 @@ spotless {
 		target '**/*.gradle', '**/*.md', '**/.gitignore'
 		indentWithTabs()
 		trimTrailingWhitespace()
+		endWithNewline()
 	}
 }
 
@@ -111,9 +110,10 @@ tasks.withType(FindBugs) {
 		html.enabled = true
 	}
 }
-// we'll want the findbugs annotations
+// we'll want the findbugs annotations (they don't have a 3.0.1 version)
 dependencies {
-	compile "com.google.code.findbugs:annotations:${VER_FINDBUGS}"
+	compile 'com.google.code.findbugs:annotations:3.0.0'
+	compile 'com.google.code.findbugs:jsr305:3.0.0'
 }
 
 ///////////
@@ -145,6 +145,36 @@ publishing {
 			from components.java
 			artifact sourcesJar
 			artifact javadocJar
+			pom.withXml {
+				// findbugs annotations should have scope "provided"
+				asNode().dependencies.'*'.findAll() { it.groupId.text() == 'com.google.code.findbugs' }.each() { it.scope*.value = 'provided' }
+				// add MavenCentral requirements to the POM
+				asNode().children().last() + {
+					resolveStrategy = Closure.DELEGATE_FIRST
+					name project.name
+					description project.description
+					url "https://github.com/${org}/${name}"
+					scm {
+						url "https://github.com/${org}/${name}"
+						connection "scm:git:git://github.com/${org}/${name}"
+						developerConnection "scm:git:ssh:git@github.com/${org}/${name}"
+					}
+					licenses {
+						license {
+							name 'The Apache Software License, Version 2.0'
+							url 'http://www.apache.org/license/LICENSE-2.0.txt'
+							distribution 'repo'
+						}
+					}
+					developers {
+						developer {
+							id 'nedtwigg'
+							name 'Ned Twigg'
+							email 'ned.twigg@diffplug.com'
+						}
+					}
+				}
+			}
 		}
 	}
 	if (project.hasProperty('dp_maven')) {
