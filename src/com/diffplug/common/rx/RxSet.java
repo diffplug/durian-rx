@@ -15,10 +15,9 @@
  */
 package com.diffplug.common.rx;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSet;
@@ -31,7 +30,7 @@ import com.diffplug.common.base.Unhandled;
  * convenience methods for modifying and observing the set,
  * as well as for converting it into an RxValue<Optional<T>>.
  */
-public class RxSet<T> extends RxValue<ImmutableSet<T>> implements Set<T> {
+public class RxSet<T> extends RxValue<ImmutableSet<T>> {
 	/** Creates an RxSet with an initially empty value. */
 	public static <T> RxSet<T> ofEmpty() {
 		return of(ImmutableSet.of());
@@ -107,104 +106,13 @@ public class RxSet<T> extends RxValue<ImmutableSet<T>> implements Set<T> {
 		}
 	}
 
-	////////////////////////
-	// Set implementation //
-	////////////////////////
-	@Override
-	public boolean add(T element) {
-		ImmutableSet<T> value = super.get();
-		if (value.contains(element)) {
-			return false;
-		} else {
-			super.set(ImmutableUtil.add(value, element));
-			return true;
-		}
+	/** Mutates this set. */
+	public void mutate(Consumer<Set<T>> mutator) {
+		set(ImmutableUtil.mutate(get(), mutator));
 	}
 
-	@Override
-	public boolean addAll(Collection<? extends T> collection) {
-		ImmutableSet<T> value = super.get();
-		ImmutableSet<T> newValue = ImmutableUtil.addAll(value, collection);
-		if (value.size() == newValue.size()) {
-			return false;
-		} else {
-			super.set(newValue);
-			return true;
-		}
-	}
-
-	@Override
-	public void clear() {
-		super.set(ImmutableSet.of());
-	}
-
-	@Override
-	public boolean contains(Object object) {
-		return super.get().contains(object);
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> collection) {
-		return super.get().containsAll(collection);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return get().isEmpty();
-	}
-
-	@Override
-	public Iterator<T> iterator() {
-		return get().iterator();
-	}
-
-	@Override
-	public boolean remove(Object object) {
-		ImmutableSet<T> value = super.get();
-		if (value.contains(object)) {
-			super.set(ImmutableUtil.remove(value, object));
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> collection) {
-		ImmutableSet<T> value = super.get();
-		ImmutableSet<T> newValue = ImmutableUtil.removeAll(value, collection);
-		if (value.size() == newValue.size()) {
-			return false;
-		} else {
-			super.set(newValue);
-			return true;
-		}
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> collection) {
-		ImmutableSet<T> value = super.get();
-		ImmutableSet<T> newValue = ImmutableUtil.retainAll(value, collection);
-		if (value.size() == newValue.size()) {
-			return false;
-		} else {
-			super.set(newValue);
-			return true;
-		}
-	}
-
-	@Override
-	public int size() {
-		return get().size();
-	}
-
-	@Override
-	public Object[] toArray() {
-		return get().toArray();
-	}
-
-	@Override
-	public <R> R[] toArray(R[] array) {
-		return get().toArray(array);
+	/** Mutates this set. */
+	public <R> R mutateAndReturn(Function<Set<T>, R> mutator) {
+		return ImmutableUtil.mutateAndReturnSet(this, mutator);
 	}
 }

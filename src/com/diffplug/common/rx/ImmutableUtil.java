@@ -34,17 +34,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableListIterator;
 
+import com.diffplug.common.base.GetterSetter;
+
 public class ImmutableUtil {
 	//////////////////////
 	// Generic mutators //
 	//////////////////////
-	/** Returns a mutated version of the given list. */
-	public static <T> ImmutableList<T> mutate(ImmutableList<T> source, Consumer<List<T>> mutator) {
-		List<T> mutable = Lists.newArrayList(source);
-		mutator.accept(mutable);
-		return ImmutableList.copyOf(mutable);
-	}
-
 	/** Returns a mutated version of the given set. */
 	public static <T> ImmutableSet<T> mutate(ImmutableSet<T> source, Consumer<Set<T>> mutator) {
 		Set<T> mutable = Sets.newHashSet(source);
@@ -52,11 +47,42 @@ public class ImmutableUtil {
 		return ImmutableSet.copyOf(mutable);
 	}
 
+	/** Returns a mutated version of the given list. */
+	public static <T> ImmutableList<T> mutate(ImmutableList<T> source, Consumer<List<T>> mutator) {
+		List<T> mutable = Lists.newArrayList(source);
+		mutator.accept(mutable);
+		return ImmutableList.copyOf(mutable);
+	}
+
 	/** Returns a mutated version of the given map. */
 	public static <K, V> ImmutableMap<K, V> mutate(ImmutableMap<K, V> source, Consumer<Map<K, V>> mutator) {
 		Map<K, V> mutable = Maps.newHashMap(source);
 		mutator.accept(mutable);
 		return ImmutableMap.copyOf(mutable);
+	}
+
+	/** Mutates the given set and returns a value. */
+	public static <T, R> R mutateAndReturnSet(GetterSetter<ImmutableSet<T>> value, Function<Set<T>, R> mutator) {
+		Set<T> mutable = Sets.newHashSet(value.get());
+		R returnValue = mutator.apply(mutable);
+		value.set(ImmutableSet.copyOf(mutable));
+		return returnValue;
+	}
+
+	/** Mutates the given list and returns a value. */
+	public static <T, R> R mutateAndReturnList(GetterSetter<ImmutableList<T>> value, Function<List<T>, R> mutator) {
+		List<T> mutable = Lists.newArrayList(value.get());
+		R returnValue = mutator.apply(mutable);
+		value.set(ImmutableList.copyOf(mutable));
+		return returnValue;
+	}
+
+	/** Mutates the given map and returns a value. */
+	public static <K, V, R> R mutateAndReturnMap(GetterSetter<ImmutableMap<K, V>> value, Function<Map<K, V>, R> mutator) {
+		Map<K, V> mutable = Maps.newHashMap(value.get());
+		R returnValue =  mutator.apply(mutable);
+		value.set(ImmutableMap.copyOf(mutable));
+		return returnValue;
 	}
 
 	/////////

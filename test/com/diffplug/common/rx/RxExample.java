@@ -21,7 +21,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -86,18 +85,20 @@ public class RxExample extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					rxMouseOver.get().ifPresent(cell -> {
-						Set<Integer> currentSelection = rxSelection.get();
-						if (e.isControlDown()) {
-							// control => toggle mouseOver item in selection
-							if (currentSelection.contains(cell)) {
-								rxSelection.remove(cell);
+						rxSelection.mutate(selection -> {
+							if (e.isControlDown()) {
+								// control => toggle mouseOver item in selection
+								if (selection.contains(cell)) {
+									selection.remove(cell);
+								} else {
+									selection.add(cell);
+								}
 							} else {
-								rxSelection.add(cell);
+								// no control => set selection to mouseOver
+								selection.clear();
+								selection.add(cell);
 							}
-						} else {
-							// no control => set selection to mouseOver
-							rxSelection.set(Collections.singleton(cell));
-						}
+						});
 					});
 				}
 			});

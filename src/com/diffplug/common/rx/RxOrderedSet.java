@@ -17,6 +17,8 @@ package com.diffplug.common.rx;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -49,7 +51,7 @@ public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
 
 	/** Initally holds the given collection. */
 	protected RxOrderedSet(ImmutableList<T> initial, OnDuplicate duplicatePolicy) {
-		super(filter(initial, Maps.newHashMap(), duplicatePolicy));
+		super(filter(initial, duplicatePolicy));
 		this.policy = duplicatePolicy;
 	}
 
@@ -58,8 +60,10 @@ public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
 	/** Policies for disallowing duplicates. */
 	public enum OnDuplicate {
 		/** Throws an error when a duplicate is encountered. */
-		ERROR, /** Resolve duplicates by taking the first duplicate in the list. */
-		TAKE_FIRST, /** Resolve duplicates by taking the last duplicate in the list. */
+		ERROR,
+		/** Resolve duplicates by taking the first duplicate in the list. */
+		TAKE_FIRST,
+		/** Resolve duplicates by taking the last duplicate in the list. */
 		TAKE_LAST
 	}
 
@@ -74,7 +78,7 @@ public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
 		Preconditions.checkNotNull(newSelection);
 		if (!selection.equals(newSelection)) {
 			// the selection changed, so we will check it for duplicates
-			newSelection = filter(newSelection, indexToTake, policy);
+			newSelection = filter(newSelection, policy);
 			// if it's still different than we expect...
 			if (!selection.equals(newSelection)) {
 				this.selection = newSelection;
@@ -83,10 +87,9 @@ public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
 		}
 	}
 
-	/** Reusable map of indices that we're going to keep (for the case that we have duplicates). */
-	private Map<T, Integer> indexToTake = Maps.newHashMap();
+	private static <T> ImmutableList<T> filter(ImmutableList<T> newList, OnDuplicate policy) {
+		Map<T, Integer> indexToTake = Maps.newHashMap();
 
-	private static <T> ImmutableList<T> filter(ImmutableList<T> newList, Map<T, Integer> indexToTake, OnDuplicate policy) {
 		// put all of the new values into the newList
 		boolean hasDuplicate = false;
 		indexToTake.clear();
@@ -129,18 +132,13 @@ public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
 		}
 	}
 
-	/** Adds the given element at the given index. */
-	public void add(int idx, T element) {
-		set(ImmutableUtil.noDuplicatesAdd(selection, idx, element));
+	/** Mutates this set. */
+	public void mutate(Consumer<List<T>> mutator) {
+		set(ImmutableUtil.mutate(get(), mutator));
 	}
 
-	/** Adds the given element at the end. */
-	public void add(T element) {
-		add(selection.size(), element);
-	}
-
-	/** Removes the given element. */
-	public void remove(T toRemove) {
-		set(ImmutableUtil.remove(selection, toRemove));
+	/** Mutates this set. */
+	public <R> R mutateAndReturn(Function<List<T>, R> mutator) {
+		return ImmutableUtil.mutateAndReturnList(this, mutator);
 	}
 }
