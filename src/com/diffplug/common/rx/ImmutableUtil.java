@@ -18,21 +18,115 @@ package com.diffplug.common.rx;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableListIterator;
 
 public class ImmutableUtil {
-	/** Returns an ImmutableList which has had the given elements removed. */
-	public static <T> ImmutableList<T> filter(ImmutableList<T> source, Predicate<T> predicate) {
-		return ImmutableList.copyOf(Collections2.filter(source, predicate::test));
+	//////////////////////
+	// Generic mutators //
+	//////////////////////
+	/** Returns a mutated version of the given list. */
+	public static <T> ImmutableList<T> mutate(ImmutableList<T> source, Consumer<List<T>> mutator) {
+		List<T> mutable = Lists.newArrayList(source);
+		mutator.accept(mutable);
+		return ImmutableList.copyOf(mutable);
+	}
+
+	/** Returns a mutated version of the given set. */
+	public static <T> ImmutableSet<T> mutate(ImmutableSet<T> source, Consumer<Set<T>> mutator) {
+		Set<T> mutable = Sets.newHashSet(source);
+		mutator.accept(mutable);
+		return ImmutableSet.copyOf(mutable);
+	}
+
+	/** Returns a mutated version of the given map. */
+	public static <K, V> ImmutableMap<K, V> mutate(ImmutableMap<K, V> source, Consumer<Map<K, V>> mutator) {
+		Map<K, V> mutable = Maps.newHashMap(source);
+		mutator.accept(mutable);
+		return ImmutableMap.copyOf(mutable);
+	}
+
+	/////////
+	// Set //
+	/////////
+	/** Returns an ImmutableSet which has added the given value. */
+	public static <T> ImmutableSet<T> add(ImmutableSet<T> input, T newValue) {
+		return mutate(input, set -> set.add(newValue));
+	}
+
+	/** Returns an ImmutableSet which has added the given values. */
+	public static <T> ImmutableSet<T> addAll(ImmutableSet<T> input, Collection<? extends T> collection) {
+		return mutate(input, set -> set.addAll(collection));
+	}
+
+	/** Returns an ImmutableSet which has removed the given value. */
+	public static <T> ImmutableSet<T> remove(ImmutableSet<T> input, Object object) {
+		return mutate(input, set -> set.remove(object));
+	}
+
+	/** Returns an ImmutableSet which has removed the given value. */
+	public static <T> ImmutableSet<T> removeAll(ImmutableSet<T> input, Collection<?> toRemove) {
+		return mutate(input, set -> set.removeAll(toRemove));
+	}
+
+	/** Returns an ImmutableSet which has removed the given value. */
+	public static <T> ImmutableSet<T> retainAll(ImmutableSet<T> input, Collection<?> toRemove) {
+		return mutate(input, set -> set.retainAll(toRemove));
+	}
+
+	//////////
+	// List //
+	//////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	/** Returns a mutated version of the given list. */
+	public static <T> ImmutableList<T> filter(ImmutableList<T> source, Predicate<T> filter) {
+		List<T> mutable = Lists.newArrayListWithCapacity(source.size());
+		filterInternal(source, mutable, filter);
+		return ImmutableList.copyOf(mutable);
+	}
+
+	/** Returns a mutated version of the given set. */
+	public static <T> ImmutableSet<T> filter(ImmutableSet<T> source, Predicate<T> filter) {
+		Set<T> mutable = Sets.newHashSetWithExpectedSize(source.size());
+		filterInternal(source, mutable, filter);
+		return ImmutableSet.copyOf(mutable);
+	}
+
+	/** Adds each element in source which passes the filter to mutable. */
+	private static <T> void filterInternal(ImmutableCollection<T> source, Collection<T> mutable, Predicate<T> filter) {
+		for (T e : source) {
+			if (filter.test(e)) {
+				mutable.add(e);
+			}
+		}
 	}
 
 	/** Returns an ImmutableList which has had the given elements removed. */
@@ -44,6 +138,12 @@ public class ImmutableUtil {
 			}
 		}
 		return ImmutableList.copyOf(result);
+	}
+
+	public static <T> ImmutableSet<T> remove(ImmutableSet<T> source, Collection<T> toRemove) {
+		Set<T> set = Sets.newHashSet(source);
+		set.removeAll(toRemove);
+		return ImmutableSet.copyOf(set);
 	}
 
 	/** Returns an ImmutableList which has had all instances of the given object removed. */
@@ -91,20 +191,6 @@ public class ImmutableUtil {
 			list.add(newValue);
 		}
 		return ImmutableList.copyOf(list);
-	}
-
-	/** Returns an ImmutableList which has added the given value to the end. */
-	public static <T> ImmutableSet<T> add(ImmutableSet<T> input, T newValue) {
-		Set<T> mutable = Sets.newHashSet(input);
-		mutable.add(newValue);
-		return ImmutableSet.copyOf(mutable);
-	}
-
-	/** Returns an ImmutableList which has added the given value to the end. */
-	public static <T> ImmutableSet<T> remove(ImmutableSet<T> input, T newValue) {
-		Set<T> mutable = Sets.newHashSet(input);
-		mutable.remove(newValue);
-		return ImmutableSet.copyOf(mutable);
 	}
 
 	/** Adds the given element to the end, ensuring that there are no duplicate entries. */
