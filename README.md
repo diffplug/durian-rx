@@ -58,7 +58,7 @@ public void mouseClicked(MouseEvent e) {
 ...
 
 Rx.subscribe(rxSelection, set -> {
-	// take some action in response to 
+	// take some action in response to
 	// selection change
 });
 ```

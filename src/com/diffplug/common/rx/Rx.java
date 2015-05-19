@@ -33,7 +33,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**

@@ -57,6 +57,7 @@ public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
 
 	private final OnDuplicate policy;
 
+	// @formatter:off
 	/** Policies for disallowing duplicates. */
 	public enum OnDuplicate {
 		/** Throws an error when a duplicate is encountered. */
@@ -66,6 +67,7 @@ public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
 		/** Resolve duplicates by taking the last duplicate in the list. */
 		TAKE_LAST
 	}
+	// @formatter:on
 
 	/** Returns the duplicate policy for this RxList. */
 	public OnDuplicate getDuplicatePolicy() {

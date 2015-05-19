@@ -20,7 +20,6 @@ import java.util.function.BiPredicate;
 
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.base.StackDumper;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**

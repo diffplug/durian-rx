@@ -32,7 +32,7 @@ public class RxMap<K, V> extends RxValue<ImmutableMap<K, V>> {
 	}
 
 	/** Creates an RxMap with the given initial value. */
-	public static <K, V> RxMap<K, V>of(Map<K, V> initial) {
+	public static <K, V> RxMap<K, V> of(Map<K, V> initial) {
 		return new RxMap<K, V>(ImmutableMap.copyOf(initial));
 	}
 

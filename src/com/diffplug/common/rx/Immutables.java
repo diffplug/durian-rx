@@ -72,7 +72,7 @@ public class Immutables {
 	/** Mutates the given map and returns a value. */
 	public static <K, V, R> R mutateMapAndReturn(GetterSetter<ImmutableMap<K, V>> value, Function<Map<K, V>, R> mutator) {
 		Map<K, V> mutable = Maps.newHashMap(value.get());
-		R returnValue =  mutator.apply(mutable);
+		R returnValue = mutator.apply(mutable);
 		value.set(ImmutableMap.copyOf(mutable));
 		return returnValue;
 	}
