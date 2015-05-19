@@ -15,10 +15,13 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import rx.Observable;
+
+import com.diffplug.common.base.Box;
 
 /** 
  * Represents a value which can be accessed through a traditional
@@ -62,5 +65,30 @@ public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 				return mapper.apply(src.get());
 			}
 		};
+	}
+
+	/** Creates an RxGetter from the given observable and initial value. */
+	public static <T> RxGetter<T> from(Observable<T> observableUnfilters, T initialValue) {
+		Observable<T> observable = observableUnfilters.distinctUntilChanged();
+
+		Box<T> box = Box.of(initialValue);
+		Rx.subscribe(observable, box::set);
+		return new RxGetter<T>() {
+			@Override
+			public Observable<T> asObservable() {
+				return observable;
+			}
+
+			@Override
+			public T get() {
+				return box.get();
+			}
+		};
+	}
+
+	/** Creates an RxGetter from the given observable and initial value. */
+	public static <T1, T2, R> RxGetter<R> combineLatest(RxGetter<? extends T1> t, RxGetter<? extends T2> u, BiFunction<? super T1, ? super T2, ? extends R> combine) {
+		Observable<R> result = Observable.combineLatest(t.asObservable(), u.asObservable(), combine::apply);
+		return from(result, combine.apply(t.get(), u.get()));
 	}
 }
