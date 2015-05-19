@@ -21,6 +21,8 @@ import java.util.function.BiPredicate;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.base.StackDumper;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Interface which gets called for every subscription through the Rx mechanism, allowing various kinds of tracing.
  * 
@@ -56,6 +58,7 @@ public interface RxTracingPolicy {
 	 */
 	public static class LogSubscriptionTrace implements RxTracingPolicy {
 		/** The BiPredicate which determines which subscriptions should be logged.  By default, any Rx which is logging will be logged. */
+		@SuppressFBWarnings(value = "MS_SHOULD_BE_FINAL", justification = "This is public on purpose, and is only functional in a debug mode.")
 		public static BiPredicate<Object, Rx<?>> shouldLog = (observable, listener) -> listener.isLogging();
 
 		@Override

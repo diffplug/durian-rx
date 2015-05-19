@@ -34,6 +34,8 @@ import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Rx is a class which unifies the listener models of rx.Observable
  * with com.google.common.util.concurrent.ListenableFuture.
@@ -86,7 +88,7 @@ import com.diffplug.common.base.Errors;
  * the Scheduler manually, you can use Rx.on(someExecutor, someScheduler), or you can
  * create an executor which implements Rx.HasRxExecutor.
  */
-public class Rx<T> implements Observer<T>, FutureCallback<T> {
+public final class Rx<T> implements Observer<T>, FutureCallback<T> {
 	private final Consumer<T> onValue;
 	private final Consumer<Optional<Throwable>> onTerminate;
 
@@ -295,7 +297,15 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		}
 	}
 
+	@SuppressFBWarnings(value = "LI_LAZY_INIT_STATIC", justification = "This race condition is fine, as explained in the comment below.")
 	private static RxExecutor getSameThreadExecutor() {
+		// There is an acceptable race condition here - _sameThread might get set multiple times.
+		// This would happen if multiple threads called blocking() at the same time
+		// during initialization, and this is likely to actually happen in practice.
+		//
+		// It is important for this method to be fast, so it's better to accept
+		// that getSameThreadExecutor() might return different instances (which each have the
+		// same behavior), rather than to incur the cost of some type of synchronization.
 		if (_sameThread == null) {
 			_sameThread = new RxExecutor(MoreExecutors.directExecutor(), Schedulers.immediate());
 		}
@@ -305,7 +315,9 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	private static RxExecutor _sameThread;
 
 	/** Returns the global tracing policy. */
+	@SuppressFBWarnings(value = "LI_LAZY_INIT_STATIC", justification = "This race condition is fine, as explained in the comment below.")
 	private static RxTracingPolicy getTracingPolicy() {
+		// There is an acceptable race condition here - see getSameThreadExecutor()
 		if (_tracingPolicy == null) {
 			_tracingPolicy = DurianPlugins.get(RxTracingPolicy.class, RxTracingPolicy.NONE);
 		}
