@@ -87,7 +87,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * the Scheduler manually, you can use Rx.on(someExecutor, someScheduler), or you can
  * create an executor which implements Rx.HasRxExecutor.
  */
-public final class Rx<T> implements Observer<T>, FutureCallback<T> {
+public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	private final Consumer<T> onValue;
 	private final Consumer<Optional<Throwable>> onTerminate;
 
