@@ -19,15 +19,12 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-
-import com.diffplug.common.base.Unhandled;
 
 /**
  * An extension of RxValue<Optional<T>>, with convenience
  * methods for converting it to an RxSet<T>.
  */
-public class RxOptional<T> extends RxValue<Optional<T>> {
+public class RxOptional<T> extends RxValue.Default<Optional<T>> {
 	/** Returns an empty RxOptional. */
 	public static <T> RxOptional<T> ofEmpty() {
 		return new RxOptional<T>(Optional.empty());
@@ -44,32 +41,7 @@ public class RxOptional<T> extends RxValue<Optional<T>> {
 	}
 
 	/** Returns a mirror of this RxOptional as an RxSet. */
-	public RxSet<T> asSet(Function<ImmutableSet<T>, T> onMultiple) {
-		RxSet<T> asSet = new RxSet<T>(setFromOptional(get())) {
-			@Override
-			public void set(ImmutableSet<T> selection) {
-				if (selection.size() == 0) {
-					RxOptional.this.set(Optional.empty());
-				} else if (selection.size() == 1) {
-					RxOptional.this.set(Optional.of(Iterables.getOnlyElement(selection)));
-				} else if (selection.size() > 1) {
-					RxOptional.this.set(Optional.of(onMultiple.apply(selection)));
-				} else {
-					throw Unhandled.integerException(selection.size());
-				}
-			}
-		};
-		asObservable().subscribe(val -> {
-			asSet.set(setFromOptional(val));
-		});
-		return asSet;
-	}
-
-	private static <T> ImmutableSet<T> setFromOptional(Optional<T> selection) {
-		if (selection.isPresent()) {
-			return ImmutableSet.of(selection.get());
-		} else {
-			return ImmutableSet.of();
-		}
+	public RxValue<ImmutableSet<T>> asSet(Function<ImmutableSet<T>, T> onMultiple) {
+		return RxConversions.asSet(this, onMultiple);
 	}
 }

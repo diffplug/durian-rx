@@ -21,16 +21,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-
-import com.diffplug.common.base.Unhandled;
 
 /** 
  * An extension of RxValue<ImmutableSet<T>>, with
  * convenience methods for modifying and observing the set,
  * as well as for converting it into an RxValue<Optional<T>>.
  */
-public class RxSet<T> extends RxValue<ImmutableSet<T>> {
+public class RxSet<T> extends RxValue.Default<ImmutableSet<T>> {
 	/** Creates an RxSet with an initially empty value. */
 	public static <T> RxSet<T> ofEmpty() {
 		return of(ImmutableSet.of());
@@ -52,58 +49,8 @@ public class RxSet<T> extends RxValue<ImmutableSet<T>> {
 	}
 
 	/** Returns a mirror of this Set as an RxOptional. */
-	public RxOptional<T> asOptional(Function<ImmutableSet<T>, T> onMultiple) {
-		RxOptional<T> optional = new RxOptional<T>(optionalFromSet(get(), onMultiple)) {
-			@Override
-			public void set(Optional<T> t) {
-				if (t.isPresent()) {
-					RxSet.this.set(ImmutableSet.of(t.get()));
-				} else {
-					RxSet.this.set(ImmutableSet.of());
-				}
-			}
-
-			@Override
-			public Optional<T> get() {
-				return optionalFromSet(RxSet.this.get(), onMultiple);
-			}
-		};
-
-		asObservable().subscribe(val -> {
-			optional.set(optionalFromSet(val, onMultiple));
-		});
-
-		return optional;
-	}
-
-	/** Convenience method for turning an optional into a set. */
-	private static <T> Optional<T> optionalFromSet(ImmutableSet<T> set, Function<ImmutableSet<T>, T> mode) {
-		if (set.size() == 0) {
-			return Optional.empty();
-		} else if (set.size() == 1) {
-			return Optional.of(Iterables.getOnlyElement(set));
-		} else if (set.size() > 1) {
-			return Optional.of(mode.apply(set));
-		} else {
-			throw Unhandled.integerException(set.size());
-		}
-	}
-
-	/** Functions for dealing with the impedance mismatch between set and optionals. */
-	public static class OnMultiple {
-		private OnMultiple() {}
-
-		/** Throws an exception when ImmutableSet is multiple. */
-		public static <T> Function<ImmutableSet<T>, T> error() {
-			return val -> {
-				throw new IllegalArgumentException();
-			};
-		}
-
-		/** Throws an exception when ImmutableSet is multiple. */
-		public static <T> Function<ImmutableSet<T>, T> takeFirst() {
-			return val -> val.asList().get(0);
-		}
+	public RxValue<Optional<T>> asOptional(Function<ImmutableSet<T>, T> onMultiple) {
+		return RxConversions.asOptional(this, onMultiple);
 	}
 
 	/** Mutates this set. */

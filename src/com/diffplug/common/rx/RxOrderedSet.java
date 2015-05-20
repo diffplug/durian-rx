@@ -28,7 +28,7 @@ import com.google.common.collect.Maps;
 import com.diffplug.common.base.Unhandled;
 
 /** An RxList which guarantees to never have any duplicates. */
-public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
+public class RxOrderedSet<T> extends RxValue.Default<ImmutableList<T>>implements RxValue<ImmutableList<T>> {
 	/** Creates an RxList with an initially empty value. */
 	public static <T> RxOrderedSet<T> ofEmpty() {
 		return of(ImmutableList.of());
@@ -78,14 +78,11 @@ public class RxOrderedSet<T> extends RxValue<ImmutableList<T>> {
 	@Override
 	public void set(ImmutableList<T> newSelection) {
 		Preconditions.checkNotNull(newSelection);
-		if (!selection.equals(newSelection)) {
+		if (!get().equals(newSelection)) {
 			// the selection changed, so we will check it for duplicates
 			newSelection = filter(newSelection, policy);
 			// if it's still different than we expect...
-			if (!selection.equals(newSelection)) {
-				this.selection = newSelection;
-				observable.onNext(selection);
-			}
+			super.set(newSelection);
 		}
 	}
 

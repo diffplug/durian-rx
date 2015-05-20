@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableList;
  * An extension of RxValue<ImmutableList<T>>, with convenience
  * methods for modifying the list.
  */
-public class RxList<T> extends RxValue<ImmutableList<T>> {
+public class RxList<T> extends RxValue.Default<ImmutableList<T>> {
 	/** Creates an RxList with an initially empty value. */
 	public static <T> RxList<T> ofEmpty() {
 		return of(ImmutableList.of());
