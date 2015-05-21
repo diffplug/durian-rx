@@ -17,6 +17,7 @@ package com.diffplug.common.rx;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -75,5 +76,15 @@ public class Immutables {
 		R returnValue = mutator.apply(mutable);
 		value.set(ImmutableMap.copyOf(mutable));
 		return returnValue;
+	}
+
+	/** Converts an Optional to a Set. */
+	public static <T> ImmutableSet<T> optionalToSet(Optional<T> selection) {
+		return RxConversions.optionalToSet(selection);
+	}
+
+	/** Converts a Set to an Optional. */
+	public static <T> Optional<T> setToOptional(ImmutableSet<T> set) {
+		return RxConversions.setToOptional(set, RxConversions.OnMultiple.error());
 	}
 }

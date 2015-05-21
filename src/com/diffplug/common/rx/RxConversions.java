@@ -26,19 +26,19 @@ import com.diffplug.common.base.Unhandled;
 public class RxConversions {
 	/** Converts an RxValue<Optional<T>> to an RxValue<ImmutableSet<T>>. */
 	public static <T> RxValue<ImmutableSet<T>> asSet(RxValue<Optional<T>> input, Function<ImmutableSet<T>, T> onMultiple) {
-		return RxValue.of(input.map(RxConversions::setFromOptional), set -> {
-			input.set(optionalFromSet(set, onMultiple));
+		return RxValue.of(input.map(RxConversions::optionalToSet), set -> {
+			input.set(setToOptional(set, onMultiple));
 		});
 	}
 
 	/** Converts an RxValue<ImmutableSet<T>> to an RxValue<Optional<T>>. */
 	public static <T> RxValue<Optional<T>> asOptional(RxValue<ImmutableSet<T>> input, Function<ImmutableSet<T>, T> onMultiple) {
-		return RxValue.of(input.map(set -> optionalFromSet(set, onMultiple)), newValue -> {
-			input.set(setFromOptional(newValue));
+		return RxValue.of(input.map(set -> setToOptional(set, onMultiple)), newValue -> {
+			input.set(optionalToSet(newValue));
 		});
 	}
 
-	private static <T> ImmutableSet<T> setFromOptional(Optional<T> selection) {
+	static <T> ImmutableSet<T> optionalToSet(Optional<T> selection) {
 		if (selection.isPresent()) {
 			return ImmutableSet.of(selection.get());
 		} else {
@@ -46,7 +46,7 @@ public class RxConversions {
 		}
 	}
 
-	private static <T> Optional<T> optionalFromSet(ImmutableSet<T> set, Function<ImmutableSet<T>, T> mode) {
+	static <T> Optional<T> setToOptional(ImmutableSet<T> set, Function<ImmutableSet<T>, T> mode) {
 		if (set.size() == 0) {
 			return Optional.empty();
 		} else if (set.size() == 1) {
