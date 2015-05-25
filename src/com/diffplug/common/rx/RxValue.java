@@ -15,6 +15,7 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import rx.Observable;
@@ -70,7 +71,7 @@ public interface RxValue<T> extends RxGetter<T>, GetterSetter<T> {
 
 		/** The constructor for implementing these selection models. */
 		private Default(T initial, BehaviorSubject<T> subject) {
-			this.value = initial;
+			this.value = Objects.requireNonNull(initial);
 			this.subject = subject;
 		}
 
