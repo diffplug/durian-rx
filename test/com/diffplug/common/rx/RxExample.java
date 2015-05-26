@@ -60,7 +60,7 @@ public class RxExample extends JFrame {
 
 		RxGrid() {
 			// maintain the position of the mouse
-			RxValue<Point> mousePosition = RxValue.of(new Point(0, 0));
+			RxBox<Point> mousePosition = RxBox.of(new Point(0, 0));
 			addMouseMotionListener(new MouseAdapter() {
 				@Override
 				public void mouseMoved(MouseEvent e) {

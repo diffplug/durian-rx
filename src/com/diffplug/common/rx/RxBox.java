@@ -23,25 +23,25 @@ import rx.subjects.BehaviorSubject;
 
 import com.google.common.base.Preconditions;
 
-import com.diffplug.common.base.GetterSetter;
+import com.diffplug.common.base.Box;
 
 /**
- * RxGetter<T> and GetterSetter<T> combined in one.
+ * RxGetter<T> and Box<T> combined in one.
  */
-public interface RxValue<T> extends RxGetter<T>, GetterSetter<T> {
-	/** Returns a read-only version of this RxValue. */
+public interface RxBox<T> extends RxGetter<T>, Box.NonNull<T> {
+	/** Returns a read-only version of this RxBox. */
 	default RxGetter<T> readOnly() {
 		return this;
 	}
 
-	/** Creates an RxValue with the given initial value. */
-	public static <T> RxValue<T> of(T initial) {
+	/** Creates an RxBox with the given initial value. */
+	public static <T> RxBox<T> of(T initial) {
 		return new Default<T>(initial);
 	}
 
-	/** Creates an RxValue which implements the "getter" part with RxGetter, and the setter part with the given Consumer. */
-	public static <T> RxValue<T> of(RxGetter<T> getter, Consumer<T> setter) {
-		return new RxValue<T>() {
+	/** Creates an RxBox which implements the "getter" part with RxGetter, and the setter part with the given Consumer. */
+	public static <T> RxBox<T> from(RxGetter<T> getter, Consumer<T> setter) {
+		return new RxBox<T>() {
 			@Override
 			public Observable<T> asObservable() {
 				return getter.asObservable();
@@ -59,8 +59,8 @@ public interface RxValue<T> extends RxGetter<T>, GetterSetter<T> {
 		};
 	}
 
-	/** The default implementation of an RxValue. */
-	public static class Default<T> implements RxValue<T> {
+	/** The default implementation of an RxBox. */
+	public static class Default<T> implements RxBox<T> {
 		private volatile T value;
 		private final BehaviorSubject<T> subject;
 

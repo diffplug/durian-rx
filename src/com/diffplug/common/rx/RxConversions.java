@@ -24,16 +24,16 @@ import com.google.common.collect.Iterables;
 import com.diffplug.common.base.Unhandled;
 
 public class RxConversions {
-	/** Converts an RxValue<Optional<T>> to an RxValue<ImmutableSet<T>>. */
-	public static <T> RxValue<ImmutableSet<T>> asSet(RxValue<Optional<T>> input, Function<ImmutableSet<T>, T> onMultiple) {
-		return RxValue.of(input.map(RxConversions::optionalToSet), set -> {
+	/** Converts an RxBox<Optional<T>> to an RxBox<ImmutableSet<T>>. */
+	public static <T> RxBox<ImmutableSet<T>> asSet(RxBox<Optional<T>> input, Function<ImmutableSet<T>, T> onMultiple) {
+		return RxBox.from(input.map(RxConversions::optionalToSet), set -> {
 			input.set(setToOptional(set, onMultiple));
 		});
 	}
 
-	/** Converts an RxValue<ImmutableSet<T>> to an RxValue<Optional<T>>. */
-	public static <T> RxValue<Optional<T>> asOptional(RxValue<ImmutableSet<T>> input, Function<ImmutableSet<T>, T> onMultiple) {
-		return RxValue.of(input.map(set -> setToOptional(set, onMultiple)), newValue -> {
+	/** Converts an RxBox<ImmutableSet<T>> to an RxBox<Optional<T>>. */
+	public static <T> RxBox<Optional<T>> asOptional(RxBox<ImmutableSet<T>> input, Function<ImmutableSet<T>, T> onMultiple) {
+		return RxBox.from(input.map(set -> setToOptional(set, onMultiple)), newValue -> {
 			input.set(optionalToSet(newValue));
 		});
 	}

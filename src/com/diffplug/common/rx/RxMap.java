@@ -22,10 +22,10 @@ import java.util.function.Function;
 import com.google.common.collect.ImmutableMap;
 
 /** 
- * An extension of RxValue<ImmutableMap<K, V>>, with
+ * An extension of RxBox<ImmutableMap<K, V>>, with
  * convenience methods for modifying and observing the map.
  */
-public class RxMap<K, V> extends RxValue.Default<ImmutableMap<K, V>> {
+public class RxMap<K, V> extends RxBox.Default<ImmutableMap<K, V>> {
 	/** Creates an RxMap with an initially empty value. */
 	public static <K, V> RxMap<K, V> ofEmpty() {
 		return of(ImmutableMap.of());

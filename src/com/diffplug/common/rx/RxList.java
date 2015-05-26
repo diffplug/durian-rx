@@ -22,10 +22,10 @@ import java.util.function.Function;
 import com.google.common.collect.ImmutableList;
 
 /**
- * An extension of RxValue<ImmutableList<T>>, with convenience
+ * An extension of RxBox<ImmutableList<T>>, with convenience
  * methods for modifying the list.
  */
-public class RxList<T> extends RxValue.Default<ImmutableList<T>> {
+public class RxList<T> extends RxBox.Default<ImmutableList<T>> {
 	/** Creates an RxList with an initially empty value. */
 	public static <T> RxList<T> ofEmpty() {
 		return of(ImmutableList.of());

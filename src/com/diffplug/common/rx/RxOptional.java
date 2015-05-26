@@ -21,10 +21,10 @@ import java.util.function.Function;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * An extension of RxValue<Optional<T>>, with convenience
+ * An extension of RxBox<Optional<T>>, with convenience
  * methods for converting it to an RxSet<T>.
  */
-public class RxOptional<T> extends RxValue.Default<Optional<T>> {
+public class RxOptional<T> extends RxBox.Default<Optional<T>> {
 	/** Returns an empty RxOptional. */
 	public static <T> RxOptional<T> ofEmpty() {
 		return new RxOptional<T>(Optional.empty());
@@ -41,7 +41,7 @@ public class RxOptional<T> extends RxValue.Default<Optional<T>> {
 	}
 
 	/** Returns a mirror of this RxOptional as an RxSet. */
-	public RxValue<ImmutableSet<T>> asSet(Function<ImmutableSet<T>, T> onMultiple) {
+	public RxBox<ImmutableSet<T>> asSet(Function<ImmutableSet<T>, T> onMultiple) {
 		return RxConversions.asSet(this, onMultiple);
 	}
 }

@@ -28,7 +28,7 @@ import com.google.common.collect.Maps;
 import com.diffplug.common.base.Unhandled;
 
 /** An RxList which guarantees to never have any duplicates. */
-public class RxOrderedSet<T> extends RxValue.Default<ImmutableList<T>> {
+public class RxOrderedSet<T> extends RxBox.Default<ImmutableList<T>> {
 	/** Creates an RxList with an initially empty value. */
 	public static <T> RxOrderedSet<T> ofEmpty() {
 		return of(ImmutableList.of());

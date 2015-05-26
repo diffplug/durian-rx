@@ -93,8 +93,8 @@ public class RxAndListenableFutureSemantics {
 
 	private static class RxAsserter<T> extends Rx<T> {
 		private static <T> RxAsserter<T> create() {
-			Box<T> value = Box.empty();
-			Box<Optional<Throwable>> terminal = Box.empty();
+			Box<T> value = Box.ofNull();
+			Box<Optional<Throwable>> terminal = Box.ofNull();
 			return new RxAsserter<T>(val -> value.set(val), ter -> terminal.set(ter), value, terminal);
 		}
 

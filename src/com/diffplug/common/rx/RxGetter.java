@@ -71,7 +71,7 @@ public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 	public static <T> RxGetter<T> from(Observable<T> observableUnfilters, T initialValue) {
 		Observable<T> observable = observableUnfilters.distinctUntilChanged();
 
-		Box<T> box = Box.of(initialValue);
+		Box.NonNull<T> box = Box.NonNull.of(initialValue);
 		Rx.subscribe(observable, box::set);
 		return new RxGetter<T>() {
 			@Override
