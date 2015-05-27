@@ -12,7 +12,7 @@ buildscript {
 
 repositories {
 	mavenCentral()
-	// SNAPSHOT versions are free to rely on other SNAPSHOT libraries, if they'd like to
+	// SNAPSHOT versions are free to rely on other SNAPSHOT libraries
 	if (project.version.endsWith('-SNAPSHOT')) {
 		maven {
 			url 'https://oss.sonatype.org/content/repositories/snapshots/'
