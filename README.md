@@ -1,9 +1,9 @@
 # <img align="left" src="durian-rx.png"> DurianRx: Reactive getters, powered by RxJava and ListenableFuture
 
-[![JCenter artifact](https://img.shields.io/badge/mavenCentral-com.diffplug.durian%3Adurian--rx-blue.svg)](https://bintray.com/diffplug/opensource/durian-rx/view)
-[![Branch master](http://img.shields.io/badge/master-1.0-lightgrey.svg)](https://github.com/diffplug/durian-rx/releases/latest)
-[![Branch develop](http://img.shields.io/badge/develop-1.1--SNAPSHOT-lightgrey.svg)](https://github.com/diffplug/durian-rx/tree/develop)
-[![Branch develop Travis CI](https://travis-ci.org/diffplug/durian-rx.svg?branch=develop)](https://travis-ci.org/diffplug/durian-rx)
+[![Maven artifact](https://img.shields.io/badge/mavenCentral-com.diffplug.durian%3Adurian--rx-blue.svg)](https://bintray.com/diffplug/opensource/durian-rx/view)
+[![Latest release](http://img.shields.io/badge/last release-?-blue.svg)](https://github.com/diffplug/durian-rx/releases/latest)
+[![Changelog](http://img.shields.io/badge/master-1.0--SNAPSHOT-lightgrey.svg)](CHANGES.md)
+[![Travis CI](https://travis-ci.org/diffplug/durian-rx.svg?branch=master)](https://travis-ci.org/diffplug/durian-rx)
 [![License](https://img.shields.io/badge/license-Apache-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
 # NOT YET SUITABLE FOR USE - we're releasing a formerly internal library, bear with us as we clean it up for public release
@@ -67,9 +67,10 @@ DurianRx's only requirements are: Guava, RxJava, and Durian.  It is published to
 
 ## Acknowledgements
 
-* Many thanks to [RxJava]() and [Guava]().
-* Formatted by [spotless](https://github.com/diffplug/spotless)    [build.gradle](https://github.com/diffplug/durian-rx/blob/develop/build.gradle?ts=4#L70-90)
-* Bugs found by [findbugs](http://findbugs.sourceforge.net/)    [build.gradle](https://github.com/diffplug/durian-rx/blob/develop/build.gradle?ts=4#L101-102)
+* Many thanks to [RxJava](https://github.com/ReactiveX/RxJava) and [Guava](https://github.com/google/guava).
+* Formatted by [spotless](https://github.com/diffplug/spotless), [as such](https://github.com/diffplug/durian-rx/blob/v1.0/build.gradle?ts=4#L70-L90).
+* Bugs found by [findbugs](http://findbugs.sourceforge.net/), [as such](https://github.com/diffplug/durian-rx/blob/v1.0/build.gradle?ts=4#L92-L116).
+* Scripts in the `.ci` folder are inspired by [Ben Limmer's work](http://benlimmer.com/2013/12/26/automatically-publish-javadoc-to-gh-pages-with-travis-ci/).
 * Built by [gradle](http://gradle.org/).
 * Tested by [junit](http://junit.org/).
 * Maintained by [DiffPlug](http://www.diffplug.com/).
