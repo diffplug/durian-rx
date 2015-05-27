@@ -26,9 +26,9 @@ import com.google.common.base.Preconditions;
 import com.diffplug.common.base.Box;
 
 /**
- * RxGetter<T> and Box<T> combined in one.
+ * RxGetter<T> and Nullable<T> combined in one.
  */
-public interface RxBox<T> extends RxGetter<T>, Box.NonNull<T> {
+public interface RxBox<T> extends RxGetter<T>, Box<T> {
 	/** Returns a read-only version of this RxBox. */
 	default RxGetter<T> readOnly() {
 		return this;

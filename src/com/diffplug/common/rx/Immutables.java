@@ -55,7 +55,7 @@ public class Immutables {
 	}
 
 	/** Mutates the given set and returns a value. */
-	public static <T, R> R mutateSetAndReturn(Box.NonNull<ImmutableSet<T>> value, Function<Set<T>, R> mutator) {
+	public static <T, R> R mutateSetAndReturn(Box<ImmutableSet<T>> value, Function<Set<T>, R> mutator) {
 		Set<T> mutable = Sets.newHashSet(value.get());
 		R returnValue = mutator.apply(mutable);
 		value.set(ImmutableSet.copyOf(mutable));
@@ -63,7 +63,7 @@ public class Immutables {
 	}
 
 	/** Mutates the given list and returns a value. */
-	public static <T, R> R mutateListAndReturn(Box.NonNull<ImmutableList<T>> value, Function<List<T>, R> mutator) {
+	public static <T, R> R mutateListAndReturn(Box<ImmutableList<T>> value, Function<List<T>, R> mutator) {
 		List<T> mutable = Lists.newArrayList(value.get());
 		R returnValue = mutator.apply(mutable);
 		value.set(ImmutableList.copyOf(mutable));
@@ -71,7 +71,7 @@ public class Immutables {
 	}
 
 	/** Mutates the given map and returns a value. */
-	public static <K, V, R> R mutateMapAndReturn(Box.NonNull<ImmutableMap<K, V>> value, Function<Map<K, V>, R> mutator) {
+	public static <K, V, R> R mutateMapAndReturn(Box<ImmutableMap<K, V>> value, Function<Map<K, V>, R> mutator) {
 		Map<K, V> mutable = Maps.newHashMap(value.get());
 		R returnValue = mutator.apply(mutable);
 		value.set(ImmutableMap.copyOf(mutable));

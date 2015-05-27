@@ -25,7 +25,7 @@ import rx.subjects.AsyncSubject;
 
 import com.google.common.util.concurrent.SettableFuture;
 
-import com.diffplug.common.base.Box;
+import com.diffplug.common.base.Box.Nullable;
 
 /**
  * This is a simple little test for confirming the behavior of
@@ -93,15 +93,15 @@ public class RxAndListenableFutureSemantics {
 
 	private static class RxAsserter<T> extends Rx<T> {
 		private static <T> RxAsserter<T> create() {
-			Box<T> value = Box.ofNull();
-			Box<Optional<Throwable>> terminal = Box.ofNull();
+			Nullable<T> value = Nullable.ofNull();
+			Nullable<Optional<Throwable>> terminal = Nullable.ofNull();
 			return new RxAsserter<T>(val -> value.set(val), ter -> terminal.set(ter), value, terminal);
 		}
 
-		private final Box<T> value;
-		private final Box<Optional<Throwable>> terminal;
+		private final Nullable<T> value;
+		private final Nullable<Optional<Throwable>> terminal;
 
-		private RxAsserter(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminal, Box<T> value, Box<Optional<Throwable>> terminal) {
+		private RxAsserter(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminal, Nullable<T> value, Nullable<Optional<Throwable>> terminal) {
 			super(onValue, onTerminal);
 			this.value = value;
 			this.terminal = terminal;
