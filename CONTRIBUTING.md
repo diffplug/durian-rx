@@ -1,8 +1,8 @@
 # Contributing to Durian
 
-Pull requests are welcome, preferably against `master`.
+Pull requests are welcome, preferably against `master`. Please update [`CHANGES.md`](CHANGES.md) as you go.
 
-Every successful Travis CI build on branch `master` is automatically published to [`https://oss.sonatype.org/content/repositories/snapshots`](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/), and its javadoc are published [here](http://diffplug.github.io/durian-rx/javadoc/latest/).
+Every successful Travis CI build on branch `master` is automatically published to [`https://oss.sonatype.org/content/repositories/snapshots`](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/), and its javadoc are published [here](http://diffplug.github.io/durian-rx/javadoc/snapshot/).
 
 ## Build instructions
 
