@@ -17,6 +17,7 @@ package com.diffplug.common.rx;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -25,6 +26,7 @@ import java.util.function.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -54,6 +56,13 @@ public class Immutables {
 		return ImmutableMap.copyOf(mutable);
 	}
 
+	/** Returns a mutated version of the given sorted map. */
+	public static <K, V> ImmutableSortedMap<K, V> mutateSortedMap(ImmutableSortedMap<K, V> source, Consumer<NavigableMap<K, V>> mutator) {
+		NavigableMap<K, V> mutable = Maps.newTreeMap(source);
+		mutator.accept(mutable);
+		return ImmutableSortedMap.copyOf(mutable);
+	}
+
 	/** Mutates the given set and returns a value. */
 	public static <T, R> R mutateSetAndReturn(Box<ImmutableSet<T>> value, Function<Set<T>, R> mutator) {
 		Set<T> mutable = Sets.newHashSet(value.get());
@@ -75,6 +84,14 @@ public class Immutables {
 		Map<K, V> mutable = Maps.newHashMap(value.get());
 		R returnValue = mutator.apply(mutable);
 		value.set(ImmutableMap.copyOf(mutable));
+		return returnValue;
+	}
+
+	/** Mutates the given sorted map and returns a value. */
+	public static <K, V, R> R mutateSortedMapAndReturn(Box<ImmutableSortedMap<K, V>> value, Function<NavigableMap<K, V>, R> mutator) {
+		NavigableMap<K, V> mutable = Maps.newTreeMap(value.get());
+		R returnValue = mutator.apply(mutable);
+		value.set(ImmutableSortedMap.copyOf(mutable));
 		return returnValue;
 	}
 
