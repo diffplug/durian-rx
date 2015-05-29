@@ -17,6 +17,7 @@ package com.diffplug.common.rx;
 
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.SortedMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -33,13 +34,23 @@ public class RxSortedMap<K, V> extends RxBox.Default<ImmutableSortedMap<K, V>> {
 	}
 
 	/** Creates an RxMap with the given initial value. */
-	public static <K, V> RxSortedMap<K, V> of(NavigableMap<K, V> initial) {
+	public static <K, V> RxSortedMap<K, V> of(SortedMap<K, V> initial) {
+		return new RxSortedMap<K, V>(ImmutableSortedMap.copyOfSorted(initial));
+	}
+
+	/** Creates an RxMap with the given initial value. */
+	public static <K, V> RxSortedMap<K, V> of(Map<K, V> initial) {
 		return new RxSortedMap<K, V>(ImmutableSortedMap.copyOf(initial));
 	}
 
 	/** Initally holds the given collection. */
 	protected RxSortedMap(ImmutableSortedMap<K, V> initial) {
 		super(initial);
+	}
+
+	/** Sets the value of this map. */
+	public void set(SortedMap<K, V> value) {
+		super.set(ImmutableSortedMap.copyOfSorted(value));
 	}
 
 	/** Sets the value of this map. */

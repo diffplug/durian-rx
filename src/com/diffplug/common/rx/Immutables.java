@@ -15,11 +15,17 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -27,61 +33,74 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSortedSet;
 
 import com.diffplug.common.base.Box;
 
 /** Utilties for manipulating Guava's immutable collections. */
 public class Immutables {
-	/** Returns a mutated version of the given set. */
-	public static <T> ImmutableSet<T> mutateSet(ImmutableSet<T> source, Consumer<Set<T>> mutator) {
-		Set<T> mutable = Sets.newHashSet(source);
-		mutator.accept(mutable);
-		return ImmutableSet.copyOf(mutable);
-	}
-
 	/** Returns a mutated version of the given list. */
 	public static <T> ImmutableList<T> mutateList(ImmutableList<T> source, Consumer<List<T>> mutator) {
-		List<T> mutable = Lists.newArrayList(source);
+		List<T> mutable = new ArrayList<>(source);
 		mutator.accept(mutable);
 		return ImmutableList.copyOf(mutable);
 	}
 
+	/** Returns a mutated version of the given set. */
+	public static <T> ImmutableSet<T> mutateSet(ImmutableSet<T> source, Consumer<Set<T>> mutator) {
+		Set<T> mutable = new LinkedHashSet<>(source);
+		mutator.accept(mutable);
+		return ImmutableSet.copyOf(mutable);
+	}
+
+	/** Returns a mutated version of the given sorted set. */
+	public static <T> ImmutableSortedSet<T> mutateSortedSet(ImmutableSortedSet<T> source, Consumer<NavigableSet<T>> mutator) {
+		NavigableSet<T> mutable = new TreeSet<>(source);
+		mutator.accept(mutable);
+		return ImmutableSortedSet.copyOfSorted(mutable);
+	}
+
 	/** Returns a mutated version of the given map. */
 	public static <K, V> ImmutableMap<K, V> mutateMap(ImmutableMap<K, V> source, Consumer<Map<K, V>> mutator) {
-		Map<K, V> mutable = Maps.newHashMap(source);
+		Map<K, V> mutable = new LinkedHashMap<>(source);
 		mutator.accept(mutable);
 		return ImmutableMap.copyOf(mutable);
 	}
 
 	/** Returns a mutated version of the given sorted map. */
 	public static <K, V> ImmutableSortedMap<K, V> mutateSortedMap(ImmutableSortedMap<K, V> source, Consumer<NavigableMap<K, V>> mutator) {
-		NavigableMap<K, V> mutable = Maps.newTreeMap(source);
+		NavigableMap<K, V> mutable = new TreeMap<>(source);
 		mutator.accept(mutable);
-		return ImmutableSortedMap.copyOf(mutable);
-	}
-
-	/** Mutates the given set and returns a value. */
-	public static <T, R> R mutateSetAndReturn(Box<ImmutableSet<T>> value, Function<Set<T>, R> mutator) {
-		Set<T> mutable = Sets.newHashSet(value.get());
-		R returnValue = mutator.apply(mutable);
-		value.set(ImmutableSet.copyOf(mutable));
-		return returnValue;
+		return ImmutableSortedMap.copyOfSorted(mutable);
 	}
 
 	/** Mutates the given list and returns a value. */
 	public static <T, R> R mutateListAndReturn(Box<ImmutableList<T>> value, Function<List<T>, R> mutator) {
-		List<T> mutable = Lists.newArrayList(value.get());
+		List<T> mutable = new ArrayList<>(value.get());
 		R returnValue = mutator.apply(mutable);
 		value.set(ImmutableList.copyOf(mutable));
 		return returnValue;
 	}
 
+	/** Mutates the given set and returns a value. */
+	public static <T, R> R mutateSetAndReturn(Box<ImmutableSet<T>> value, Function<Set<T>, R> mutator) {
+		Set<T> mutable = new LinkedHashSet<>(value.get());
+		R returnValue = mutator.apply(mutable);
+		value.set(ImmutableSet.copyOf(mutable));
+		return returnValue;
+	}
+
+	/** Mutates the given sorted set and returns a value. */
+	public static <T, R> R mutateSortedSetAndReturn(Box<ImmutableSortedSet<T>> value, Function<NavigableSet<T>, R> mutator) {
+		NavigableSet<T> mutable = new TreeSet<>(value.get());
+		R returnValue = mutator.apply(mutable);
+		value.set(ImmutableSortedSet.copyOfSorted(mutable));
+		return returnValue;
+	}
+
 	/** Mutates the given map and returns a value. */
 	public static <K, V, R> R mutateMapAndReturn(Box<ImmutableMap<K, V>> value, Function<Map<K, V>, R> mutator) {
-		Map<K, V> mutable = Maps.newHashMap(value.get());
+		Map<K, V> mutable = new LinkedHashMap<>(value.get());
 		R returnValue = mutator.apply(mutable);
 		value.set(ImmutableMap.copyOf(mutable));
 		return returnValue;
@@ -89,9 +108,9 @@ public class Immutables {
 
 	/** Mutates the given sorted map and returns a value. */
 	public static <K, V, R> R mutateSortedMapAndReturn(Box<ImmutableSortedMap<K, V>> value, Function<NavigableMap<K, V>, R> mutator) {
-		NavigableMap<K, V> mutable = Maps.newTreeMap(value.get());
+		NavigableMap<K, V> mutable = new TreeMap<>(value.get());
 		R returnValue = mutator.apply(mutable);
-		value.set(ImmutableSortedMap.copyOf(mutable));
+		value.set(ImmutableSortedMap.copyOfSorted(mutable));
 		return returnValue;
 	}
 
