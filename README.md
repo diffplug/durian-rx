@@ -13,16 +13,16 @@
 DurianRx unifies RxJava's [Observable](http://reactivex.io/documentation/observable.html) with Guava's [ListenableFuture](https://code.google.com/p/guava-libraries/wiki/ListenableFutureExplained).
 
 ```java
-ListenableFuture<SomeType> future = someFuture();
 Observable<SomeType> observable = someObservable();
-Rx.subscribe(future, val -> doSomething(val));
+ListenableFuture<SomeType> future = someFuture();
 Rx.subscribe(observable, val -> doSomething(val));
+Rx.subscribe(future, val -> doSomething(val));
 ```
 
 It also provides [reactive getters](src/com/diffplug/common/rx/RxGetter.java?ts=4), a simple abstraction for piping data which allows access via `T get()` or `Observable<T> asObservable()`.
 
 ```java
-RxValue<Point> mousePos = RxValue.of(new Point(0, 0));
+RxBox<Point> mousePos = RxBox.of(new Point(0, 0));
 this.addMouseListener(e -> mousePos.set(new Point(e.x, e.y)));
 
 Rectangle hotSpot = new Rectangle(0, 0, 10, 10)
@@ -37,7 +37,7 @@ Debugging an error which involves lots of callbacks can be difficult.  To make t
 DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace()).
 ```
 
-Lastly, DurianRx provides convenience classes for manipulating Guava's immutable collections inside of reactive containers, such as `RxSet<T> extends RxValue<ImmutableSet<T>>`, which can be used as such:
+Lastly, DurianRx provides convenience classes for manipulating Guava's immutable collections inside of reactive containers, such as `RxSet<T> extends RxBox<ImmutableSet<T>>`, which can be used as such:
 
 ```java
 public void mouseClicked(MouseEvent e) {
@@ -65,11 +65,11 @@ Rx.subscribe(rxSelection, set -> {
 });
 ```
 
-DurianRx's only requirements are: Guava, RxJava, and Durian.  It is published to MavenCentral at the maven coordinates `com.diffplug.durian:durian-rx`.
+DurianRx's only requirements are [Guava](https://github.com/google/guava), [RxJava](https://github.com/reactivex/rxjava), and [Durian](https://github.com/diffplug/durian).
 
 ## Acknowledgements
 
-* Many thanks to [RxJava](https://github.com/ReactiveX/RxJava) and [Guava](https://github.com/google/guava).
+* Many thanks to [RxJava](https://github.com/reactivex/rxjava) and [Guava](https://github.com/google/guava).
 * Formatted by [spotless](https://github.com/diffplug/spotless), [as such](https://github.com/diffplug/durian-rx/blob/v1.0/build.gradle?ts=4#L70-L90).
 * Bugs found by [findbugs](http://findbugs.sourceforge.net/), [as such](https://github.com/diffplug/durian-rx/blob/v1.0/build.gradle?ts=4#L92-L116).
 * Scripts in the `.ci` folder are inspired by [Ben Limmer's work](http://benlimmer.com/2013/12/26/automatically-publish-javadoc-to-gh-pages-with-travis-ci/).
