@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * An extension of RxBox<ImmutableList<T>>, with convenience
- * methods for modifying the list.
+ * methods for creating the list.
  */
 public class RxList<T> extends RxBox.Default<ImmutableList<T>> {
 	/** Creates an RxList with an initially empty value. */

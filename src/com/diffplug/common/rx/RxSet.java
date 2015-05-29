@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableSet;
 
 /** 
  * An extension of RxBox<ImmutableSet<T>>, with
- * convenience methods for modifying and observing the set,
+ * convenience methods for modifying and creating the set,
  * as well as for converting it into an RxBox<Optional<T>>.
  */
 public class RxSet<T> extends RxBox.Default<ImmutableSet<T>> {
