@@ -37,7 +37,7 @@ import com.google.common.collect.ImmutableSortedSet;
 
 import com.diffplug.common.base.Box;
 
-/** Utilties for manipulating Guava's immutable collections. */
+/** Utilities for manipulating Guava's immutable collections. */
 public class Immutables {
 	/** Returns a mutated version of the given list. */
 	public static <T> ImmutableList<T> mutateList(ImmutableList<T> source, Consumer<List<T>> mutator) {
@@ -119,7 +119,7 @@ public class Immutables {
 		return RxConversions.optionalToSet(selection);
 	}
 
-	/** Converts a Set to an Optional. */
+	/** Converts a Set to an Optional, throwing an error if there are multiple elements. */
 	public static <T> Optional<T> setToOptional(ImmutableSet<T> set) {
 		return RxConversions.setToOptional(set, RxConversions.OnMultiple.error());
 	}

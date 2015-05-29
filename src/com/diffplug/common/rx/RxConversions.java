@@ -23,6 +23,7 @@ import com.google.common.collect.Iterables;
 
 import com.diffplug.common.base.Unhandled;
 
+/** Static methods for converting between RxBox<ImmutableSet<T>> and RxBox<Optional<T>>. */
 public class RxConversions {
 	/** Converts an RxBox<Optional<T>> to an RxBox<ImmutableSet<T>>. */
 	public static <T> RxBox<ImmutableSet<T>> asSet(RxBox<Optional<T>> input, Function<ImmutableSet<T>, T> onMultiple) {
@@ -58,7 +59,7 @@ public class RxConversions {
 		}
 	}
 
-	/** Functions which implement the onMultiple function required by the conversions. */
+	/** Functions which implement the onMultiple function required to convert a Set to an Optional. */
 	public static class OnMultiple {
 		private OnMultiple() {}
 

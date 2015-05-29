@@ -15,7 +15,6 @@
  */
 package com.diffplug.common.rx;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,8 +23,7 @@ import com.google.common.collect.ImmutableSet;
 
 /** 
  * An extension of RxBox<ImmutableSet<T>>, with
- * convenience methods for modifying and creating the set,
- * as well as for converting it into an RxBox<Optional<T>>.
+ * convenience methods for modifying and creating the set.
  */
 public class RxSet<T> extends RxBox.Default<ImmutableSet<T>> {
 	/** Creates an RxSet with an initially empty value. */
@@ -46,11 +44,6 @@ public class RxSet<T> extends RxBox.Default<ImmutableSet<T>> {
 	/** Removes the given value from the set. */
 	public void set(Set<T> value) {
 		super.set(ImmutableSet.copyOf(value));
-	}
-
-	/** Returns a mirror of this Set as an RxOptional. */
-	public RxBox<Optional<T>> asOptional(Function<ImmutableSet<T>, T> onMultiple) {
-		return RxConversions.asOptional(this, onMultiple);
 	}
 
 	/** Mutates this set. */

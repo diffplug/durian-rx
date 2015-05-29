@@ -16,13 +16,10 @@
 package com.diffplug.common.rx;
 
 import java.util.Optional;
-import java.util.function.Function;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * An extension of RxBox<Optional<T>>, with convenience
- * methods for converting it to an RxSet<T>.
+ * methods for creation.
  */
 public class RxOptional<T> extends RxBox.Default<Optional<T>> {
 	/** Returns an empty RxOptional. */
@@ -38,10 +35,5 @@ public class RxOptional<T> extends RxBox.Default<Optional<T>> {
 	/** Initially holds the given value. */
 	protected RxOptional(Optional<T> initial) {
 		super(initial);
-	}
-
-	/** Returns a mirror of this RxOptional as an RxSet. */
-	public RxBox<ImmutableSet<T>> asSet(Function<ImmutableSet<T>, T> onMultiple) {
-		return RxConversions.asSet(this, onMultiple);
 	}
 }
