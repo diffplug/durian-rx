@@ -18,31 +18,39 @@ package com.diffplug.common.rx;
 import java.util.List;
 import java.util.function.BiPredicate;
 
+import rx.Observable;
+
+import com.google.common.util.concurrent.ListenableFuture;
+
+import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.base.StackDumper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * Interface which gets called for every subscription through the Rx mechanism, allowing various kinds of tracing.
- * 
- * To enable tracing for subscription calls, set the following system property:
- *   durian.plugins.com.diffplug.common.rx.RxTracingPolicy = com.diffplug.common.rx.RxTracingPolicy$LogSubscriptionTrace
- * Or call
- *   DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace()).
+ * Plugin which gets notified of every call to {@link Rx#subscribe Rx.subscribe}, allowing various kinds of tracing.
+ * <p>
+ * By default, no tracing is done. To enable tracing, do one of the following:
+ * <ul>
+ * <li>Execute this at the very beginning of your application: {@code DurianPlugins.set(RxTracingPolicy.class, new MyTracingPolicy());}</li>
+ * <li>Set this system property: {@code durian.plugins.com.diffplug.common.rx.RxTracingPolicy=fully.qualified.name.to.MyTracingPolicy}</li>
+ * </ul>
+ * {@link LogSubscriptionTrace} is a useful tracing policy for debugging errors within callbacks.
+ * @see DurianPlugins
  */
 public interface RxTracingPolicy {
 	/**
-	 * Given an observable, and an Rx which is about to be subscribed to this observable,
-	 * return an observable which might have various kinds of instrumentation.
+	 * Given an observable, and an {@link Rx} which is about to be subscribed to this observable,
+	 * return a (possibly instrumented) {@code Rx}.
 	 * 
-	 * @param observable The IObservable, Observable, or ListenableFuture which is about to be subscribed to.
-	 * @param listener The Rx<T> which is about to be subscribed.
-	 * @return An Rx<T> which may (or may not) be instrumented.  In order to ensure that the program's behavior
-	 * is not changed, implementors should ensure that all method calls are delegated to the listener Rx eventually.
+	 * @param observable The {@link IObservable}, {@link Observable}, or {@link ListenableFuture} which is about to be subscribed to.
+	 * @param listener The {@link Rx} which is about to be subscribed.
+	 * @return An {@link Rx} which may (or may not) be instrumented.  To ensure that the program's behavior
+	 * is not changed, implementors should ensure that all method calls are delegated unchanged to the original listener eventually.
 	 */
 	<T> Rx<T> hook(Object observable, Rx<T> listener);
 
-	/** An RxTracingPolicy which performs no tracing, and has very low overhead. */
+	/** An {@code RxTracingPolicy} which performs no tracing, and has very low overhead. */
 	public static final RxTracingPolicy NONE = new RxTracingPolicy() {
 		@Override
 		public <T> Rx<T> hook(Object observable, Rx<T> listener) {
@@ -51,9 +59,21 @@ public interface RxTracingPolicy {
 	};
 
 	/**
-	 * An RxTracingPolicy which records the stack trace of every subscription which matches its
-	 * predicate.  Anytime a subscription throws an error, that error's stacktrace gets dumped, along
-	 * with the stacktrace at the time of the subscription.
+	 * An {@link RxTracingPolicy} which logs the stack trace of every subscription, so
+	 * that it can decorate any exceptions with the stack trace at the time they were subscribed.
+	 * <p>
+	 * This logging is fairly expensive, so you might want to set the {@link LogSubscriptionTrace#shouldLog} field,
+	 * which determines whether a subscription is logged or passed along untouched.
+	 * <p>
+	 * By default every {@link Rx#onValue} listener will be logged, but nothing else.
+	 * <p>
+	 * To enable this tracing policy, do one of the following:
+	 * <ul>
+	 * <li>Execute this at the very beginning of your application: {@code DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace());}</li>
+	 * <li>Set this system property: {@code durian.plugins.com.diffplug.common.rx.RxTracingPolicy=com.diffplug.common.rx.RxTracingPolicy$LogSubscriptionTrace}</li>
+	 * </ul>
+	 * @see <a href="https://github.com/diffplug/durian-rx/blob/master/src/com/diffplug/common/rx/RxTracingPolicy.java?ts=4">LogSubscriptionTrace source code</a>
+	 * @see DurianPlugins
 	 */
 	public static class LogSubscriptionTrace implements RxTracingPolicy {
 		/** The BiPredicate which determines which subscriptions should be logged.  By default, any Rx which is logging will be logged. */
@@ -62,24 +82,29 @@ public interface RxTracingPolicy {
 
 		@Override
 		public <T> Rx<T> hook(Object observable, Rx<T> listener) {
-			if (shouldLog.test(observable, listener)) {
+			if (!shouldLog.test(observable, listener)) {
+				// we're not logging, so pass the listener unchanged
+				return listener;
+			} else {
 				// capture the stack at the time of the subscription
 				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(LogSubscriptionTrace.class, Rx.RxExecutor.class, Rx.class);
+				// create a new Rx which passes values unchanged, but instruments exceptions with the subscription stack
 				return Rx.onValueOrTerminate(listener::onNext, error -> {
 					if (error.isPresent()) {
 						// if there is an error, wrap it in a SubscriptionException and log it
 						SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
 						Errors.log().handle(subException);
-						// prevent double-logging
+						// if the original listener was just logging exceptions, there's no need to notify it, as this would be a double-log
 						if (!listener.isLogging()) {
-							listener.onError(subException);
+							// the listener isn't a simple logger, so we should pass the original exception
+							// to ensure that our logging doesn't change the program's behavior
+							listener.onError(error.get());
 						}
 					} else {
+						// pass clean terminations unchanged
 						listener.onCompleted();
 					}
 				});
-			} else {
-				return listener;
 			}
 		}
 

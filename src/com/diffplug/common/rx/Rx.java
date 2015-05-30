@@ -36,7 +36,7 @@ import com.diffplug.common.base.Errors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * Rx unifies the listener models of {@link rx.Observable RxJava's Observable} 
+ * Unifies the listener models of {@link rx.Observable RxJava's Observable} 
  * with <code><a href="https://code.google.com/p/guava-libraries/wiki/ListenableFutureExplained">Guava's ListenableFuture</a></code>
  * , and also adds tracing capabilities.
  * <p>

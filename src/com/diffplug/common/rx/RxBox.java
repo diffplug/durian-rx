@@ -26,7 +26,7 @@ import com.google.common.base.Preconditions;
 import com.diffplug.common.base.Box;
 
 /**
- * {@link RxGetter} and {@link Box} combined in one - a value you can set, get, and subscribe to.
+ * {@link RxGetter} and {@link Box} combined in one: a value you can set, get, and subscribe to.
  */
 public interface RxBox<T> extends RxGetter<T>, Box<T> {
 	/** Returns a read-only version of this RxBox. */
@@ -59,7 +59,7 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 		};
 	}
 
-	/** A default implementation of an {@code RxBox}. */
+	/** Standard implementation of an {@link RxBox}. */
 	public static class Default<T> implements RxBox<T> {
 		private volatile T value;
 		private final BehaviorSubject<T> subject;
