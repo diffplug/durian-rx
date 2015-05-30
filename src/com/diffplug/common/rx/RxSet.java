@@ -21,9 +21,9 @@ import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSet;
 
-/** 
- * An extension of RxBox<ImmutableSet<T>>, with
- * convenience methods for modifying and creating the set.
+/**
+ * <code>{@link RxBox}&lt;{@link ImmutableSet}&lt;T&gt;&gt;</code>
+ * with convenience methods for creating and mutating the set.
  */
 public class RxSet<T> extends RxBox.Default<ImmutableSet<T>> {
 	/** Creates an RxSet with an initially empty value. */

@@ -22,8 +22,8 @@ import java.util.function.Function;
 import com.google.common.collect.ImmutableList;
 
 /**
- * An extension of RxBox<ImmutableList<T>>, with convenience
- * methods for creating the list.
+ * <code>{@link RxBox}&lt;{@link ImmutableList}&lt;T&gt;&gt;</code>
+ * with convenience methods for creating and mutating the list.
  */
 public class RxList<T> extends RxBox.Default<ImmutableList<T>> {
 	/** Creates an RxList with an initially empty value. */
@@ -32,8 +32,8 @@ public class RxList<T> extends RxBox.Default<ImmutableList<T>> {
 	}
 
 	/** Creates an RxList with the given initial value. */
-	public static <T> RxList<T> of(ImmutableList<T> initial) {
-		return new RxList<T>(initial);
+	public static <T> RxList<T> of(List<T> initial) {
+		return new RxList<T>(ImmutableList.copyOf(initial));
 	}
 
 	/** Initally holds the given collection. */
@@ -46,12 +46,12 @@ public class RxList<T> extends RxBox.Default<ImmutableList<T>> {
 		super.set(ImmutableList.copyOf(newSelection));
 	}
 
-	/** Mutates this set. */
+	/** Mutates this list. */
 	public void mutate(Consumer<List<T>> mutator) {
 		set(Immutables.mutateList(get(), mutator));
 	}
 
-	/** Mutates this set. */
+	/** Mutates this list and returns a value. */
 	public <R> R mutateAndReturn(Function<List<T>, R> mutator) {
 		return Immutables.mutateListAndReturn(this, mutator);
 	}

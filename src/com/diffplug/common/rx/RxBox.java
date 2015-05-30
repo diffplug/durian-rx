@@ -26,7 +26,7 @@ import com.google.common.base.Preconditions;
 import com.diffplug.common.base.Box;
 
 /**
- * RxGetter<T> and Nullable<T> combined in one.
+ * {@link RxGetter} and {@link Box} combined in one - a value you can set, get, and subscribe to.
  */
 public interface RxBox<T> extends RxGetter<T>, Box<T> {
 	/** Returns a read-only version of this RxBox. */
@@ -34,12 +34,12 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 		return this;
 	}
 
-	/** Creates an RxBox with the given initial value. */
+	/** Creates an {@code RxBox} with the given initial value. */
 	public static <T> RxBox<T> of(T initial) {
-		return new Default<T>(initial);
+		return new Default<T>(Objects.requireNonNull(initial));
 	}
 
-	/** Creates an RxBox which implements the "getter" part with RxGetter, and the setter part with the given Consumer. */
+	/** Creates an {@code RxBox} which implements the "getter" part with {@code RxGetter}, and the setter part with {@code Consumer}. */
 	public static <T> RxBox<T> from(RxGetter<T> getter, Consumer<T> setter) {
 		return new RxBox<T>() {
 			@Override
@@ -59,7 +59,7 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 		};
 	}
 
-	/** The default implementation of an RxBox. */
+	/** A default implementation of an {@code RxBox}. */
 	public static class Default<T> implements RxBox<T> {
 		private volatile T value;
 		private final BehaviorSubject<T> subject;

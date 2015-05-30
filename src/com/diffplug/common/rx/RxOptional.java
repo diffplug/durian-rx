@@ -18,8 +18,8 @@ package com.diffplug.common.rx;
 import java.util.Optional;
 
 /**
- * An extension of RxBox<Optional<T>>, with convenience
- * methods for creation.
+ * <code>{@link RxBox}&lt;{@link Optional}&lt;T&gt;&gt;</code>
+ * with convenience methods for creating the optional.
  */
 public class RxOptional<T> extends RxBox.Default<Optional<T>> {
 	/** Returns an empty RxOptional. */

@@ -24,10 +24,9 @@ import java.util.function.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 
-/** 
- * An extension of RxBox<ImmutableSet<T>>, with
- * convenience methods for modifying and creating the set,
- * as well as for converting it into an RxBox<Optional<T>>.
+/**
+ * <code>{@link RxBox}&lt;{@link ImmutableSortedSet}&lt;T&gt;&gt;</code>
+ * with convenience methods for creating and mutating the set.
  */
 public class RxSortedSet<T> extends RxBox.Default<ImmutableSortedSet<T>> {
 	/** Creates an RxSet with an initially empty value. */

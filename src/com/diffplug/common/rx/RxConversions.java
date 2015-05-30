@@ -23,16 +23,16 @@ import com.google.common.collect.Iterables;
 
 import com.diffplug.common.base.Unhandled;
 
-/** Static methods for converting between RxBox<ImmutableSet<T>> and RxBox<Optional<T>>. */
+/** Static methods for converting between <code>{@link RxBox}&lt;{@link ImmutableSet}&lt;T&gt;&gt;</code> and <code>{@link RxBox}&lt;{@link ImmutableSet}&lt;T&gt;&gt;</code>. */
 public class RxConversions {
-	/** Converts an RxBox<Optional<T>> to an RxBox<ImmutableSet<T>>. */
+	/** Converts an {@code RxBox<Optional<T>>} to an {@code RxBox<ImmutableSet<T>>}. */
 	public static <T> RxBox<ImmutableSet<T>> asSet(RxBox<Optional<T>> input, Function<ImmutableSet<T>, T> onMultiple) {
 		return RxBox.from(input.map(RxConversions::optionalToSet), set -> {
 			input.set(setToOptional(set, onMultiple));
 		});
 	}
 
-	/** Converts an RxBox<ImmutableSet<T>> to an RxBox<Optional<T>>. */
+	/** Converts an {@code RxBox<ImmutableSet<T>>} to an {@code RxBox<Optional<T>>}. */
 	public static <T> RxBox<Optional<T>> asOptional(RxBox<ImmutableSet<T>> input, Function<ImmutableSet<T>, T> onMultiple) {
 		return RxBox.from(input.map(set -> setToOptional(set, onMultiple)), newValue -> {
 			input.set(optionalToSet(newValue));
@@ -59,7 +59,7 @@ public class RxConversions {
 		}
 	}
 
-	/** Functions which implement the onMultiple function required to convert a Set to an Optional. */
+	/** Functions which implement the {@code onMultiple} function required to convert a Set to an Optional. */
 	public static class OnMultiple {
 		private OnMultiple() {}
 
@@ -70,7 +70,7 @@ public class RxConversions {
 			};
 		}
 
-		/** Throws an exception when ImmutableSet is multiple. */
+		/** Just takes the first value when ImmutableSet has multiple values. */
 		public static <T> Function<ImmutableSet<T>, T> takeFirst() {
 			return val -> val.asList().get(0);
 		}

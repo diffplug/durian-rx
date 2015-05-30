@@ -18,10 +18,10 @@ package com.diffplug.common.rx;
 import rx.Observable;
 
 /**
- * An object which can be supplied in an Observable form.
- * 
- * Ideally, rx.Observable would be an interface, and this interface wouldn't be necessary.  But
- * so long as it isn't an interface, this (combined with Rx) makes it fairly seamless to fix this.
+ * An object which can be supplied in an {@link rx.Observable} form.
+ * <p>
+ * Ideally, {@code rx.Observable} would be an interface, which would make this interface unnecessary.  But
+ * so long as it isn't, this (combined with {@link Rx}) makes it fairly seamless to fix this.
  */
 public interface IObservable<T> {
 	Observable<T> asObservable();

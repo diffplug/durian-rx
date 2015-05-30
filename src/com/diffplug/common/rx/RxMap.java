@@ -21,9 +21,9 @@ import java.util.function.Function;
 
 import com.google.common.collect.ImmutableMap;
 
-/** 
- * An extension of RxBox<ImmutableMap<K, V>>, with
- * convenience methods for modifying and creating the map.
+/**
+ * <code>{@link RxBox}&lt;{@link ImmutableMap}&lt;T&gt;&gt;</code>
+ * with convenience methods for creating and mutating the map.
  */
 public class RxMap<K, V> extends RxBox.Default<ImmutableMap<K, V>> {
 	/** Creates an RxMap with an initially empty value. */

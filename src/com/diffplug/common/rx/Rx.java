@@ -36,56 +36,67 @@ import com.diffplug.common.base.Errors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * Rx is a class which unifies the listener models of rx.Observable
- * with com.google.common.util.concurrent.ListenableFuture.
- * 
- * TL;DR:
- * 
- * Rx.subscribe(listenableOrObservable, val -> doSomething(val)); // errors are passed to ErrorHandler.log()
- * Rx.subscribe(listenableOrObservable, Rx.onTerminate(optionalError -> maybeHandleError()); // values are ignored
+ * Rx unifies the listener models of {@link rx.Observable RxJava's Observable} 
+ * with <code><a href="https://code.google.com/p/guava-libraries/wiki/ListenableFutureExplained">Guava's ListenableFuture</a></code>
+ * , and also adds tracing capabilities.
+ * <p>
+ * TL;DR
+ * <pre>
+ * // subscribe to values, termination, or both
+ * Rx.subscribe(listenableOrObservable, val -> doSomething(val));                             // errors are passed to Errors.log()
+ * Rx.subscribe(listenableOrObservable, Rx.onTerminate(optionalError -> maybeHandleError());  // values are ignored
  * Rx.subscribe(listenableOrObservable, Rx.onValueOrTerminate(val -> doSomething(val), optionalError -> maybeHandleError()));
- * 
+ * // receive callbacks on a specific executor
  * Rx.on(someExecutor).subscribe(listenableOrObservable, val -> doSomething(val));
- * 
+ * // call unsubscribe() on the subscription to cancel it 
  * rx.Subscription subscription = Rx.subscribe(listenableOrObservable, val -> doSomething);
- * 
- * Long version:
- * 
- * Rx implements both the Observer and FutureCallback interfaces by mapping them to two functions,
- * `onValue(T value)` and `onTerminate(Optional<Throwable> error)` as follows:
- * 
- * - Observable.onNext(T value) -> Rx.onValue(T value)
- * - Observable.onCompleted() -> Rx.onTerminate(Optional.empty())
- * - Observable.onError(Throwable error) -> Rx.onTerminate(Optional.of(error))
- * - ListenableFuture.onSuccess(T result) -> Rx.onValue(T value), Rx.onTerminate(Optional.empty())
- * - ListenableFuture.onError(Throwable error -> Rx.onTerminate(Optional.of(error))
- * 
- * An instance of Rx is created by calling one of Rx's 3 static creator methods:
- * - Rx.onValueOrTerminate(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate))
- * - Rx.onTerminate(Consumer<Optional<Throwable>> onTerminate) // This Rx implementation ignores all values
- * - Rx.onValue(Consumer<T> onValue) // This Rx implementation passes all errors to ErrorHandler.log()
- * 
+ * </pre>
+ * Long version: {@code Rx} implements both the {@link rx.Observer} and {@link com.google.common.util.concurrent.FutureCallback}
+ * interfaces by mapping them to two {@code Consumer}s:
+ * <ul>
+ * <li>{@code Consumer<T> onValue}</li>
+ * <li>{@code Consumer<Optional<Throwable>> onTerminate}</li>
+ * </ul>
+ * Which are mapped as follows:
+ * <ul>
+ * <li>{@code Observable.onNext(T value)          -> onValue.accept(value)}</li>
+ * <li>{@code Observable.onCompleted()            -> onTerminate.accept(Optional.empty())}</li>
+ * <li>{@code Observable.onError(Throwable error) -> onTerminate.accept(Optional.of(error))}</li>
+ * <li>{@code FutureCallback.onSuccess(T value)       -> onValue.accept(value); onTerminate.accept(Optional.empty());}</li>
+ * <li>{@code FutureCallback.onError(Throwable error) -> onTerminate.accept(Optional.of(error))}</li>
+ * </ul>
+ * An instance of Rx is created by calling one of Rx's static creator methods:
+ * <ul>
+ * <li>{@link #onValue(Consumer)     onValue(Consumer&lt;T&gt;)}</li>
+ * <li>{@link #onTerminate(Consumer) onTerminate(Consumer&lt;Optional&lt;Throwable&gt;&gt;)}</li>
+ * <li>{@link #onFailure(Consumer)   onFailure(Consumer&lt;Throwable&gt;)}</li>
+ * <li>{@link #onValueOrTerminate    onValueOrTerminate(Consumer&lt;T&gt;, Consumer&lt;Optional&lt;Throwable&gt;&gt;)}</li>
+ * <li>{@link #onValueOrFailure      onValueOrFailure(Consumer&lt;T&gt;, Consumer&lt;Throwable&gt;)}</li>
+ * </ul>
  * Once you have an instance of Rx, you can subscribe it using the normal RxJava or Guava calls:
- *   Futures.addCallback(listenableFuture, Rx.onValue(val -> doSomething(val));
- *   rxObservable.subscribe(Rx.onValue(val -> doSomething(val));
- * 
+ * <ul>
+ * <li>{@code rxObservable.subscribe(Rx.onValue(val -> doSomething(val));}</li>
+ * <li>{@code Futures.addCallback(listenableFuture, Rx.onValue(val -> doSomething(val));}</li>
+ * </ul>
  * But the recommended way to subscribe is to use:
- *   Rx.subscribe(listenableOrObservable, Rx.onValue(val -> doSomething(val)));
- *   Rx.subscribe(listenableOrObservable, val -> doSomething(val)); // automatically uses Rx.onValue()
- * 
- * The advantage of this latter method is that it returns rx.Subscription instances
+ * <ul>
+ * <li>{@code Rx.subscribe(listenableOrObservable, Rx.onValue(val -> doSomething(val)));}</li>
+ * <li>{@code Rx.subscribe(listenableOrObservable, val -> doSomething(val)); // automatically uses Rx.onValue()}</li>
+ * </ul>
+ * The advantage of this latter method is that it returns {@link rx.Subscription} instances
  * which allow you to unsubscribe from futures in the same manner as for observables.
- * 
- *   subscription = Rx.subscribe( ... )
- * 
+ * <ul>
+ * <li>{@code subscription = Rx.subscribe( ... )}</li>
+ * </ul>
  * If you wish to receive callbacks on a specific thread, you can use:
+ * <ul>
+ * <li>{@code Rx.on(someExecutor).subscribe( ... )}</li>
+ * </ul>
+ * Because RxJava's Observables use {@link rx.Scheduler}s rather than {@link java.util.concurrent.Executor}s,
+ * a Scheduler is automatically created using {@link rx.Schedulers#from}. If you'd like to specify the Scheduler manually, you can use {@link Rx#on(Executor, Scheduler)}
+ * or you can create an executor which implements {@link Rx.HasRxExecutor}.
  * 
- * Rx.on(someExecutor).subscribe( ... ).
- * 
- * Because RxJava's Observables use Schedulers rather than Executors, a Scheduler is
- * automatically created using Schedulers.from(executor).  If you'd like to specify
- * the Scheduler manually, you can use Rx.on(someExecutor, someScheduler), or you can
- * create an executor which implements Rx.HasRxExecutor.
+ * @see <a href="https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html">SwtExec</a>
  */
 public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	private final Consumer<T> onValue;
@@ -155,9 +166,9 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		});
 	}
 
-	// ///////////
+	//////////////
 	// Observer //
-	// ///////////
+	//////////////
 	@Override
 	public final void onNext(T t) {
 		onValue.accept(t);
@@ -190,9 +201,9 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		return subscribe(observable.asObservable(), listener);
 	}
 
-	// /////////////////
+	////////////////////
 	// FutureCallback //
-	// /////////////////
+	////////////////////
 	@Override
 	public final void onSuccess(T result) {
 		onValue.accept(result);
