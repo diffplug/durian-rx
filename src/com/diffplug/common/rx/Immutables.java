@@ -16,6 +16,7 @@
 package com.diffplug.common.rx;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,8 +27,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -154,5 +159,76 @@ public class Immutables {
 	/** Converts a Set to an Optional, throwing an error if there are multiple elements. */
 	public static <T> Optional<T> setToOptional(ImmutableSet<T> set) {
 		return RxConversions.setToOptional(set, RxConversions.OnMultiple.error());
+	}
+
+	///////////////////////
+	// Java 8 Collectors //
+	///////////////////////
+	// Inspired by http://blog.comsysto.com/2014/11/12/java-8-collectors-for-guava-collections/
+	/** A Collector which returns an ImmutableList. */
+	public static <T> Collector<T, ?, ImmutableList<T>> toList() {
+		// called for each combiner element (once if single-threaded, multiple if parallel)
+		Supplier<ImmutableList.Builder<T>> supplier = ImmutableList::builder;
+		// called for every element in the stream
+		BiConsumer<ImmutableList.Builder<T>, T> accumulator = (b, v) -> b.add(v);
+		// combines multiple collectors for parallel streams
+		BinaryOperator<ImmutableList.Builder<T>> combiner = (l, r) -> l.addAll(r.build());
+		// converts the builder into the list
+		Function<ImmutableList.Builder<T>, ImmutableList<T>> finisher = ImmutableList.Builder::build;
+		return Collector.of(supplier, accumulator, combiner, finisher);
+	}
+
+	/** A Collector which returns an ImmutableSet. */
+	public static <T> Collector<T, ?, ImmutableSet<T>> toSet() {
+		Supplier<ImmutableSet.Builder<T>> supplier = ImmutableSet::builder;
+		BiConsumer<ImmutableSet.Builder<T>, T> accumulator = (b, v) -> b.add(v);
+		BinaryOperator<ImmutableSet.Builder<T>> combiner = (l, r) -> l.addAll(r.build());
+		Function<ImmutableSet.Builder<T>, ImmutableSet<T>> finisher = ImmutableSet.Builder::build;
+		return Collector.of(supplier, accumulator, combiner, finisher);
+	}
+
+	/** A Collector of Comparables which returns an ImmutableSortedSet. */
+	public static <T extends Comparable<?>> Collector<T, ?, ImmutableSortedSet<T>> toSortedSet() {
+		return toSortedSetImp(ImmutableSortedSet::naturalOrder);
+	}
+
+	/** A Collector which returns an ImmutableSortedSet which is ordered by the given comparator. */
+	public static <T> Collector<T, ?, ImmutableSortedSet<T>> toSortedSet(Comparator<T> comparator) {
+		return toSortedSetImp(() -> ImmutableSortedSet.orderedBy(comparator));
+	}
+
+	private static <T> Collector<T, ?, ImmutableSortedSet<T>> toSortedSetImp(Supplier<ImmutableSortedSet.Builder<T>> supplier) {
+		BiConsumer<ImmutableSortedSet.Builder<T>, T> accumulator = (b, v) -> b.add(v);
+		BinaryOperator<ImmutableSortedSet.Builder<T>> combiner = (l, r) -> l.addAll(r.build());
+		Function<ImmutableSortedSet.Builder<T>, ImmutableSortedSet<T>> finisher = ImmutableSortedSet.Builder::build;
+		return Collector.of(supplier, accumulator, combiner, finisher);
+	}
+
+	/** A Collector which returns an ImmutableMap using the given pair of key and value functions. */
+	public static <T, K, V> Collector<T, ?, ImmutableMap<K, V>> toMap(Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
+		Supplier<ImmutableMap.Builder<K, V>> supplier = ImmutableMap::builder;
+		BiConsumer<ImmutableMap.Builder<K, V>, T> accumulator = (b, v) -> b.put(keyMapper.apply(v), valueMapper.apply(v));
+		BinaryOperator<ImmutableMap.Builder<K, V>> combiner = (l, r) -> l.putAll(r.build());
+		Function<ImmutableMap.Builder<K, V>, ImmutableMap<K, V>> finisher = ImmutableMap.Builder::build;
+		return Collector.of(supplier, accumulator, combiner, finisher);
+	}
+
+	/** A Collector which returns an ImmutableSortedMap which is populated by the given pair of key and value functions. */
+	public static <T, K extends Comparable<?>, V> Collector<T, ?, ImmutableSortedMap<K, V>> toSortedMap(Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
+		Supplier<ImmutableSortedMap.Builder<K, V>> supplier = ImmutableSortedMap::naturalOrder;
+		return toSortedMap(supplier, keyMapper, valueMapper);
+	}
+
+	/** A Collector which returns an ImmutableSortedMap which is ordered by the given comparator, and populated by the given pair of key and value functions. */
+	public static <T, K extends Comparable<?>, V> Collector<T, ?, ImmutableSortedMap<K, V>> toSortedMap(Comparator<K> comparator, Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
+		Supplier<ImmutableSortedMap.Builder<K, V>> supplier = () -> ImmutableSortedMap.orderedBy(comparator);
+		return toSortedMap(supplier, keyMapper, valueMapper);
+	}
+
+	private static <T, K, V> Collector<T, ?, ImmutableSortedMap<K, V>> toSortedMap(Supplier<ImmutableSortedMap.Builder<K, V>> supplier, Function<? super T, ? extends K> keyMapper, Function<? super T, ? extends V> valueMapper) {
+		BiConsumer<ImmutableSortedMap.Builder<K, V>, T> accumulator = (b, v) -> b.put(keyMapper.apply(v), valueMapper.apply(v));
+		BinaryOperator<ImmutableSortedMap.Builder<K, V>> combiner = (l, r) -> l.putAll(r.build());
+		Function<ImmutableSortedMap.Builder<K, V>, ImmutableSortedMap<K, V>> finisher = ImmutableSortedMap.Builder::build;
+		return Collector.of(supplier, accumulator, combiner, finisher);
 	}
 }

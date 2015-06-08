@@ -70,6 +70,7 @@ DurianRx's only requirements are [Guava](https://github.com/google/guava), [RxJa
 ## Acknowledgements
 
 * Many thanks to [RxJava](https://github.com/reactivex/rxjava) and [Guava](https://github.com/google/guava).
+* Stream Collectors for Guava collections inspired by [Maciej Miklas's blog post](http://blog.comsysto.com/2014/11/12/java-8-collectors-for-guava-collections/).
 * Formatted by [spotless](https://github.com/diffplug/spotless), [as such](https://github.com/diffplug/durian-rx/blob/v1.0/build.gradle?ts=4#L70-L90).
 * Bugs found by [findbugs](http://findbugs.sourceforge.net/), [as such](https://github.com/diffplug/durian-rx/blob/v1.0/build.gradle?ts=4#L92-L116).
 * Scripts in the `.ci` folder are inspired by [Ben Limmer's work](http://benlimmer.com/2013/12/26/automatically-publish-javadoc-to-gh-pages-with-travis-ci/).
