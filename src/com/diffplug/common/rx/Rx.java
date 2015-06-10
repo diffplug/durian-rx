@@ -253,7 +253,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	 * Scheduler (for Observable).  It has methods which match the signatures of Rx's
 	 * static methods, which allows users to   
 	 */
-	public static class RxExecutor {
+	public static class RxExecutor implements RxSubscriber {
 		private final Executor executor;
 		private final Scheduler scheduler;
 		private final RxTracingPolicy tracingPolicy;
@@ -264,23 +264,13 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 			this.tracingPolicy = getTracingPolicy();
 		}
 
+		@Override
 		public <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> untracedListener) {
 			Rx<T> listener = tracingPolicy.hook(observable, untracedListener);
 			return observable.observeOn(scheduler).subscribe(listener);
 		}
 
-		public <T> Subscription subscribe(Observable<? extends T> observable, Consumer<T> listener) {
-			return subscribe(observable, Rx.onValue(listener));
-		}
-
-		public <T> Subscription subscribe(IObservable<? extends T> observable, Rx<T> listener) {
-			return subscribe(observable.asObservable(), listener);
-		}
-
-		public <T> Subscription subscribe(IObservable<? extends T> observable, Consumer<T> listener) {
-			return subscribe(observable, Rx.onValue(listener));
-		}
-
+		@Override
 		public <T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> untracedListener) {
 			Rx<T> listener = tracingPolicy.hook(future, untracedListener);
 			// when we're unsubscribed, set the flag to false
@@ -300,10 +290,6 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 			}, executor);
 			// return the subscription
 			return sub;
-		}
-
-		public <T> Subscription subscribe(ListenableFuture<? extends T> future, Consumer<T> listener) {
-			return subscribe(future, Rx.onValue(listener));
 		}
 	}
 
