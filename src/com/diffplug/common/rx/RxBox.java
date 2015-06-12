@@ -17,6 +17,7 @@ package com.diffplug.common.rx;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
@@ -29,9 +30,14 @@ import com.diffplug.common.base.Box;
  * {@link RxGetter} and {@link Box} combined in one: a value you can set, get, and subscribe to.
  */
 public interface RxBox<T> extends RxGetter<T>, Box<T> {
-	/** Returns a read-only version of this RxBox. */
+	/** Returns a read-only version of this {@code RxBox}. */
 	default RxGetter<T> readOnly() {
 		return this;
+	}
+
+	/** Maps one {@code RxBox} to another {@code RxBox}. */
+	default <R> RxBox<R> map(Function<? super T, ? extends R> getMapper, Function<? super R, ? extends T> setMapper) {
+		return from(map(getMapper), toSet -> set(setMapper.apply(toSet)));
 	}
 
 	/** Creates an {@code RxBox} with the given initial value. */
