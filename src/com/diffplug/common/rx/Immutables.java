@@ -34,6 +34,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -62,7 +63,7 @@ import com.diffplug.common.base.Box;
  * </ul>
  * </ul>
  * <p>
- * This class also contains the simple {@link #optionalToSet} and {@link #setToOptional(ImmutableSet)} methods.
+ * This class also contains the simple {@link #optionalToSet} and {@link #optionalFrom(ImmutableSet)} methods.
  */
 public class Immutables {
 	private Immutables() {}
@@ -149,16 +150,29 @@ public class Immutables {
 	}
 
 	//////////////////////
-	// Optional <-> Set //
+	// Optional <-> Stuff //
 	//////////////////////
-	/** Converts an Optional to a Set. */
+	/** Converts an {@link Optional} to an {@link ImmutableSet}. */
 	public static <T> ImmutableSet<T> optionalToSet(Optional<T> selection) {
-		return RxConversions.optionalToSet(selection);
+		if (selection.isPresent()) {
+			return ImmutableSet.of(selection.get());
+		} else {
+			return ImmutableSet.of();
+		}
 	}
 
-	/** Converts a Set to an Optional, throwing an error if there are multiple elements. */
-	public static <T> Optional<T> setToOptional(ImmutableSet<T> set) {
-		return RxConversions.setToOptional(set, RxConversions.OnMultiple.error());
+	/**
+	 * Converts an {@link ImmutableCollection} to an {@link Optional}.
+	 * @throws IllegalArgumentException if there are multiple elements.
+	 */
+	public static <T> Optional<T> optionalFrom(ImmutableCollection<T> collection) {
+		if (collection.size() == 0) {
+			return Optional.empty();
+		} else if (collection.size() == 1) {
+			return Optional.of(collection.iterator().next());
+		} else {
+			throw new IllegalArgumentException("Collection contains multiple elements.");
+		}
 	}
 
 	///////////////////////
