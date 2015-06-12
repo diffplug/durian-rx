@@ -49,9 +49,10 @@ public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 	 * <li>Correct: {@code ("A", "B", "C") -> map(String::length) = (1)}</li>
 	 * </ul>
 	 */
-	default <R> RxGetter<R> map(Function<T, R> mapper) {
+	default <R> RxGetter<R> map(Function<? super T, ? extends R> mapper) {
 		final RxGetter<T> src = this;
-		final Observable<R> observable = src.asObservable().map(mapper::apply).distinctUntilChanged();
+		final Observable<R> mapped = src.asObservable().map(mapper::apply);
+		final Observable<R> observable = mapped.distinctUntilChanged();
 		return new RxGetter<R>() {
 			@Override
 			public Observable<R> asObservable() {
