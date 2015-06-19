@@ -64,6 +64,9 @@ import com.diffplug.common.base.Box;
  * </ul>
  * </ul>
  * <p>
+ * There are also {@code Function<ImmutableCollection, ImmutableCollection> mutateCollection(Consumer<MutableCollection> mutator)}
+ * methods for each type, to easily create functions which operate on immutable collections.
+ * <p>
  * This class also contains the simple {@link #optionalToSet} and {@link #optionalFrom(ImmutableSet)} methods.
  */
 public class Immutables {
