@@ -32,6 +32,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 
 import com.google.common.collect.ImmutableCollection;
@@ -104,6 +105,34 @@ public class Immutables {
 		NavigableMap<K, V> mutable = new TreeMap<>(source);
 		mutator.accept(mutable);
 		return ImmutableSortedMap.copyOfSorted(mutable);
+	}
+
+	/////////////
+	// Mutator //
+	/////////////
+	/** Returns a function which mutates a list using the given mutator. */
+	public static <T> UnaryOperator<ImmutableList<T>> mutatorList(Consumer<List<T>> mutator) {
+		return input -> mutateList(input, mutator);
+	}
+
+	/** Returns a function which mutates a set using the given mutator. */
+	public static <T> UnaryOperator<ImmutableSet<T>> mutatorSet(Consumer<Set<T>> mutator) {
+		return input -> mutateSet(input, mutator);
+	}
+
+	/** Returns a function which mutates a sorted set using the given mutator. */
+	public static <T> UnaryOperator<ImmutableSortedSet<T>> mutatorSortedSet(Consumer<NavigableSet<T>> mutator) {
+		return input -> mutateSortedSet(input, mutator);
+	}
+
+	/** Returns a function which mutates a map using the given mutator. */
+	public static <K, V> UnaryOperator<ImmutableMap<K, V>> mutatorMap(Consumer<Map<K, V>> mutator) {
+		return input -> mutateMap(input, mutator);
+	}
+
+	/** Returns a function which mutates a sorted map using the given mutator. */
+	public static <K, V> UnaryOperator<ImmutableSortedMap<K, V>> mutatorSortedMap(Consumer<NavigableMap<K, V>> mutator) {
+		return input -> mutateSortedMap(input, mutator);
 	}
 
 	///////////////////////
