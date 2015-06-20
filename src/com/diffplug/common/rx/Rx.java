@@ -117,7 +117,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	private static final Consumer<Optional<Throwable>> logErrors = error -> {
 		if (error.isPresent()) {
-			Errors.log().handle(error.get());
+			Errors.log().accept(error.get());
 		}
 	};
 

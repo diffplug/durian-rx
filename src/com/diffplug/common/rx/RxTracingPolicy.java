@@ -93,7 +93,7 @@ public interface RxTracingPolicy {
 					if (error.isPresent()) {
 						// if there is an error, wrap it in a SubscriptionException and log it
 						SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
-						Errors.log().handle(subException);
+						Errors.log().accept(subException);
 						// if the original listener was just logging exceptions, there's no need to notify it, as this would be a double-log
 						if (!listener.isLogging()) {
 							// the listener isn't a simple logger, so we should pass the original exception
