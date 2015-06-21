@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSortedMap;
 
@@ -61,10 +60,5 @@ public class RxSortedMap<K, V> extends RxBox.Default<ImmutableSortedMap<K, V>> {
 	/** Mutates this map. */
 	public void mutate(Consumer<NavigableMap<K, V>> mutator) {
 		super.set(Immutables.mutateSortedMap(get(), mutator));
-	}
-
-	/** Mutates this map, and returns a value. */
-	public <R> R mutateAndReturn(Function<NavigableMap<K, V>, R> mutator) {
-		return Immutables.mutateSortedMapAndReturn(this, mutator);
 	}
 }

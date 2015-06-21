@@ -45,32 +45,25 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 
-import com.diffplug.common.base.Box;
-
 /**
  * Methods for manipulating Guava's immutable collections.
  * <p>
- * For each Guava {@code ImmutableCollection}, (where {@code Collection} is {@code List, Set, SortedSet, Map, SortedMap, BiMap}) there are two methods:
+ * For each Guava {@code ImmutableCollection}, (where {@code Collection} is {@code List, Set, SortedSet, Map, SortedMap, BiMap}) there is a method:
  * <ul>
  * <li>{@code ImmutableCollection mutateCollection(ImmutableCollection source, Consumer<MutableCollection> mutator)}</li>
- * <li>{@code <T> T mutateCollectionAndReturn(Box<ImmutableCollection>, Function<MutableCollection, T> mutator)}</li>
  * </ul>
- * Which work like this:
+ * Which works like this:
  * <ul>
  * <li>Copy the {@code ImmutableCollection} into a new {@code MutableCollection}.</li>
  * <li>Pass this {@code MutableCollection} collection to the {@code mutator}.</li>
  * <li>Copy the (now-mutated) {@code MutableCollection} into a new {@code ImmutableCollection}.</li>
- * <li>The return value is:
- * <ul>
- *     <li>{@code mutateCollection}: the mutated {@code ImmutableCollection} is returned.</li>
- *     <li>{@code mutateCollectionAndReturn}: the mutated {@code ImmutableCollection} is set into the supplied {@code box}, and the return value of the {@code mutator} is returned.</li>
- * </ul>
+ * <li>Return this {@code ImmutableCollecion}.</li>
  * </ul>
  * <p>
- * There are also {@code Function<ImmutableCollection, ImmutableCollection> mutateCollection(Consumer<MutableCollection> mutator)}
+ * There are also {@code Function<ImmutableCollection, ImmutableCollection> mutatorCollection(Consumer<MutableCollection> mutator)}
  * methods for each type, to easily create functions which operate on immutable collections.
  * <p>
- * This class also contains the simple {@link #optionalToSet} and {@link #optionalFrom(ImmutableSet)} methods.
+ * This class also contains the simple {@link #optionalToSet} and {@link #optionalFrom(ImmutableCollection)} methods.
  */
 public class Immutables {
 	private Immutables() {}
@@ -153,60 +146,9 @@ public class Immutables {
 		return input -> mutateBiMap(input, mutator);
 	}
 
-	///////////////////////
-	// Mutate and return //
-	///////////////////////
-	/** Mutates the given list and returns a value. */
-	public static <T, R> R mutateListAndReturn(Box<ImmutableList<T>> box, Function<List<T>, R> mutator) {
-		List<T> mutable = new ArrayList<>(box.get());
-		R returnValue = mutator.apply(mutable);
-		box.set(ImmutableList.copyOf(mutable));
-		return returnValue;
-	}
-
-	/** Mutates the given set and returns a value. */
-	public static <T, R> R mutateSetAndReturn(Box<ImmutableSet<T>> box, Function<Set<T>, R> mutator) {
-		Set<T> mutable = new LinkedHashSet<>(box.get());
-		R returnValue = mutator.apply(mutable);
-		box.set(ImmutableSet.copyOf(mutable));
-		return returnValue;
-	}
-
-	/** Mutates the given sorted set and returns a value. */
-	public static <T, R> R mutateSortedSetAndReturn(Box<ImmutableSortedSet<T>> box, Function<NavigableSet<T>, R> mutator) {
-		NavigableSet<T> mutable = new TreeSet<>(box.get());
-		R returnValue = mutator.apply(mutable);
-		box.set(ImmutableSortedSet.copyOfSorted(mutable));
-		return returnValue;
-	}
-
-	/** Mutates the given map and returns a value. */
-	public static <K, V, R> R mutateMapAndReturn(Box<ImmutableMap<K, V>> box, Function<Map<K, V>, R> mutator) {
-		Map<K, V> mutable = new LinkedHashMap<>(box.get());
-		R returnValue = mutator.apply(mutable);
-		box.set(ImmutableMap.copyOf(mutable));
-		return returnValue;
-	}
-
-	/** Mutates the given sorted map and returns a value. */
-	public static <K, V, R> R mutateSortedMapAndReturn(Box<ImmutableSortedMap<K, V>> box, Function<NavigableMap<K, V>, R> mutator) {
-		NavigableMap<K, V> mutable = new TreeMap<>(box.get());
-		R returnValue = mutator.apply(mutable);
-		box.set(ImmutableSortedMap.copyOfSorted(mutable));
-		return returnValue;
-	}
-
-	/** Mutates the given sorted map and returns a value. */
-	public static <K, V, R> R mutateBiMapAndReturn(Box<ImmutableBiMap<K, V>> box, Function<BiMap<K, V>, R> mutator) {
-		BiMap<K, V> mutable = HashBiMap.create(box.get());
-		R returnValue = mutator.apply(mutable);
-		box.set(ImmutableBiMap.copyOf(mutable));
-		return returnValue;
-	}
-
-	//////////////////////
+	////////////////////////
 	// Optional <-> Stuff //
-	//////////////////////
+	////////////////////////
 	/** Converts an {@link Optional} to an {@link ImmutableSet}. */
 	public static <T> ImmutableSet<T> optionalToSet(Optional<T> selection) {
 		if (selection.isPresent()) {

@@ -17,7 +17,6 @@ package com.diffplug.common.rx;
 
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -49,10 +48,5 @@ public class RxMap<K, V> extends RxBox.Default<ImmutableMap<K, V>> {
 	/** Mutates this map. */
 	public void mutate(Consumer<Map<K, V>> mutator) {
 		super.set(Immutables.mutateMap(get(), mutator));
-	}
-
-	/** Mutates this map, and returns a value. */
-	public <R> R mutateAndReturn(Function<Map<K, V>, R> mutator) {
-		return Immutables.mutateMapAndReturn(this, mutator);
 	}
 }

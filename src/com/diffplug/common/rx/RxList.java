@@ -17,7 +17,6 @@ package com.diffplug.common.rx;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import com.google.common.collect.ImmutableList;
 
@@ -49,10 +48,5 @@ public class RxList<T> extends RxBox.Default<ImmutableList<T>> {
 	/** Mutates this list. */
 	public void mutate(Consumer<List<T>> mutator) {
 		set(Immutables.mutateList(get(), mutator));
-	}
-
-	/** Mutates this list and returns a value. */
-	public <R> R mutateAndReturn(Function<List<T>, R> mutator) {
-		return Immutables.mutateListAndReturn(this, mutator);
 	}
 }

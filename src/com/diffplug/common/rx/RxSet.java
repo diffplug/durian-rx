@@ -17,7 +17,6 @@ package com.diffplug.common.rx;
 
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -49,10 +48,5 @@ public class RxSet<T> extends RxBox.Default<ImmutableSet<T>> {
 	/** Mutates this set. */
 	public void mutate(Consumer<Set<T>> mutator) {
 		set(Immutables.mutateSet(get(), mutator));
-	}
-
-	/** Mutates this set. */
-	public <R> R mutateAndReturn(Function<Set<T>, R> mutator) {
-		return Immutables.mutateSetAndReturn(this, mutator);
 	}
 }
