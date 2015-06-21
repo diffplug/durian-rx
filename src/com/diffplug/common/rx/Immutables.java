@@ -35,6 +35,9 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -47,7 +50,7 @@ import com.diffplug.common.base.Box;
 /**
  * Methods for manipulating Guava's immutable collections.
  * <p>
- * For each Guava {@code ImmutableCollection}, (where {@code Collection} is {@code List, Set, SortedSet, Map, SortedMap}) there are two methods:
+ * For each Guava {@code ImmutableCollection}, (where {@code Collection} is {@code List, Set, SortedSet, Map, SortedMap, BiMap}) there are two methods:
  * <ul>
  * <li>{@code ImmutableCollection mutateCollection(ImmutableCollection source, Consumer<MutableCollection> mutator)}</li>
  * <li>{@code <T> T mutateCollectionAndReturn(Box<ImmutableCollection>, Function<MutableCollection, T> mutator)}</li>
@@ -110,6 +113,13 @@ public class Immutables {
 		return ImmutableSortedMap.copyOfSorted(mutable);
 	}
 
+	/** Returns a mutated version of the given sorted map. */
+	public static <K, V> ImmutableBiMap<K, V> mutateBiMap(ImmutableBiMap<K, V> source, Consumer<BiMap<K, V>> mutator) {
+		BiMap<K, V> mutable = HashBiMap.create(source);
+		mutator.accept(mutable);
+		return ImmutableBiMap.copyOf(mutable);
+	}
+
 	/////////////
 	// Mutator //
 	/////////////
@@ -136,6 +146,11 @@ public class Immutables {
 	/** Returns a function which mutates a sorted map using the given mutator. */
 	public static <K, V> UnaryOperator<ImmutableSortedMap<K, V>> mutatorSortedMap(Consumer<NavigableMap<K, V>> mutator) {
 		return input -> mutateSortedMap(input, mutator);
+	}
+
+	/** Returns a function which mutates a sorted map using the given mutator. */
+	public static <K, V> UnaryOperator<ImmutableBiMap<K, V>> mutatorBiMap(Consumer<BiMap<K, V>> mutator) {
+		return input -> mutateBiMap(input, mutator);
 	}
 
 	///////////////////////
@@ -178,6 +193,14 @@ public class Immutables {
 		NavigableMap<K, V> mutable = new TreeMap<>(box.get());
 		R returnValue = mutator.apply(mutable);
 		box.set(ImmutableSortedMap.copyOfSorted(mutable));
+		return returnValue;
+	}
+
+	/** Mutates the given sorted map and returns a value. */
+	public static <K, V, R> R mutateBiMapAndReturn(Box<ImmutableBiMap<K, V>> box, Function<BiMap<K, V>, R> mutator) {
+		BiMap<K, V> mutable = HashBiMap.create(box.get());
+		R returnValue = mutator.apply(mutable);
+		box.set(ImmutableBiMap.copyOf(mutable));
 		return returnValue;
 	}
 
