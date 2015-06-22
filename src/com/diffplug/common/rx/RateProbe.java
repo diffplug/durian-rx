@@ -18,7 +18,6 @@ package com.diffplug.common.rx;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
 /** A probe for inspecting rates in reactive systems. */
@@ -35,14 +34,14 @@ public class RateProbe {
 		return elapsed;
 	}
 
-	/** Returns a stream of the average rate in hertz over the last n samples. */
-	public Observable<Double> rateHzOverNSamples(int n) {
-		return timestampNano.buffer(n).map(RateProbe::toHz);
+	/** Returns the average rate in hertz over the last n samples. */
+	public RxGetter<Double> rateHzOverNSamples(int n) {
+		return RxGetter.from(timestampNano.buffer(n).map(RateProbe::toHz), 0.0);
 	}
 
-	/** Returns a stream of the average rate in hertz over the specified time period. */
-	public Observable<Double> rateHzOver(long timespan, TimeUnit unit) {
-		return timestampNano.buffer(timespan, unit).map(RateProbe::toHz);
+	/** Returns the average rate in hertz over the specified time period. */
+	public RxGetter<Double> rateHzOver(long timespan, TimeUnit unit) {
+		return RxGetter.from(timestampNano.buffer(timespan, unit).map(RateProbe::toHz), 0.0);
 	}
 
 	/** Converts a list of System.nanoTime() timestamps into a rate. */
