@@ -130,28 +130,28 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	 * Creates an Rx instance which will call the given consumer whenever the followed stream
 	 * or future completes, whether with an error or not.
 	 */
-	public static <T> Rx<T> onTerminate(Consumer<Optional<Throwable>> onTerminal) {
-		return new Rx<T>(Consumers.doNothing(), onTerminal);
+	public static <T> Rx<T> onTerminate(Consumer<Optional<Throwable>> onTerminate) {
+		return new Rx<T>(Consumers.doNothing(), onTerminate);
 	}
 
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever the followed stream
 	 * or future completes, whether with an error or not, and the error (if present) will be logged.
 	 */
-	public static <T> Rx<T> onTerminateLogError(Consumer<Optional<Throwable>> onAnyTerminate) {
-		return new Rx<T>(Consumers.doNothing(), new DefaultTerminate(onAnyTerminate));
+	public static <T> Rx<T> onTerminateLogError(Consumer<Optional<Throwable>> onTerminate) {
+		return new Rx<T>(Consumers.doNothing(), new DefaultTerminate(onTerminate));
 	}
 
 	private static class DefaultTerminate implements Consumer<Optional<Throwable>> {
-		private final Consumer<Optional<Throwable>> onTerminal;
+		private final Consumer<Optional<Throwable>> onTerminate;
 
-		private DefaultTerminate(Consumer<Optional<Throwable>> onTerminal) {
-			this.onTerminal = onTerminal;
+		private DefaultTerminate(Consumer<Optional<Throwable>> onTerminate) {
+			this.onTerminate = onTerminate;
 		}
 
 		@Override
 		public void accept(Optional<Throwable> t) {
-			onTerminal.accept(t);
+			onTerminate.accept(t);
 			if (t.isPresent()) {
 				logErrors.accept(t);
 			}
@@ -183,7 +183,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	 * or future completes, whether with an error or not, and the error (if present) will automatically be logged.
 	 */
 	public static <T> Rx<T> onValueOnTerminateLogError(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
-		return new Rx<T>(Consumers.doNothing(), new DefaultTerminate(onTerminate));
+		return new Rx<T>(onValue, new DefaultTerminate(onTerminate));
 	}
 
 	/**
