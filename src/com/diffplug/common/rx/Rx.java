@@ -123,7 +123,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	/** Returns true iff the given Rx is a logging Rx. */
 	boolean isLogging() {
-		return onTerminate == logErrors;
+		return onTerminate == logErrors || onTerminate instanceof DefaultTerminate;
 	}
 
 	/**
@@ -132,6 +132,30 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	 */
 	public static <T> Rx<T> onTerminate(Consumer<Optional<Throwable>> onTerminal) {
 		return new Rx<T>(Consumers.doNothing(), onTerminal);
+	}
+
+	/**
+	 * Creates an Rx instance which will call the given consumer whenever the followed stream
+	 * or future completes, whether with an error or not, and the error (if present) will be logged.
+	 */
+	public static <T> Rx<T> onTerminateLogError(Consumer<Optional<Throwable>> onAnyTerminate) {
+		return new Rx<T>(Consumers.doNothing(), new DefaultTerminate(onAnyTerminate));
+	}
+
+	private static class DefaultTerminate implements Consumer<Optional<Throwable>> {
+		private final Consumer<Optional<Throwable>> onTerminal;
+
+		private DefaultTerminate(Consumer<Optional<Throwable>> onTerminal) {
+			this.onTerminal = onTerminal;
+		}
+
+		@Override
+		public void accept(Optional<Throwable> t) {
+			onTerminal.accept(t);
+			if (t.isPresent()) {
+				logErrors.accept(t);
+			}
+		}
 	}
 
 	/**
@@ -148,17 +172,25 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	/**
 	 * Creates an Rx instance which will call onValue whenever a value is received, 
-	 * is received, or onTerminal when the future or observable completes.
+	 * is received, and onTerminate when the future or observable completes, whether with an error or not.
 	 */
-	public static <T> Rx<T> onValueOrTerminate(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminal) {
-		return new Rx<T>(onValue, onTerminal);
+	public static <T> Rx<T> onValueOnTerminate(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
+		return new Rx<T>(onValue, onTerminate);
+	}
+
+	/**
+	 * Creates an Rx instance which will call the given consumer whenever the followed stream
+	 * or future completes, whether with an error or not, and the error (if present) will automatically be logged.
+	 */
+	public static <T> Rx<T> onValueOnTerminateLogError(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
+		return new Rx<T>(Consumers.doNothing(), new DefaultTerminate(onTerminate));
 	}
 
 	/**
 	 * Creates an Rx instance which will call onValue whenever a value is received,
-	 * and onFailure whenever an exception is thrown. 
+	 * and onFailure if the stream or future completes with an error.
 	 */
-	public static <T> Rx<T> onValueOrFailure(Consumer<T> onValue, Consumer<Throwable> onFailure) {
+	public static <T> Rx<T> onValueOnFailure(Consumer<T> onValue, Consumer<Throwable> onFailure) {
 		return new Rx<T>(onValue, error -> {
 			if (error.isPresent()) {
 				onFailure.accept(error.get());
