@@ -46,7 +46,9 @@ public class RxSet<T> extends RxBox.Default<ImmutableSet<T>> {
 	}
 
 	/** Mutates this set. */
-	public void mutate(Consumer<Set<T>> mutator) {
-		set(Immutables.mutateSet(get(), mutator));
+	public ImmutableSet<T> mutate(Consumer<Set<T>> mutator) {
+		ImmutableSet<T> mutated = Immutables.mutateSet(get(), mutator);
+		set(mutated);
+		return mutated;
 	}
 }

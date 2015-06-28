@@ -15,6 +15,7 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Consumer;
@@ -58,7 +59,9 @@ public class RxSortedSet<T> extends RxBox.Default<ImmutableSortedSet<T>> {
 	}
 
 	/** Mutates this set. */
-	public void mutate(Consumer<Set<T>> mutator) {
-		set(Immutables.mutateSet(get(), mutator));
+	public ImmutableSortedSet<T> mutate(Consumer<NavigableSet<T>> mutator) {
+		ImmutableSortedSet<T> mutated = Immutables.mutateSortedSet(get(), mutator);
+		set(mutated);
+		return mutated;
 	}
 }

@@ -134,7 +134,9 @@ public class RxOrderedSet<T> extends RxBox.Default<ImmutableList<T>> {
 	}
 
 	/** Mutates this set. */
-	public void mutate(Consumer<List<T>> mutator) {
-		set(Immutables.mutateList(get(), mutator));
+	public ImmutableList<T> mutate(Consumer<List<T>> mutator) {
+		ImmutableList<T> mutated = Immutables.mutateList(get(), mutator);
+		set(mutated);
+		return mutated;
 	}
 }

@@ -47,7 +47,9 @@ public class RxBiMap<K, V> extends RxBox.Default<ImmutableBiMap<K, V>> {
 	}
 
 	/** Mutates this map. */
-	public void mutate(Consumer<BiMap<K, V>> mutator) {
-		super.set(Immutables.mutateBiMap(get(), mutator));
+	public ImmutableBiMap<K, V> mutate(Consumer<BiMap<K, V>> mutator) {
+		ImmutableBiMap<K, V> mutated = Immutables.mutateBiMap(get(), mutator);
+		super.set(mutated);
+		return mutated;
 	}
 }

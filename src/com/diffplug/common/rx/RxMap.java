@@ -46,7 +46,9 @@ public class RxMap<K, V> extends RxBox.Default<ImmutableMap<K, V>> {
 	}
 
 	/** Mutates this map. */
-	public void mutate(Consumer<Map<K, V>> mutator) {
-		super.set(Immutables.mutateMap(get(), mutator));
+	public ImmutableMap<K, V> mutate(Consumer<Map<K, V>> mutator) {
+		ImmutableMap<K, V> mutated = Immutables.mutateMap(get(), mutator);
+		super.set(mutated);
+		return mutated;
 	}
 }

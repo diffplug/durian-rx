@@ -58,7 +58,9 @@ public class RxSortedMap<K, V> extends RxBox.Default<ImmutableSortedMap<K, V>> {
 	}
 
 	/** Mutates this map. */
-	public void mutate(Consumer<NavigableMap<K, V>> mutator) {
-		super.set(Immutables.mutateSortedMap(get(), mutator));
+	public ImmutableSortedMap<K, V> mutate(Consumer<NavigableMap<K, V>> mutator) {
+		ImmutableSortedMap<K, V> mutated = Immutables.mutateSortedMap(get(), mutator);
+		super.set(mutated);
+		return mutated;
 	}
 }
