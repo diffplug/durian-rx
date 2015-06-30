@@ -123,7 +123,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	/** Returns true iff the given Rx is a logging Rx. */
 	boolean isLogging() {
-		return onTerminate == logErrors || onTerminate instanceof DefaultTerminate;
+		return onTerminate == logErrors || onTerminate instanceof DefaultTerminate || onTerminate instanceof TrackCancelled;
 	}
 
 	/**
@@ -142,6 +142,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		return new Rx<T>(Consumers.doNothing(), new DefaultTerminate(onTerminate));
 	}
 
+	/** An error listener which promises to pass log all errors, without requiring the user to. */
 	private static class DefaultTerminate implements Consumer<Optional<Throwable>> {
 		private final Consumer<Optional<Throwable>> onTerminate;
 
@@ -248,12 +249,28 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	}
 
 	// Static versions
-	public static <T> Subscription subscribe(ListenableFuture<? extends T> observable, Rx<T> listener) {
-		return getSameThreadExecutor().subscribe(observable, listener);
+	public static <T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> listener) {
+		return getSameThreadExecutor().subscribe(future, listener);
 	}
 
-	public static <T> Subscription subscribe(ListenableFuture<? extends T> observable, Consumer<T> listener) {
-		return subscribe(observable, Rx.onValue(listener));
+	public static <T> Subscription subscribe(ListenableFuture<? extends T> future, Consumer<T> listener) {
+		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
+	}
+
+	/** An error listener which tracks whether a future has been cancelled, so that it doesn't log the errors of cancelled futures. */
+	static class TrackCancelled implements Consumer<Optional<Throwable>> {
+		private final ListenableFuture<?> future;
+
+		public TrackCancelled(ListenableFuture<?> future) {
+			this.future = future;
+		}
+
+		@Override
+		public void accept(Optional<Throwable> errorOpt) {
+			if (errorOpt.isPresent() && !future.isCancelled()) {
+				Errors.log().accept(errorOpt.get());
+			}
+		}
 	}
 
 	/**

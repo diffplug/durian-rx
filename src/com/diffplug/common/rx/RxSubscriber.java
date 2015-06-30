@@ -45,6 +45,6 @@ public interface RxSubscriber {
 	}
 
 	default <T> Subscription subscribe(ListenableFuture<? extends T> future, Consumer<T> listener) {
-		return subscribe(future, Rx.onValue(listener));
+		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
 	}
 }
