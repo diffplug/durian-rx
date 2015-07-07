@@ -67,8 +67,8 @@ public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 	}
 
 	/** Creates an {@code RxGetter} from the given {@code Observable} and {@code initialValue}. */
-	public static <T> RxGetter<T> from(Observable<T> observableUnfilters, T initialValue) {
-		Observable<T> observable = observableUnfilters.distinctUntilChanged();
+	public static <T> RxGetter<T> from(Observable<T> observableUnfiltered, T initialValue) {
+		Observable<T> observable = observableUnfiltered.distinctUntilChanged();
 
 		Box<T> box = Box.of(initialValue);
 		Rx.subscribe(observable, box::set);
