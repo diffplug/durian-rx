@@ -27,6 +27,11 @@ public class RxOptional<T> extends RxBox.Default<Optional<T>> {
 		return new RxOptional<T>(Optional.empty());
 	}
 
+	/** Returns an empty RxOptional. */
+	public static <T> RxOptional<T> ofValue(T value) {
+		return new RxOptional<T>(Optional.of(value));
+	}
+
 	/** Returns an RxOptional of the given value. */
 	public static <T> RxOptional<T> of(Optional<T> value) {
 		return new RxOptional<T>(value);
@@ -35,5 +40,15 @@ public class RxOptional<T> extends RxBox.Default<Optional<T>> {
 	/** Initially holds the given value. */
 	protected RxOptional(Optional<T> initial) {
 		super(initial);
+	}
+
+	/** Shortcut for {@code set(Optional.of(value))}. */
+	public void setValue(T value) {
+		super.set(Optional.of(value));
+	}
+
+	/** Shortcut for {@code set(Optional.ofEmpty())}. */
+	public void setEmpty() {
+		super.set(Optional.empty());
 	}
 }
