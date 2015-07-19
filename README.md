@@ -1,14 +1,12 @@
 # <img align="left" src="durian-rx.png"> DurianRx: Reactive getters, powered by RxJava and ListenableFuture
 
 [![Maven artifact](https://img.shields.io/badge/mavenCentral-com.diffplug.durian%3Adurian--rx-blue.svg)](https://bintray.com/diffplug/opensource/durian-rx/view)
-[![Latest version](http://img.shields.io/badge/latest-None yet-blue.svg)](https://github.com/diffplug/durian-rx/releases/latest)
-[![Javadoc](http://img.shields.io/badge/javadoc-OK-blue.svg)](https://diffplug.github.io/durian-rx/javadoc/snapshot/)
+[![Latest version](http://img.shields.io/badge/latest-1.0-blue.svg)](https://github.com/diffplug/durian-rx/releases/latest)
+[![Javadoc](http://img.shields.io/badge/javadoc-OK-blue.svg)](https://diffplug.github.io/durian-rx/javadoc/1.0/)
 [![License](https://img.shields.io/badge/license-Apache-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
-[![Changelog](http://img.shields.io/badge/changelog-1.0--SNAPSHOT-brightgreen.svg)](CHANGES.md)
+[![Changelog](http://img.shields.io/badge/changelog-1.1--SNAPSHOT-brightgreen.svg)](CHANGES.md)
 [![Travis CI](https://travis-ci.org/diffplug/durian-rx.svg?branch=master)](https://travis-ci.org/diffplug/durian-rx)
-
-# NOT YET SUITABLE FOR USE - we're releasing a formerly internal library, bear with us as we clean it up for public release
 
 DurianRx unifies RxJava's [Observable](http://reactivex.io/documentation/observable.html) with Guava's [ListenableFuture](https://code.google.com/p/guava-libraries/wiki/ListenableFutureExplained).
 
@@ -37,7 +35,7 @@ Debugging an error which involves lots of callbacks can be difficult.  To make t
 DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace()).
 ```
 
-Lastly, DurianRx provides convenience classes for manipulating Guava's immutable collections inside of reactive containers, such as `RxSet<T> extends RxBox<ImmutableSet<T>>`, which can be used as such:
+Lastly, DurianRx provides convenience classes for manipulating Guava's immutable collections inside reactive containers, such as `RxSet<T> extends RxBox<ImmutableSet<T>>`, which can be used as such:
 
 ```java
 public void mouseClicked(MouseEvent e) {
@@ -64,6 +62,8 @@ Rx.subscribe(rxSelection, set -> {
 	// selection change
 });
 ```
+
+Perhaps most useful of all is the [Immutables](https://diffplug.github.io/durian-rx/javadoc/snapshot/com/diffplug/common/rx/Immutables.html) utility class, which helps with all kinds of manipulations of Guava's immmutable collections.
 
 DurianRx's only requirements are [Guava](https://github.com/google/guava), [RxJava](https://github.com/reactivex/rxjava), and [Durian](https://github.com/diffplug/durian).
 
