@@ -70,8 +70,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <li>{@link #onValue(Consumer)     onValue(Consumer&lt;T&gt;)}</li>
  * <li>{@link #onTerminate(Consumer) onTerminate(Consumer&lt;Optional&lt;Throwable&gt;&gt;)}</li>
  * <li>{@link #onFailure(Consumer)   onFailure(Consumer&lt;Throwable&gt;)}</li>
- * <li>{@link #onValueOrTerminate    onValueOrTerminate(Consumer&lt;T&gt;, Consumer&lt;Optional&lt;Throwable&gt;&gt;)}</li>
- * <li>{@link #onValueOrFailure      onValueOrFailure(Consumer&lt;T&gt;, Consumer&lt;Throwable&gt;)}</li>
+ * <li>{@link #onValueOnTerminate    onValueOrTerminate(Consumer&lt;T&gt;, Consumer&lt;Optional&lt;Throwable&gt;&gt;)}</li>
+ * <li>{@link #onValueOnFailure      onValueOrFailure(Consumer&lt;T&gt;, Consumer&lt;Throwable&gt;)}</li>
  * </ul>
  * Once you have an instance of Rx, you can subscribe it using the normal RxJava or Guava calls:
  * <ul>
