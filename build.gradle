@@ -48,6 +48,7 @@ dependencies {
 jar.manifest {
 	attributes (
 		'Export-Package': 'com.diffplug.common.rx.*',
+		'Bundle-SymbolicName': 'com.diffplug.durian.rx',
 		'Bundle-RequiredExecutionEnvironment': 'JavaSE-1.8',
 		'Bundle-Vendor': 'DiffPlug',
 		'Bundle-DocURL': "https://github.com/${project.org}/${project.name}",
