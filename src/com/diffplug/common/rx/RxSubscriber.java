@@ -15,6 +15,7 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 
 import rx.Observable;
@@ -29,8 +30,11 @@ public interface RxSubscriber {
 	/** Subscribes the given listener to the given observable. */
 	<T> Subscription subscribe(Observable<? extends T> observable, Rx<T> listener);
 
-	/** Subscribes the given listener to the given future. */
+	/** Subscribes the given listener to the given Guava ListenableFuture. */
 	<T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> listener);
+
+	/** Subscribes the given listener to the given Java 8 CompletableFuture. */
+	<T> Subscription subscribe(CompletionStage<? extends T> future, Rx<T> listener);
 
 	default <T> Subscription subscribe(Observable<? extends T> observable, Consumer<T> listener) {
 		return subscribe(observable, Rx.onValue(listener));
@@ -46,5 +50,9 @@ public interface RxSubscriber {
 
 	default <T> Subscription subscribe(ListenableFuture<? extends T> future, Consumer<T> listener) {
 		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
+	}
+
+	default <T> Subscription subscribe(CompletionStage<? extends T> future, Consumer<T> listener) {
+		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
 	}
 }

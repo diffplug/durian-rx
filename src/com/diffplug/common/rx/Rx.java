@@ -16,7 +16,9 @@
 package com.diffplug.common.rx;
 
 import java.util.Optional;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import rx.Observable;
@@ -234,9 +236,9 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		return subscribe(observable.asObservable(), listener);
 	}
 
-	////////////////////
-	// FutureCallback //
-	////////////////////
+	/////////////
+	// Futures //
+	/////////////
 	@Override
 	public final void onSuccess(T result) {
 		onValue.accept(result);
@@ -257,11 +259,19 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
 	}
 
+	public static <T> Subscription subscribe(CompletionStage<? extends T> future, Rx<T> listener) {
+		return getSameThreadExecutor().subscribe(future, listener);
+	}
+
+	public static <T> Subscription subscribe(CompletionStage<? extends T> future, Consumer<T> listener) {
+		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
+	}
+
 	/** An error listener which tracks whether a future has been cancelled, so that it doesn't log the errors of cancelled futures. */
 	static class TrackCancelled implements Consumer<Optional<Throwable>> {
-		private final ListenableFuture<?> future;
+		private final Future<?> future;
 
-		public TrackCancelled(ListenableFuture<?> future) {
+		public TrackCancelled(Future<?> future) {
 			this.future = future;
 		}
 
@@ -317,6 +327,25 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		public <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> untracedListener) {
 			Rx<T> listener = tracingPolicy.hook(observable, untracedListener);
 			return observable.observeOn(scheduler).subscribe(listener);
+		}
+
+		@Override
+		public <T> Subscription subscribe(CompletionStage<? extends T> future, Rx<T> untracedListener) {
+			Rx<T> listener = tracingPolicy.hook(future, untracedListener);
+
+			// when we're unsubscribed, set the flag to false
+			BooleanSubscription sub = BooleanSubscription.create();
+			future.whenCompleteAsync((value, exception) -> {
+				if (!sub.isUnsubscribed()) {
+					if (exception == null) {
+						listener.onSuccess(value);
+					} else {
+						listener.onFailure(exception);
+					}
+				}
+			}, executor);
+			// return the subscription
+			return sub;
 		}
 
 		@Override

@@ -2,6 +2,8 @@
 
 ### Version 1.2.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/)) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
 
+* Added support for `CompletionStage` (and therefore `CompletableFuture`), with the same behavior as `ListenableFuture`.
+
 ### Version 1.1.0 - October 19th 2015 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/1.1.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/1.1.0/view))
 
 * Changed OSGi metadata Bundle-SymbolicName to `com.diffplug.durian.rx`.

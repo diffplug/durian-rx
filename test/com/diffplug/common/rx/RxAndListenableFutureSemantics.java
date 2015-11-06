@@ -16,6 +16,7 @@
 package com.diffplug.common.rx;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
@@ -78,6 +79,39 @@ public class RxAndListenableFutureSemantics {
 	public void testListenableFutureCancelAfterSet() {
 		SettableFuture<String> future = SettableFuture.create();
 		future.set("Some value");
+
+		// subscribe to a future then cancel should terminate with CancellationException
+		RxAsserter<String> assertDuring = RxAsserter.create();
+		Rx.subscribe(future, assertDuring);
+		future.cancel(true);
+		assertDuring.assertTerminal(Optional.empty());
+
+		// subscribe to a cancelled future should terminate with CancellationException
+		RxAsserter<String> assertAfter = RxAsserter.create();
+		Rx.subscribe(future, assertAfter);
+		assertDuring.assertTerminal(Optional.empty());
+	}
+
+	@Test
+	public void testCompletableFutureCancellationResult() {
+		CompletableFuture<String> future = new CompletableFuture<>();
+
+		// subscribe to a future then cancel should terminate with CancellationException
+		RxAsserter<String> assertDuring = RxAsserter.create();
+		Rx.subscribe(future, assertDuring);
+		future.cancel(true);
+		assertDuring.assertTerminalExceptionClass(java.util.concurrent.CancellationException.class);
+
+		// subscribe to a cancelled future should terminate with CancellationException
+		RxAsserter<String> assertAfter = RxAsserter.create();
+		Rx.subscribe(future, assertAfter);
+		assertDuring.assertTerminalExceptionClass(java.util.concurrent.CancellationException.class);
+	}
+
+	@Test
+	public void testCompletableFutureCancelAfterSet() {
+		CompletableFuture<String> future = new CompletableFuture<>();
+		future.complete("Some value");
 
 		// subscribe to a future then cancel should terminate with CancellationException
 		RxAsserter<String> assertDuring = RxAsserter.create();
