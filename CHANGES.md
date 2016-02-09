@@ -1,6 +1,10 @@
 # DurianRx releases
 
-### Version 1.3.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/)) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
+### Version 1.4.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/)) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
+
+### Version 1.3.0 - February 9th 2015 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/1.3.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/1.3.0/view))
+
+* Ditched Guava for DurianGuava.
 
 ### Version 1.2.0 - November 18th 2015 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/1.2.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/1.2.0/view))
 
