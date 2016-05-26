@@ -18,12 +18,12 @@ package com.diffplug.common.rx;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
-import com.diffplug.common.base.ConverterNonNull;
+import com.diffplug.common.base.Converter;
 
 public interface RxLockBox<T> extends LockBox<T>, RxBox<T> {
 	/** RxLockBox must map to another kind of LockBox. */
 	@Override
-	<R> RxLockBox<R> map(ConverterNonNull<T, R> converter);
+	<R> RxLockBox<R> map(Converter<T, R> converter);
 
 	public static <T> RxLockBox<T> of(T value) {
 		return new Default<>(value);
@@ -43,7 +43,7 @@ public interface RxLockBox<T> extends LockBox<T>, RxBox<T> {
 		}
 
 		@Override
-		public <R> RxLockBox<R> map(ConverterNonNull<T, R> converter) {
+		public <R> RxLockBox<R> map(Converter<T, R> converter) {
 			return new RxLockBox.Mapped<>(this, converter);
 		}
 	}
@@ -52,9 +52,9 @@ public interface RxLockBox<T> extends LockBox<T>, RxBox<T> {
 		final Observable<R> observable;
 
 		public Mapped(RxLockBox<T> delegate,
-				ConverterNonNull<T, R> converter) {
+				Converter<T, R> converter) {
 			super(delegate, converter);
-			Observable<R> mapped = delegate.asObservable().map(converter::convert);
+			Observable<R> mapped = delegate.asObservable().map(converter::convertNonNull);
 			observable = mapped.distinctUntilChanged();
 		}
 
@@ -64,7 +64,7 @@ public interface RxLockBox<T> extends LockBox<T>, RxBox<T> {
 		}
 
 		@Override
-		public <V> RxLockBox<V> map(ConverterNonNull<R, V> converter) {
+		public <V> RxLockBox<V> map(Converter<R, V> converter) {
 			return new RxLockBox.Mapped<>(this, converter);
 		}
 	}

@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.diffplug.common.base.Box;
-import com.diffplug.common.base.ConverterNonNull;
+import com.diffplug.common.base.Converter;
 
 /**
  * LockBox is a box where every call to {@link #modify(Function)}
@@ -88,16 +88,16 @@ public interface LockBox<T> extends Box<T> {
 	 * only one piece of state.
 	 */
 	@Override
-	default <R> Box<R> map(ConverterNonNull<T, R> converter) {
+	default <R> Box<R> map(Converter<T, R> converter) {
 		return new Mapped<>(this, converter);
 	}
 
 	static class Mapped<T, R> implements LockBox<R> {
 		private final LockBox<T> delegate;
-		private final ConverterNonNull<T, R> converter;
+		private final Converter<T, R> converter;
 
 		public Mapped(LockBox<T> delegate,
-				ConverterNonNull<T, R> converter) {
+				Converter<T, R> converter) {
 			this.delegate = delegate;
 			this.converter = converter;
 		}
@@ -113,12 +113,12 @@ public interface LockBox<T> extends Box<T> {
 
 		@Override
 		public R get() {
-			return converter.convert(delegate.get());
+			return converter.convertNonNull(delegate.get());
 		}
 
 		@Override
 		public void set(R value) {
-			delegate.set(converter.revert(value));
+			delegate.set(converter.revertNonNull(value));
 		}
 
 		/** Shortcut for doing a set() on the result of a get(). */
@@ -126,9 +126,9 @@ public interface LockBox<T> extends Box<T> {
 		public R modify(Function<? super R, ? extends R> mutator) {
 			Box.Nullable<R> result = Box.Nullable.ofNull();
 			delegate.modify(input -> {
-				R unmappedResult = mutator.apply(converter.convert(input));
+				R unmappedResult = mutator.apply(converter.convertNonNull(input));
 				result.set(unmappedResult);
-				return converter.revert(unmappedResult);
+				return converter.revertNonNull(unmappedResult);
 			});
 			return result.get();
 		}

@@ -24,7 +24,7 @@ import rx.subjects.BehaviorSubject;
 
 import com.diffplug.common.base.Box;
 import com.diffplug.common.base.Consumers;
-import com.diffplug.common.base.ConverterNonNull;
+import com.diffplug.common.base.Converter;
 
 /**
  * {@link RxGetter} and {@link Box} combined in one: a value you can set, get, and subscribe to.
@@ -37,8 +37,8 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 
 	/** Maps one {@code RxBox} to another {@code RxBox}. */
 	@Override
-	default <R> RxBox<R> map(ConverterNonNull<T, R> converter) {
-		return from(map(converter::convert), toSet -> set(converter.revert(toSet)));
+	default <R> RxBox<R> map(Converter<T, R> converter) {
+		return from(map(converter::convertNonNull), toSet -> set(converter.revertNonNull(toSet)));
 	}
 
 	/**

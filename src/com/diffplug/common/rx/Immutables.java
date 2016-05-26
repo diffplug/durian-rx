@@ -45,7 +45,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 
-import com.diffplug.common.base.ConverterNonNull;
+import com.diffplug.common.base.Converter;
 import com.diffplug.common.base.ConverterNullable;
 
 /**
@@ -264,15 +264,15 @@ public class Immutables {
 	////////////////////////////
 	// Per-element converters //
 	////////////////////////////
-	public static <T, R> ConverterNonNull<Optional<T>, Optional<R>> perElementConverterOpt(ConverterNullable<T, R> perElement) {
-		return ConverterNonNull.from(
+	public static <T, R> Converter<Optional<T>, Optional<R>> perElementConverterOpt(ConverterNullable<T, R> perElement) {
+		return Converter.from(
 				optT -> optT.map(perElement::convert),
 				optR -> optR.map(perElement::revert),
 				"perElement=" + perElement);
 	}
 
-	public static <T, R> ConverterNonNull<ImmutableSet<T>, ImmutableSet<R>> perElementConverterSet(ConverterNullable<T, R> perElement) {
-		return ConverterNonNull.from(
+	public static <T, R> Converter<ImmutableSet<T>, ImmutableSet<R>> perElementConverterSet(ConverterNullable<T, R> perElement) {
+		return Converter.from(
 				setOfT -> perElementMutateSet(setOfT, perElement::convert),
 				setOfR -> perElementMutateSet(setOfR, perElement::revert),
 				perElement.toString());
