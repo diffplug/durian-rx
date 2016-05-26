@@ -45,6 +45,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 
+import com.diffplug.common.base.ConverterNonNull;
+import com.diffplug.common.base.ConverterNullable;
+
 /**
  * Methods for manipulating Guava's immutable collections.
  * <p>
@@ -241,5 +244,37 @@ public class Immutables {
 		BinaryOperator<ImmutableSortedMap.Builder<K, V>> combiner = (l, r) -> l.putAll(r.build());
 		Function<ImmutableSortedMap.Builder<K, V>, ImmutableSortedMap<K, V>> finisher = ImmutableSortedMap.Builder::build;
 		return Collector.of(supplier, accumulator, combiner, finisher);
+	}
+
+	/////////////////////////
+	// Mutate element-wise //
+	/////////////////////////
+	/** Returns a mutated version of the given set.  Function can return null to indicate the element should be removed. */
+	public static <T, R> ImmutableSet<R> perElementMutateSet(ImmutableSet<T> source, Function<? super T, ? extends R> mutator) {
+		ImmutableSet.Builder<R> builder = ImmutableSet.builder();
+		for (T element : source) {
+			R result = mutator.apply(element);
+			if (result != null) {
+				builder.add(result);
+			}
+		}
+		return builder.build();
+	}
+
+	////////////////////////////
+	// Per-element converters //
+	////////////////////////////
+	public static <T, R> ConverterNonNull<Optional<T>, Optional<R>> perElementConverterOpt(ConverterNullable<T, R> perElement) {
+		return ConverterNonNull.from(
+				optT -> optT.map(perElement::convert),
+				optR -> optR.map(perElement::revert),
+				"perElement=" + perElement);
+	}
+
+	public static <T, R> ConverterNonNull<ImmutableSet<T>, ImmutableSet<R>> perElementConverterSet(ConverterNullable<T, R> perElement) {
+		return ConverterNonNull.from(
+				setOfT -> perElementMutateSet(setOfT, perElement::convert),
+				setOfR -> perElementMutateSet(setOfR, perElement::revert),
+				perElement.toString());
 	}
 }
