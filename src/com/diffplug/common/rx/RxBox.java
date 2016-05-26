@@ -22,10 +22,9 @@ import java.util.function.Function;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
-import com.google.common.base.Preconditions;
-
 import com.diffplug.common.base.Box;
 import com.diffplug.common.base.Consumers;
+import com.diffplug.common.base.ConverterNonNull;
 
 /**
  * {@link RxGetter} and {@link Box} combined in one: a value you can set, get, and subscribe to.
@@ -37,8 +36,9 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 	}
 
 	/** Maps one {@code RxBox} to another {@code RxBox}. */
-	default <R> RxBox<R> map(Function<? super T, ? extends R> getMapper, Function<? super R, ? extends T> setMapper) {
-		return from(map(getMapper), toSet -> set(setMapper.apply(toSet)));
+	@Override
+	default <R> RxBox<R> map(ConverterNonNull<T, R> converter) {
+		return from(map(converter::convert), toSet -> set(converter.revert(toSet)));
 	}
 
 	/**
@@ -131,8 +131,7 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 		/** Sets the value. */
 		@Override
 		public void set(T newValue) {
-			Preconditions.checkNotNull(newValue);
-			if (!value.equals(newValue)) {
+			if (!newValue.equals(value)) {
 				value = newValue;
 				subject.onNext(newValue);
 			}
