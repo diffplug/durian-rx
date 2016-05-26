@@ -25,7 +25,11 @@ public class RateProbe {
 	private volatile long lastEvent = System.nanoTime();
 	private final BehaviorSubject<Long> timestampNano = BehaviorSubject.create();
 
-	/** Fires the rate probe, and returns the elapsed time since the last call in nanoseconds. */
+	/**
+	 * Fires the rate probe, and returns the elapsed time in nanoseconds since the last call.
+	 * 
+	 * On the first call to fire(), returns the elapsed time since the RateProbe was constructed.
+	 */
 	public long fire() {
 		long now = System.nanoTime();
 		timestampNano.onNext(now);
