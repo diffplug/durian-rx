@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import rx.subjects.AsyncSubject;
+import rx.subjects.BehaviorSubject;
 
 import com.google.common.util.concurrent.SettableFuture;
 
@@ -30,9 +31,24 @@ import com.diffplug.common.base.Box.Nullable;
 
 /**
  * This is a simple little test for confirming the behavior of
- * subscribing to a stuff.
+ * subscribing to stuff.
  */
 public class RxAndListenableFutureSemantics {
+	@Test
+	public void testBehaviorSubjectSubscribe() {
+		RxAsserter<String> observer = RxAsserter.create();
+
+		// create an behavior subject, subscribe pre, and pump test through
+		BehaviorSubject<String> testSubject = BehaviorSubject.create("initial");
+		Rx.subscribe(testSubject, observer);
+		// the observer gets the value immediately
+		observer.assertValue("initial");
+
+		// call on next, and the observer gets the new value immediately
+		testSubject.onNext("value");
+		observer.assertValue("value");
+	}
+
 	@Test
 	public void testAsyncSubjectSubscribeAfterComplete() {
 		RxAsserter<String> preObserver = RxAsserter.create();
