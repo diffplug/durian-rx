@@ -28,13 +28,12 @@ import rx.Subscription;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.BooleanSubscription;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
-
 import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
+import com.diffplug.common.util.concurrent.FutureCallback;
+import com.diffplug.common.util.concurrent.ListenableFuture;
+import com.diffplug.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -53,7 +52,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * // call unsubscribe() on the subscription to cancel it 
  * rx.Subscription subscription = Rx.subscribe(listenableOrObservable, val -> doSomething);
  * </pre>
- * Long version: {@code Rx} implements both the {@link rx.Observer} and {@link com.google.common.util.concurrent.FutureCallback}
+ * Long version: {@code Rx} implements both the {@link rx.Observer} and {@link com.diffplug.common.util.concurrent.FutureCallback}
  * interfaces by mapping them to two {@code Consumer}s:
  * <ul>
  * <li>{@code Consumer<T> onValue}</li>

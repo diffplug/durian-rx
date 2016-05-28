@@ -18,8 +18,8 @@ package com.diffplug.common.rx;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
+import com.diffplug.common.collect.BiMap;
+import com.diffplug.common.collect.ImmutableBiMap;
 
 /**
  * <code>{@link RxBox}&lt;{@link ImmutableBiMap}&lt;T&gt;&gt;</code>

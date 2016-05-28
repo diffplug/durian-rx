@@ -19,12 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
+import com.diffplug.common.base.Preconditions;
 import com.diffplug.common.base.Unhandled;
+import com.diffplug.common.collect.ImmutableList;
+import com.diffplug.common.collect.Lists;
+import com.diffplug.common.collect.Maps;
 
 /**
  * <code>{@link RxBox}&lt;{@link ImmutableList}&lt;T&gt;&gt;</code>

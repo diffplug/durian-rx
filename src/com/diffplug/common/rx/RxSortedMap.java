@@ -20,7 +20,7 @@ import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableSortedMap;
+import com.diffplug.common.collect.ImmutableSortedMap;
 
 /**
  * <code>{@link RxBox}&lt;{@link ImmutableSortedMap}&lt;T&gt;&gt;</code>

@@ -18,7 +18,7 @@ package com.diffplug.common.rx;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableList;
+import com.diffplug.common.collect.ImmutableList;
 
 /**
  * <code>{@link RxBox}&lt;{@link ImmutableList}&lt;T&gt;&gt;</code>

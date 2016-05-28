@@ -25,11 +25,11 @@ import java.util.stream.IntStream;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import com.diffplug.common.collect.ImmutableList;
+import com.diffplug.common.collect.ImmutableMap;
+import com.diffplug.common.collect.ImmutableSet;
+import com.diffplug.common.collect.Lists;
+import com.diffplug.common.collect.Ordering;
 
 public class ImmutablesTest {
 	private List<Integer> zeroTo100() {

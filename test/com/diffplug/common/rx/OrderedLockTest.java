@@ -24,9 +24,8 @@ import java.util.stream.Stream;
 
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
 import com.diffplug.common.base.Errors;
+import com.diffplug.common.collect.ImmutableList;
 
 public class OrderedLockTest {
 	@Test

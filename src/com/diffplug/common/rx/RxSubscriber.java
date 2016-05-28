@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import rx.Observable;
 import rx.Subscription;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.diffplug.common.util.concurrent.ListenableFuture;
 
 /**
  * An object which can subscribe observables to {@link Rx} listeners.

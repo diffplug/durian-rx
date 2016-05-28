@@ -20,8 +20,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
+import com.diffplug.common.collect.ImmutableSet;
+import com.diffplug.common.collect.ImmutableSortedSet;
 
 /**
  * <code>{@link RxBox}&lt;{@link ImmutableSortedSet}&lt;T&gt;&gt;</code>

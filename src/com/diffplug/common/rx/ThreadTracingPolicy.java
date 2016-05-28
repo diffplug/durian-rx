@@ -19,11 +19,10 @@ import java.util.function.Predicate;
 
 import rx.Observable;
 
-import com.google.common.util.concurrent.ListenableFuture;
-
 import com.diffplug.common.base.Box;
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.rx.RxTracingPolicy.LogSubscriptionTrace;
+import com.diffplug.common.util.concurrent.ListenableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**

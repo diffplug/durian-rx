@@ -21,8 +21,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
+import com.diffplug.common.collect.ImmutableList;
 import com.diffplug.common.rx.RxOrderedSet.OnDuplicate;
 
 public class RxOrderedSetTest {

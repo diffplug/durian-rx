@@ -20,11 +20,10 @@ import java.util.function.BiPredicate;
 
 import rx.Observable;
 
-import com.google.common.util.concurrent.ListenableFuture;
-
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.base.StackDumper;
+import com.diffplug.common.util.concurrent.ListenableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**

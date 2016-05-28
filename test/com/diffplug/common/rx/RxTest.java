@@ -26,10 +26,10 @@ import rx.Observer;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.SettableFuture;
+import com.diffplug.common.util.concurrent.Futures;
+import com.diffplug.common.util.concurrent.ListenableFuture;
+import com.diffplug.common.util.concurrent.MoreExecutors;
+import com.diffplug.common.util.concurrent.SettableFuture;
 
 /** The point of this test is to demonstrate why the DpRx API should be what it is. */
 @SuppressWarnings("null")

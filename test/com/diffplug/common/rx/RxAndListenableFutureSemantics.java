@@ -25,9 +25,8 @@ import org.junit.Test;
 import rx.subjects.AsyncSubject;
 import rx.subjects.BehaviorSubject;
 
-import com.google.common.util.concurrent.SettableFuture;
-
 import com.diffplug.common.base.Box.Nullable;
+import com.diffplug.common.util.concurrent.SettableFuture;
 
 /**
  * This is a simple little test for confirming the behavior of
@@ -143,8 +142,8 @@ public class RxAndListenableFutureSemantics {
 
 	private static class RxAsserter<T> extends Rx<T> {
 		private static <T> RxAsserter<T> create() {
-			Nullable<T> value = Nullable.ofNull();
-			Nullable<Optional<Throwable>> terminal = Nullable.ofNull();
+			Nullable<T> value = Nullable.ofVolatileNull();
+			Nullable<Optional<Throwable>> terminal = Nullable.ofVolatileNull();
 			return new RxAsserter<T>(val -> value.set(val), ter -> terminal.set(ter), value, terminal);
 		}
 

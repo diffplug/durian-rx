@@ -18,7 +18,7 @@ package com.diffplug.common.rx;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableMap;
+import com.diffplug.common.collect.ImmutableMap;
 
 /**
  * <code>{@link RxBox}&lt;{@link ImmutableMap}&lt;T&gt;&gt;</code>

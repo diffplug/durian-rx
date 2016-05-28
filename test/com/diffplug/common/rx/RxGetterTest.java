@@ -22,7 +22,7 @@ import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
+import com.diffplug.common.collect.Lists;
 
 public class RxGetterTest {
 	@Test

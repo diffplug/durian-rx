@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import com.google.common.collect.Ordering;
+import com.diffplug.common.collect.Ordering;
 
 /**
  * All code which takes locks using this code is guaranteed to do so

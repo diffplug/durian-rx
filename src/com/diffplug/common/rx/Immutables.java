@@ -35,18 +35,17 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.ImmutableSortedSet;
-
 import com.diffplug.common.base.Converter;
 import com.diffplug.common.base.ConverterNullable;
+import com.diffplug.common.collect.BiMap;
+import com.diffplug.common.collect.HashBiMap;
+import com.diffplug.common.collect.ImmutableBiMap;
+import com.diffplug.common.collect.ImmutableCollection;
+import com.diffplug.common.collect.ImmutableList;
+import com.diffplug.common.collect.ImmutableMap;
+import com.diffplug.common.collect.ImmutableSet;
+import com.diffplug.common.collect.ImmutableSortedMap;
+import com.diffplug.common.collect.ImmutableSortedSet;
 
 /**
  * Methods for manipulating Guava's immutable collections.

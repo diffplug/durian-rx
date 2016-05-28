@@ -125,7 +125,7 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 		/** The constructor for implementing these selection models. */
 		private Default(T initial, BehaviorSubject<T> subject) {
 			this.value = Objects.requireNonNull(initial);
-			this.subject = subject;
+			this.subject = Objects.requireNonNull(subject);
 		}
 
 		/** Sets the value. */

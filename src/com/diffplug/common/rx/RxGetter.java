@@ -70,7 +70,7 @@ public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 	public static <T> RxGetter<T> from(Observable<T> observableUnfiltered, T initialValue) {
 		Observable<T> observable = observableUnfiltered.distinctUntilChanged();
 
-		Box<T> box = Box.of(initialValue);
+		Box<T> box = Box.ofVolatile(initialValue);
 		Rx.subscribe(observable, box::set);
 		return new RxGetter<T>() {
 			@Override
