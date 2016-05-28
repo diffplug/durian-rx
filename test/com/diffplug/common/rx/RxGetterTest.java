@@ -27,7 +27,7 @@ import com.diffplug.common.collect.Lists;
 public class RxGetterTest {
 	@Test
 	public void testMap() {
-		RxOptional<String> original = RxOptional.ofEmpty();
+		RxBox<Optional<String>> original = RxBox.of(Optional.empty());
 		RxGetter<Boolean> mapped = original.readOnly().map(Optional::isPresent);
 
 		Asserter<Optional<String>> assertOriginal = new Asserter<>(original);
