@@ -88,18 +88,13 @@ public interface LockBox<T> extends Box<T> {
 	 * only one piece of state.
 	 */
 	@Override
-	default <R> Box<R> map(Converter<T, R> converter) {
-		return new Mapped<>(this, converter);
+	default <R> LockBox<R> map(Converter<T, R> converter) {
+		return new LockMapped<>(this, converter);
 	}
 
-	static class Mapped<T, R> implements LockBox<R> {
-		private final LockBox<T> delegate;
-		private final Converter<T, R> converter;
-
-		public Mapped(LockBox<T> delegate,
-				Converter<T, R> converter) {
-			this.delegate = delegate;
-			this.converter = converter;
+	static class LockMapped<T, R> extends MappedImp<T, R, LockBox<T>> implements LockBox<R> {
+		public LockMapped(LockBox<T> delegate, Converter<T, R> converter) {
+			super(delegate, converter);
 		}
 
 		/**
@@ -109,33 +104,6 @@ public interface LockBox<T> extends Box<T> {
 		@Override
 		public Object lock() {
 			return delegate.lock();
-		}
-
-		@Override
-		public R get() {
-			return converter.convertNonNull(delegate.get());
-		}
-
-		@Override
-		public void set(R value) {
-			delegate.set(converter.revertNonNull(value));
-		}
-
-		/** Shortcut for doing a set() on the result of a get(). */
-		@Override
-		public R modify(Function<? super R, ? extends R> mutator) {
-			Box.Nullable<R> result = Box.Nullable.ofNull();
-			delegate.modify(input -> {
-				R unmappedResult = mutator.apply(converter.convertNonNull(input));
-				result.set(unmappedResult);
-				return converter.revertNonNull(unmappedResult);
-			});
-			return result.get();
-		}
-
-		@Override
-		public String toString() {
-			return "[" + delegate + " mapped to " + get() + " by " + converter + "]";
 		}
 	}
 
