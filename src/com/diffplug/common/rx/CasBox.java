@@ -35,11 +35,11 @@ public interface CasBox<T> extends Box<T> {
 	/**
 	 * Applies the given mutator function to this box, which may require
 	 * calling the function more than once, so make sure it's pure!
-	 * 
+	 *
 	 * The function is called using the box's current input, and
-	 * {@link compareAndSet} is used to ensure that the input does
-	 * not change.
-	 * 
+	 * {@link #compareAndSet(Object, Object) compareAndSet} is used to
+	 * ensure that the input does not change.
+	 *
 	 * The implementation is more or less verbatim from Rich Hickey's
 	 * [Clojure](https://github.com/clojure/clojure/blob/bfb82f86631bde45a8e3749ea7df509e59a0791c/src/jvm/clojure/lang/Atom.java#L75-L87).
 	 */
