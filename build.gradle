@@ -59,6 +59,7 @@ jar.manifest.attributes (
 	'Bundle-License': "https://github.com/${project.org}/${project.name}/blob/v${project.version}/LICENSE",
 	'-removeheaders': 'Bnd-LastModified,Bundle-Name,Created-By,Tool',
 )
+// copy the manifest into the WC
 osgiBndManifest {
 	copyTo 'META-INF/MANIFEST.MF'
 }
@@ -142,11 +143,11 @@ task sourcesJar(type: Jar) {
 	from sourceSets.main.allJava
 }
 
+def verSnapshot = { it -> it.endsWith('-SNAPSHOT') ? 'snapshot' : VER_DURIAN }
 // Where it's possible to name parameters and methods clearly enough
 // that javadoc is not necessary, why make the code bigger?
 //
 // Thus, no javadoc warnings.
-String version_str = version.endsWith('-SNAPSHOT') ? 'snapshot' : project.version
 def makeLink = { url, text -> "<a href=\"${url}\" style=\"text-transform: none;\">${text}</a>" }
 def javadocInfo = '<h2>' + makeLink("https://github.com/${org}/${name}", "${group}:${name}:${version}") +
 ' by ' + makeLink('http://www.diffplug.com', 'DiffPlug') + '</h2>'
@@ -154,10 +155,12 @@ javadoc {
 	options.addStringOption('Xdoclint:none', '-quiet')
 	options.header javadocInfo
 	options.footer javadocInfo
-	options.links('https://diffplug.github.io/durian/javadoc/' + (VER_DURIAN.endsWith('-SNAPSHOT') ? 'snapshot' : VER_DURIAN) + '/')
+	options.links('https://diffplug.github.io/durian/javadoc/durian-core/' + verSnapshot(VER_DURIAN) + '/')
+	options.links('https://diffplug.github.io/durian/javadoc/durian-collect/' + verSnapshot(VER_DURIAN) + '/')
+	options.links('https://diffplug.github.io/durian/javadoc/durian-concurrent/' + verSnapshot(VER_DURIAN) + '/')
+	options.links('https://diffplug.github.io/durian-debug/javadoc/' + verSnapshot(VER_DURIAN_DEBUG) + '/')
 	options.links('https://docs.oracle.com/javase/8/docs/api/')
 	options.links('http://reactivex.io/RxJava/javadoc/')
-	options.links('http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc/')
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
