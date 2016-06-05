@@ -28,6 +28,8 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import com.diffplug.common.collect.ImmutableSet;
+
 import rx.Observable;
 
 @SuppressWarnings("serial")
@@ -56,7 +58,7 @@ public class RxExample extends JFrame {
 		/** The cell which the mouse is over. */
 		private RxGetter<Optional<Integer>> rxMouseOver;
 		/** The selected cells. */
-		private RxSet<Integer> rxSelection;
+		private RxBox<ImmutableSet<Integer>> rxSelection;
 
 		RxGrid() {
 			// maintain the position of the mouse
@@ -80,12 +82,12 @@ public class RxExample extends JFrame {
 			});
 
 			// maintain the selection state
-			rxSelection = RxSet.ofEmpty();
+			rxSelection = RxBox.of(ImmutableSet.of());
 			addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					rxMouseOver.get().ifPresent(cell -> {
-						rxSelection.mutate(selection -> {
+						rxSelection.modify(Immutables.mutatorSet(selection -> {
 							if (e.isControlDown()) {
 								// control => toggle mouseOver item in selection
 								if (selection.contains(cell)) {
@@ -98,7 +100,7 @@ public class RxExample extends JFrame {
 								selection.clear();
 								selection.add(cell);
 							}
-						});
+						}));
 					});
 				}
 			});
