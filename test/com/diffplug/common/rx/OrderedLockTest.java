@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.collect.ImmutableList;
+import com.diffplug.common.collect.Immutables;
 
 public class OrderedLockTest {
 	@Test

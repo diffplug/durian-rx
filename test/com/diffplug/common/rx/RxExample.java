@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.diffplug.common.collect.ImmutableSet;
+import com.diffplug.common.collect.Immutables;
 
 import rx.Observable;
 
