@@ -44,8 +44,9 @@ public interface LockBox<T> extends Box<T> {
 	@Override
 	default T modify(Function<? super T, ? extends T> mutator) {
 		synchronized (lock()) {
-			set(mutator.apply(get()));
-			return get();
+			T result = mutator.apply(get());
+			set(result);
+			return result;
 		}
 	}
 
