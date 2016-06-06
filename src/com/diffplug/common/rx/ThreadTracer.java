@@ -48,12 +48,12 @@ public final class ThreadTracer {
 		private static final long serialVersionUID = -7946660913539412568L;
 
 		public final String name;
-		public final Thread expected, actual;
+		public final String expected, actual;
 
 		public InconsistentThreadCallException(String name, Thread expected, Thread actual) {
 			this.name = name;
-			this.expected = expected;
-			this.actual = actual;
+			this.expected = expected.toString();
+			this.actual = actual.toString();
 		}
 
 		@Override
