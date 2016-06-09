@@ -39,7 +39,6 @@ targetCompatibility = VER_JAVA
 
 dependencies {
 	compile "com.diffplug.durian:durian-core:${VER_DURIAN}"
-	compile "com.diffplug.durian:durian-collect:${VER_DURIAN}"
 	compile "com.diffplug.durian:durian-concurrent:${VER_DURIAN}"
 	compile "com.diffplug.durian:durian-debug:${VER_DURIAN_DEBUG}"
 	compile "io.reactivex:rxjava:${VER_RXJAVA}"
