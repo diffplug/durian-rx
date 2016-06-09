@@ -16,7 +16,6 @@
 package com.diffplug.common.rx;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -52,35 +51,7 @@ public interface LockBox<T> extends Box<T> {
 
 	/** Creates a `LockBox` containing the given value. */
 	public static <T> LockBox<T> of(T value) {
-		return new Default<>(value);
-	}
-
-	static class Default<T> implements LockBox<T> {
-		protected T value;
-
-		protected Default(T value) {
-			set(value);
-		}
-
-		@Override
-		public Object lock() {
-			return this;
-		}
-
-		@Override
-		public T get() {
-			return value;
-		}
-
-		@Override
-		public void set(T value) {
-			this.value = Objects.requireNonNull(value);
-		}
-
-		@Override
-		public String toString() {
-			return "LockBox.of[" + get() + "]";
-		}
+		return new LockBoxImp<>(value);
 	}
 
 	/**
@@ -90,22 +61,7 @@ public interface LockBox<T> extends Box<T> {
 	 */
 	@Override
 	default <R> LockBox<R> map(Converter<T, R> converter) {
-		return new LockMapped<>(this, converter);
-	}
-
-	static class LockMapped<T, R> extends MappedImp<T, R, LockBox<T>> implements LockBox<R> {
-		public LockMapped(LockBox<T> delegate, Converter<T, R> converter) {
-			super(delegate, converter);
-		}
-
-		/**
-		 * Ensures that we use the root delegate which
-		 * is actually holding the state as our lock.
-		 */
-		@Override
-		public Object lock() {
-			return delegate.lock();
-		}
+		return new LockBoxImp.Mapped<>(this, converter);
 	}
 
 	/**

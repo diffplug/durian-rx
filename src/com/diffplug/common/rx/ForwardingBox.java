@@ -21,6 +21,13 @@ import rx.Observable;
 
 import com.diffplug.common.base.Box;
 
+/**
+ * Utility class for wrapping one kind of box with another.
+ *
+ * - For wrapping an {@link RxBox}, use {@link ForwardingBox.Rx}.
+ * - For wrapping a {@link LockBox}, use {@link ForwardingBox.Lock}.
+ * - For wrapping an {@link RxLockBox}, use {@link ForwardingBox.RxLock}.
+ */
 public class ForwardingBox<T, BoxType extends Box<T>> implements Box<T> {
 	protected final BoxType delegate;
 
@@ -65,8 +72,8 @@ public class ForwardingBox<T, BoxType extends Box<T>> implements Box<T> {
 		}
 	}
 
-	public static class LockRx<T> extends ForwardingBox<T, RxLockBox<T>> implements RxLockBox<T> {
-		protected LockRx(RxLockBox<T> delegate) {
+	public static class RxLock<T> extends ForwardingBox<T, RxLockBox<T>> implements RxLockBox<T> {
+		protected RxLock(RxLockBox<T> delegate) {
 			super(delegate);
 		}
 

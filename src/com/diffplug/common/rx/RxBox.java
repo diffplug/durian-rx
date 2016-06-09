@@ -15,12 +15,10 @@
  */
 package com.diffplug.common.rx;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
 
 import com.diffplug.common.base.Box;
 import com.diffplug.common.base.Consumers;
@@ -89,7 +87,7 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 
 	/** Creates an {@code RxBox} with the given initial value. */
 	public static <T> RxBox<T> of(T initial) {
-		return new Default<T>(Objects.requireNonNull(initial));
+		return new RxBoxImp<T>(initial);
 	}
 
 	/** Creates an {@code RxBox} which implements the "getter" part with {@code RxGetter}, and the setter part with {@code Consumer}. */
@@ -110,42 +108,5 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 				setter.accept(value);
 			}
 		};
-	}
-
-	/** Standard implementation of an {@link RxBox}. */
-	public static class Default<T> implements RxBox<T> {
-		private volatile T value;
-		private final BehaviorSubject<T> subject;
-
-		/** Creates a Holder which holds the given value. */
-		protected Default(T initial) {
-			this(initial, BehaviorSubject.create(initial));
-		}
-
-		/** The constructor for implementing these selection models. */
-		private Default(T initial, BehaviorSubject<T> subject) {
-			this.value = Objects.requireNonNull(initial);
-			this.subject = Objects.requireNonNull(subject);
-		}
-
-		/** Sets the value. */
-		@Override
-		public void set(T newValue) {
-			if (!newValue.equals(value)) {
-				value = newValue;
-				subject.onNext(newValue);
-			}
-		}
-
-		/** Returns the value. */
-		@Override
-		public T get() {
-			return value;
-		}
-
-		@Override
-		public Observable<T> asObservable() {
-			return subject;
-		}
 	}
 }

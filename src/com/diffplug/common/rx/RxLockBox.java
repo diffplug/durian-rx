@@ -15,53 +15,17 @@
  */
 package com.diffplug.common.rx;
 
-import rx.Observable;
-import rx.subjects.BehaviorSubject;
-
 import com.diffplug.common.base.Converter;
 
+/** {@link RxBox} and {@link LockBox} in one. */
 public interface RxLockBox<T> extends LockBox<T>, RxBox<T> {
 	public static <T> RxLockBox<T> of(T value) {
-		return new Default<>(value);
-	}
-
-	static class Default<T> extends LockBox.Default<T> implements RxLockBox<T> {
-		BehaviorSubject<T> subject = BehaviorSubject.create();
-
-		protected Default(T value) {
-			super(value);
-			subject = BehaviorSubject.create();
-		}
-
-		@Override
-		public Observable<T> asObservable() {
-			return subject;
-		}
+		return new RxLockBoxImp<>(value);
 	}
 
 	/** RxLockBox must map to another kind of LockBox. */
 	@Override
 	default <R> RxLockBox<R> map(Converter<T, R> converter) {
-		return new RxLockMapped<T, R>(this, converter);
-	}
-
-	static class RxLockMapped<T, R> extends MappedImp<T, R, RxLockBox<T>> implements RxLockBox<R> {
-		final Observable<R> observable;
-
-		public RxLockMapped(RxLockBox<T> delegate, Converter<T, R> converter) {
-			super(delegate, converter);
-			Observable<R> mapped = delegate.asObservable().map(converter::convertNonNull);
-			observable = mapped.distinctUntilChanged();
-		}
-
-		@Override
-		public Object lock() {
-			return delegate.lock();
-		}
-
-		@Override
-		public Observable<R> asObservable() {
-			return observable;
-		}
+		return new RxLockBoxImp.Mapped<T, R>(this, converter);
 	}
 }
