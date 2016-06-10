@@ -220,7 +220,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	// Static versions
 	public static <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> listener) {
-		return getSameThreadExecutor().subscribe(observable, listener);
+		return sameThreadExecutor().subscribe(observable, listener);
 	}
 
 	public static <T> Subscription subscribe(Observable<? extends T> observable, Consumer<T> listener) {
@@ -251,7 +251,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 	// Static versions
 	public static <T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> listener) {
-		return getSameThreadExecutor().subscribe(future, listener);
+		return sameThreadExecutor().subscribe(future, listener);
 	}
 
 	public static <T> Subscription subscribe(ListenableFuture<? extends T> future, Consumer<T> listener) {
@@ -259,7 +259,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	}
 
 	public static <T> Subscription subscribe(CompletionStage<? extends T> future, Rx<T> listener) {
-		return getSameThreadExecutor().subscribe(future, listener);
+		return sameThreadExecutor().subscribe(future, listener);
 	}
 
 	public static <T> Subscription subscribe(CompletionStage<? extends T> future, Consumer<T> listener) {
@@ -288,7 +288,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	 */
 	public static RxExecutor on(Executor executor) {
 		if (executor == MoreExecutors.directExecutor()) {
-			return getSameThreadExecutor();
+			return sameThreadExecutor();
 		} else if (executor instanceof HasRxExecutor) {
 			return ((HasRxExecutor) executor).getRxExecutor();
 		} else {
@@ -371,7 +371,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	}
 
 	@SuppressFBWarnings(value = "LI_LAZY_INIT_STATIC", justification = "This race condition is fine, as explained in the comment below.")
-	private static RxExecutor getSameThreadExecutor() {
+	public static RxExecutor sameThreadExecutor() {
 		// There is an acceptable race condition here - _sameThread might get set multiple times.
 		// This would happen if multiple threads called blocking() at the same time
 		// during initialization, and this is likely to actually happen in practice.
