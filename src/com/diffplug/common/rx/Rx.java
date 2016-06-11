@@ -99,6 +99,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see <a href="https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html">SwtExec</a>
  */
 public class Rx {
+	private Rx() {}
+
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever a value is received.
 	 * Any errors are sent to ErrorHandler.log().
