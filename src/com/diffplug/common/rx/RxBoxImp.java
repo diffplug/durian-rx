@@ -21,7 +21,7 @@ import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
 class RxBoxImp<T> implements RxBox<T> {
-	private volatile T value;
+	private T value;
 	private final BehaviorSubject<T> subject;
 
 	/** Creates a Holder which holds the given value. */

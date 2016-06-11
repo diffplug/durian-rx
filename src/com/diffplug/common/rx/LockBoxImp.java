@@ -33,12 +33,16 @@ class LockBoxImp<T> implements LockBox<T> {
 
 	@Override
 	public T get() {
-		return value;
+		synchronized (lock()) {
+			return value;
+		}
 	}
 
 	@Override
 	public void set(T value) {
-		this.value = Objects.requireNonNull(value);
+		synchronized (lock()) {
+			this.value = Objects.requireNonNull(value);
+		}
 	}
 
 	@Override
