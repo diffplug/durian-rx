@@ -23,10 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
-
 import rx.Observable;
-import rx.Observer;
 import rx.Scheduler;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
@@ -35,7 +32,6 @@ import rx.subscriptions.BooleanSubscription;
 import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
-import com.diffplug.common.util.concurrent.FutureCallback;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 import com.diffplug.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -103,74 +99,38 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * 
  * @see <a href="https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html">SwtExec</a>
  */
-public class Rx<T> implements Observer<T>, FutureCallback<T> {
-	private final Consumer<T> onValue;
-	private final Consumer<Optional<Throwable>> onTerminate;
-
-	protected Rx(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
-		this.onValue = requireNonNull(onValue);
-		this.onTerminate = requireNonNull(onTerminate);
-	}
-
+public class Rx {
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever a value is received.
 	 * Any errors are sent to ErrorHandler.log().
 	 */
-	public static <T> Rx<T> onValue(Consumer<T> onValue) {
-		return new Rx<T>(onValue, logErrors);
-	}
-
-	private static final Consumer<Optional<Throwable>> logErrors = error -> {
-		if (error.isPresent()) {
-			Errors.log().accept(error.get());
-		}
-	};
-
-	/** Returns true iff the given Rx is a logging Rx. */
-	boolean isLogging() {
-		return onTerminate == logErrors || onTerminate instanceof DefaultTerminate || onTerminate instanceof TrackCancelled;
+	public static <T> RxListener<T> onValue(Consumer<T> onValue) {
+		return new RxListener<T>(onValue, RxListener.logErrors);
 	}
 
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever the followed stream
 	 * or future completes, whether with an error or not.
 	 */
-	public static <T> Rx<T> onTerminate(Consumer<Optional<Throwable>> onTerminate) {
-		return new Rx<T>(Consumers.doNothing(), onTerminate);
+	public static <T> RxListener<T> onTerminate(Consumer<Optional<Throwable>> onTerminate) {
+		return new RxListener<T>(Consumers.doNothing(), onTerminate);
 	}
 
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever the followed stream
 	 * or future completes, whether with an error or not, and the error (if present) will be logged.
 	 */
-	public static <T> Rx<T> onTerminateLogError(Consumer<Optional<Throwable>> onTerminate) {
-		return new Rx<T>(Consumers.doNothing(), new DefaultTerminate(onTerminate));
-	}
-
-	/** An error listener which promises to pass log all errors, without requiring the user to. */
-	private static class DefaultTerminate implements Consumer<Optional<Throwable>> {
-		private final Consumer<Optional<Throwable>> onTerminate;
-
-		private DefaultTerminate(Consumer<Optional<Throwable>> onTerminate) {
-			this.onTerminate = requireNonNull(onTerminate);
-		}
-
-		@Override
-		public void accept(Optional<Throwable> t) {
-			onTerminate.accept(t);
-			if (t.isPresent()) {
-				logErrors.accept(t);
-			}
-		}
+	public static <T> RxListener<T> onTerminateLogError(Consumer<Optional<Throwable>> onTerminate) {
+		return new RxListener<T>(Consumers.doNothing(), new RxListener.DefaultTerminate(onTerminate));
 	}
 
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever the followed stream
 	 * or future completes with an error.
 	 */
-	public static <T> Rx<T> onFailure(Consumer<Throwable> onFailure) {
+	public static <T> RxListener<T> onFailure(Consumer<Throwable> onFailure) {
 		requireNonNull(onFailure);
-		return new Rx<T>(Consumers.doNothing(), error -> {
+		return new RxListener<T>(Consumers.doNothing(), error -> {
 			if (error.isPresent()) {
 				onFailure.accept(error.get());
 			}
@@ -181,51 +141,33 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	 * Creates an Rx instance which will call onValue whenever a value is received, 
 	 * is received, and onTerminate when the future or observable completes, whether with an error or not.
 	 */
-	public static <T> Rx<T> onValueOnTerminate(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
-		return new Rx<T>(onValue, onTerminate);
+	public static <T> RxListener<T> onValueOnTerminate(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
+		return new RxListener<T>(onValue, onTerminate);
 	}
 
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever the followed stream
 	 * or future completes, whether with an error or not, and the error (if present) will automatically be logged.
 	 */
-	public static <T> Rx<T> onValueOnTerminateLogError(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
-		return new Rx<T>(onValue, new DefaultTerminate(onTerminate));
+	public static <T> RxListener<T> onValueOnTerminateLogError(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
+		return new RxListener<T>(onValue, new RxListener.DefaultTerminate(onTerminate));
 	}
 
 	/**
 	 * Creates an Rx instance which will call onValue whenever a value is received,
 	 * and onFailure if the stream or future completes with an error.
 	 */
-	public static <T> Rx<T> onValueOnFailure(Consumer<T> onValue, Consumer<Throwable> onFailure) {
+	public static <T> RxListener<T> onValueOnFailure(Consumer<T> onValue, Consumer<Throwable> onFailure) {
 		requireNonNull(onFailure);
-		return new Rx<T>(onValue, error -> {
+		return new RxListener<T>(onValue, error -> {
 			if (error.isPresent()) {
 				onFailure.accept(error.get());
 			}
 		});
 	}
 
-	//////////////
-	// Observer //
-	//////////////
-	@Override
-	public final void onNext(@Nullable T t) {
-		onValue.accept(t);
-	}
-
-	@Override
-	public final void onCompleted() {
-		onTerminate.accept(Optional.empty());
-	}
-
-	@Override
-	public final void onError(Throwable e) {
-		onTerminate.accept(Optional.of(e));
-	}
-
 	// Static versions
-	public static <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> listener) {
+	public static <T> Subscription subscribe(Observable<? extends T> observable, RxListener<T> listener) {
 		return sameThreadExecutor().subscribe(observable, listener);
 	}
 
@@ -233,7 +175,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		return subscribe(observable, Rx.onValue(listener));
 	}
 
-	public static <T> Subscription subscribe(IObservable<? extends T> observable, Rx<T> listener) {
+	public static <T> Subscription subscribe(IObservable<? extends T> observable, RxListener<T> listener) {
 		return subscribe(observable.asObservable(), listener);
 	}
 
@@ -241,22 +183,8 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		return subscribe(observable.asObservable(), listener);
 	}
 
-	/////////////
-	// Futures //
-	/////////////
-	@Override
-	public final void onSuccess(@Nullable T result) {
-		onValue.accept(result);
-		onTerminate.accept(Optional.empty());
-	}
-
-	@Override
-	public final void onFailure(Throwable e) {
-		onTerminate.accept(Optional.of(e));
-	}
-
 	// Static versions
-	public static <T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> listener) {
+	public static <T> Subscription subscribe(ListenableFuture<? extends T> future, RxListener<T> listener) {
 		return sameThreadExecutor().subscribe(future, listener);
 	}
 
@@ -264,7 +192,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
 	}
 
-	public static <T> Subscription subscribe(CompletionStage<? extends T> future, Rx<T> listener) {
+	public static <T> Subscription subscribe(CompletionStage<? extends T> future, RxListener<T> listener) {
 		return sameThreadExecutor().subscribe(future, listener);
 	}
 
@@ -329,16 +257,16 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		}
 
 		@Override
-		public <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> untracedListener) {
+		public <T> Subscription subscribe(Observable<? extends T> observable, RxListener<T> untracedListener) {
 			requireNonNull(untracedListener);
-			Rx<T> listener = tracingPolicy.hook(observable, untracedListener);
+			RxListener<T> listener = tracingPolicy.hook(observable, untracedListener);
 			return observable.observeOn(scheduler).subscribe(listener);
 		}
 
 		@Override
-		public <T> Subscription subscribe(CompletionStage<? extends T> future, Rx<T> untracedListener) {
+		public <T> Subscription subscribe(CompletionStage<? extends T> future, RxListener<T> untracedListener) {
 			requireNonNull(untracedListener);
-			Rx<T> listener = tracingPolicy.hook(future, untracedListener);
+			RxListener<T> listener = tracingPolicy.hook(future, untracedListener);
 
 			// when we're unsubscribed, set the flag to false
 			BooleanSubscription sub = BooleanSubscription.create();
@@ -356,9 +284,9 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		}
 
 		@Override
-		public <T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> untracedListener) {
+		public <T> Subscription subscribe(ListenableFuture<? extends T> future, RxListener<T> untracedListener) {
 			requireNonNull(untracedListener);
-			Rx<T> listener = tracingPolicy.hook(future, untracedListener);
+			RxListener<T> listener = tracingPolicy.hook(future, untracedListener);
 			// when we're unsubscribed, set the flag to false
 			BooleanSubscription sub = BooleanSubscription.create();
 			// add a callback that guards on whether it is still subscribed

@@ -47,12 +47,12 @@ public interface RxTracingPolicy {
 	 * @return An {@link Rx} which may (or may not) be instrumented.  To ensure that the program's behavior
 	 * is not changed, implementors should ensure that all method calls are delegated unchanged to the original listener eventually.
 	 */
-	<T> Rx<T> hook(Object observable, Rx<T> listener);
+	<T> RxListener<T> hook(Object observable, RxListener<T> listener);
 
 	/** An {@code RxTracingPolicy} which performs no tracing, and has very low overhead. */
 	public static final RxTracingPolicy NONE = new RxTracingPolicy() {
 		@Override
-		public <T> Rx<T> hook(Object observable, Rx<T> listener) {
+		public <T> RxListener<T> hook(Object observable, RxListener<T> listener) {
 			return listener;
 		}
 	};
@@ -77,10 +77,10 @@ public interface RxTracingPolicy {
 	public static class LogSubscriptionTrace implements RxTracingPolicy {
 		/** The BiPredicate which determines which subscriptions should be logged.  By default, any Rx which is logging will be logged. */
 		@SuppressFBWarnings(value = "MS_SHOULD_BE_FINAL", justification = "This is public on purpose, and is only functional in a debug mode.")
-		public static BiPredicate<Object, Rx<?>> shouldLog = (observable, listener) -> listener.isLogging();
+		public static BiPredicate<Object, RxListener<?>> shouldLog = (observable, listener) -> listener.isLogging();
 
 		@Override
-		public <T> Rx<T> hook(Object observable, Rx<T> listener) {
+		public <T> RxListener<T> hook(Object observable, RxListener<T> listener) {
 			if (!shouldLog.test(observable, listener)) {
 				// we're not logging, so pass the listener unchanged
 				return listener;

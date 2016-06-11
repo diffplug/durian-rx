@@ -24,23 +24,23 @@ import rx.Subscription;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 
 /**
- * An object which can subscribe observables to {@link Rx} listeners.
+ * An object which can subscribe observables to {@link RxListener} listeners.
  */
 public interface RxSubscriber {
 	/** Subscribes the given listener to the given observable. */
-	<T> Subscription subscribe(Observable<? extends T> observable, Rx<T> listener);
+	<T> Subscription subscribe(Observable<? extends T> observable, RxListener<T> listener);
 
 	/** Subscribes the given listener to the given Guava ListenableFuture. */
-	<T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> listener);
+	<T> Subscription subscribe(ListenableFuture<? extends T> future, RxListener<T> listener);
 
 	/** Subscribes the given listener to the given Java 8 CompletableFuture. */
-	<T> Subscription subscribe(CompletionStage<? extends T> future, Rx<T> listener);
+	<T> Subscription subscribe(CompletionStage<? extends T> future, RxListener<T> listener);
 
 	default <T> Subscription subscribe(Observable<? extends T> observable, Consumer<T> listener) {
 		return subscribe(observable, Rx.onValue(listener));
 	}
 
-	default <T> Subscription subscribe(IObservable<? extends T> observable, Rx<T> listener) {
+	default <T> Subscription subscribe(IObservable<? extends T> observable, RxListener<T> listener) {
 		return subscribe(observable.asObservable(), listener);
 	}
 

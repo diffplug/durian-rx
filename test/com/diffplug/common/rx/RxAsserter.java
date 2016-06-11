@@ -22,7 +22,7 @@ import org.junit.Assert;
 
 import com.diffplug.common.base.Box;
 
-class RxAsserter<T> extends Rx<T> {
+class RxAsserter<T> extends RxListener<T> {
 	static <T> RxAsserter<T> create() {
 		Box.Nullable<T> value = Box.Nullable.ofVolatileNull();
 		Box.Nullable<Optional<Throwable>> terminal = Box.Nullable.ofVolatileNull();

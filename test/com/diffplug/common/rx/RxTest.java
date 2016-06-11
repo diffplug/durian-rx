@@ -39,7 +39,7 @@ public class RxTest {
 		// create an Observable, Future, and DpRx
 		Observable<Integer> observable = null;
 		SettableFuture<String> future = null;
-		Rx<Object> listener = null;
+		RxListener<Object> listener = null;
 
 		// observing with static methods isn't awful
 		Executor executor = null;
@@ -72,7 +72,7 @@ public class RxTest {
 	}
 
 	/** A theoretical DpRx with support for creating Runnables to add as listeners to ListenableFutures. */
-	private static class DpRxWithFutureRunnable<T> extends Rx<T> {
+	private static class DpRxWithFutureRunnable<T> extends RxListener<T> {
 		/**
 		 * Returns a Runnable appropriate for a FutureListener callback, e.g.
 		 * 

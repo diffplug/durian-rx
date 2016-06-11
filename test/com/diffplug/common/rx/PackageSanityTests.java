@@ -26,7 +26,7 @@ public class PackageSanityTests extends AbstractPackageSanityTests {
 	public PackageSanityTests() {
 		publicApiOnly();
 		setDefault(Scheduler.class, Schedulers.immediate());
-		setDefault(Rx.class, Rx.onValue(Consumers.doNothing()));
+		setDefault(RxListener.class, Rx.onValue(Consumers.doNothing()));
 		setDefault(Observable.class, Observable.just(""));
 	}
 }
