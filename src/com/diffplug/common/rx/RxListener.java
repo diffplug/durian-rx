@@ -28,7 +28,7 @@ import com.diffplug.common.base.Errors;
 import com.diffplug.common.rx.Rx.TrackCancelled;
 import com.diffplug.common.util.concurrent.FutureCallback;
 
-public class RxListener<T> implements Observer<T>, FutureCallback<T> {
+public final class RxListener<T> implements Observer<T>, FutureCallback<T> {
 	private final Consumer<T> onValue;
 	private final Consumer<Optional<Throwable>> onTerminate;
 

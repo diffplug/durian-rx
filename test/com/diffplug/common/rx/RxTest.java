@@ -15,9 +15,7 @@
  */
 package com.diffplug.common.rx;
 
-import java.util.Optional;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 
 import org.junit.Test;
 
@@ -26,12 +24,13 @@ import rx.Observer;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
 
+import com.diffplug.common.util.concurrent.FutureCallback;
 import com.diffplug.common.util.concurrent.Futures;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 import com.diffplug.common.util.concurrent.MoreExecutors;
 import com.diffplug.common.util.concurrent.SettableFuture;
 
-/** The point of this test is to demonstrate why the DpRx API should be what it is. */
+/** The point of this test is to demonstrate why the Rx API should be what it is. */
 @SuppressWarnings("null")
 public class RxTest {
 	@Test(expected = NullPointerException.class)
@@ -72,7 +71,7 @@ public class RxTest {
 	}
 
 	/** A theoretical DpRx with support for creating Runnables to add as listeners to ListenableFutures. */
-	private static class DpRxWithFutureRunnable<T> extends RxListener<T> {
+	private static class DpRxWithFutureRunnable<T> implements FutureCallback<T> {
 		/**
 		 * Returns a Runnable appropriate for a FutureListener callback, e.g.
 		 * 
@@ -89,8 +88,10 @@ public class RxTest {
 			};
 		}
 
-		protected DpRxWithFutureRunnable(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminal) {
-			super(onValue, onTerminal);
-		}
+		@Override
+		public void onSuccess(T result) {}
+
+		@Override
+		public void onFailure(Throwable t) {}
 	}
 }

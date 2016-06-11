@@ -15,42 +15,75 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.concurrent.CompletionStage;
 
 import org.junit.Assert;
 
-import com.diffplug.common.base.Box;
+import rx.Observable;
 
-class RxAsserter<T> extends RxListener<T> {
-	static <T> RxAsserter<T> create() {
-		Box.Nullable<T> value = Box.Nullable.ofVolatileNull();
-		Box.Nullable<Optional<Throwable>> terminal = Box.Nullable.ofVolatileNull();
-		return new RxAsserter<T>(val -> value.set(val), ter -> terminal.set(ter), value, terminal);
+import com.diffplug.common.util.concurrent.ListenableFuture;
+
+final class RxAsserter<T> {
+	private final List<T> values = new ArrayList<>();
+	private Optional<Throwable> terminal = null;
+	private final RxListener<T> listener = Rx.onValueOnTerminate(value -> {
+		synchronized (RxAsserter.this) {
+			values.add(value);
+		}
+	}, terminate -> {
+		synchronized (RxAsserter.this) {
+			terminal = terminate;
+		}
+	});
+
+	public static <T> RxAsserter<T> on(Observable<? extends T> observable) {
+		RxAsserter<T> asserter = new RxAsserter<>();
+		Rx.subscribe(observable, asserter.listener);
+		return asserter;
 	}
 
-	private final Box.Nullable<T> value;
-	private final Box.Nullable<Optional<Throwable>> terminal;
-
-	private RxAsserter(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminal, Box.Nullable<T> value, Box.Nullable<Optional<Throwable>> terminal) {
-		super(onValue, onTerminal);
-		this.value = value;
-		this.terminal = terminal;
+	public static <T> RxAsserter<T> on(IObservable<? extends T> observable) {
+		RxAsserter<T> asserter = new RxAsserter<>();
+		Rx.subscribe(observable, asserter.listener);
+		return asserter;
 	}
 
-	/** Asserts that the given value was observed. */
-	public void assertValue(T expected) {
-		Assert.assertEquals(expected, value.get());
+	public static <T> RxAsserter<T> on(ListenableFuture<? extends T> observable) {
+		RxAsserter<T> asserter = new RxAsserter<>();
+		Rx.subscribe(observable, asserter.listener);
+		return asserter;
+	}
+
+	public static <T> RxAsserter<T> on(CompletionStage<? extends T> observable) {
+		RxAsserter<T> asserter = new RxAsserter<>();
+		Rx.subscribe(observable, asserter.listener);
+		return asserter;
+	}
+
+	/** Asserts that the given values were observed. */
+	@SafeVarargs
+	public final void assertValues(T... expected) {
+		synchronized (this) {
+			Assert.assertEquals(Arrays.asList(expected), values);
+		}
 	}
 
 	/** Asserts that the given terminal condition was observed. */
 	public void assertTerminal(Optional<Throwable> expected) {
-		Assert.assertEquals(expected, terminal.get());
+		synchronized (this) {
+			Assert.assertEquals(expected, terminal);
+		}
 	}
 
 	/** Asserts that the given terminal condition was observed. */
 	public void assertTerminalExceptionClass(Class<? extends Throwable> clazz) {
-		Assert.assertTrue(terminal.get().isPresent());
-		Assert.assertEquals(clazz, terminal.get().get().getClass());
+		synchronized (this) {
+			Assert.assertTrue(terminal.isPresent());
+			Assert.assertEquals(clazz, terminal.get().getClass());
+		}
 	}
 }

@@ -32,43 +32,36 @@ import com.diffplug.common.util.concurrent.SettableFuture;
 public class RxAndListenableFutureSemantics {
 	@Test
 	public void testBehaviorSubjectSubscribe() {
-		RxAsserter<String> observer = RxAsserter.create();
-
 		// create an behavior subject, subscribe pre, and pump test through
 		BehaviorSubject<String> testSubject = BehaviorSubject.create("initial");
-		Rx.subscribe(testSubject, observer);
+		RxAsserter<String> observer = RxAsserter.on(testSubject);
 		// the observer gets the value immediately
-		observer.assertValue("initial");
+		observer.assertValues("initial");
 
 		// call on next, and the observer gets the new value immediately
 		testSubject.onNext("value");
-		observer.assertValue("value");
+		observer.assertValues("initial", "value");
 	}
 
 	@Test
 	public void testAsyncSubjectSubscribeAfterComplete() {
-		RxAsserter<String> preObserver = RxAsserter.create();
-		RxAsserter<String> postObserver = RxAsserter.create();
 
 		// create an async subject, subscribe pre, and pump test through
 		AsyncSubject<String> testSubject = AsyncSubject.create();
-		Rx.subscribe(testSubject, preObserver);
-		testSubject.subscribe(preObserver);
+		RxAsserter<String> preObserver = RxAsserter.on(testSubject);
 		testSubject.onNext("test");
 
 		// make sure that no one has observed anything yet
-		preObserver.assertValue(null);
-		postObserver.assertValue(null);
+		preObserver.assertValues();
 
 		// when the subject completes, pre should observe but not post
 		testSubject.onCompleted();
-		preObserver.assertValue("test");
-		postObserver.assertValue(null);
+		preObserver.assertValues("test");
 
 		// and if we subscribe after the fact, everyone should get it
-		Rx.subscribe(testSubject, postObserver);
-		preObserver.assertValue("test");
-		postObserver.assertValue("test");
+		RxAsserter<String> postObserver = RxAsserter.on(testSubject);
+		preObserver.assertValues("test");
+		postObserver.assertValues("test");
 	}
 
 	@Test
@@ -76,15 +69,13 @@ public class RxAndListenableFutureSemantics {
 		SettableFuture<String> future = SettableFuture.create();
 
 		// subscribe to a future then cancel should terminate with CancellationException
-		RxAsserter<String> assertDuring = RxAsserter.create();
-		Rx.subscribe(future, assertDuring);
+		RxAsserter<String> assertDuring = RxAsserter.on(future);
 		future.cancel(true);
 		assertDuring.assertTerminalExceptionClass(java.util.concurrent.CancellationException.class);
 
 		// subscribe to a cancelled future should terminate with CancellationException
-		RxAsserter<String> assertAfter = RxAsserter.create();
-		Rx.subscribe(future, assertAfter);
-		assertDuring.assertTerminalExceptionClass(java.util.concurrent.CancellationException.class);
+		RxAsserter<String> assertAfter = RxAsserter.on(future);
+		assertAfter.assertTerminalExceptionClass(java.util.concurrent.CancellationException.class);
 	}
 
 	@Test
@@ -92,16 +83,13 @@ public class RxAndListenableFutureSemantics {
 		SettableFuture<String> future = SettableFuture.create();
 		future.set("Some value");
 
-		// subscribe to a future then cancel should terminate with CancellationException
-		RxAsserter<String> assertDuring = RxAsserter.create();
-		Rx.subscribe(future, assertDuring);
+		// cancelling after setting value should not fail
+		RxAsserter<String> assertDuring = RxAsserter.on(future);
 		future.cancel(true);
 		assertDuring.assertTerminal(Optional.empty());
 
-		// subscribe to a cancelled future should terminate with CancellationException
-		RxAsserter<String> assertAfter = RxAsserter.create();
-		Rx.subscribe(future, assertAfter);
-		assertDuring.assertTerminal(Optional.empty());
+		RxAsserter<String> assertAfter = RxAsserter.on(future);
+		assertAfter.assertTerminal(Optional.empty());
 	}
 
 	@Test
@@ -109,15 +97,13 @@ public class RxAndListenableFutureSemantics {
 		CompletableFuture<String> future = new CompletableFuture<>();
 
 		// subscribe to a future then cancel should terminate with CancellationException
-		RxAsserter<String> assertDuring = RxAsserter.create();
-		Rx.subscribe(future, assertDuring);
+		RxAsserter<String> assertDuring = RxAsserter.on(future);
 		future.cancel(true);
 		assertDuring.assertTerminalExceptionClass(java.util.concurrent.CancellationException.class);
 
 		// subscribe to a cancelled future should terminate with CancellationException
-		RxAsserter<String> assertAfter = RxAsserter.create();
-		Rx.subscribe(future, assertAfter);
-		assertDuring.assertTerminalExceptionClass(java.util.concurrent.CancellationException.class);
+		RxAsserter<String> assertAfter = RxAsserter.on(future);
+		assertAfter.assertTerminalExceptionClass(java.util.concurrent.CancellationException.class);
 	}
 
 	@Test
@@ -126,14 +112,12 @@ public class RxAndListenableFutureSemantics {
 		future.complete("Some value");
 
 		// subscribe to a future then cancel should terminate with CancellationException
-		RxAsserter<String> assertDuring = RxAsserter.create();
-		Rx.subscribe(future, assertDuring);
+		RxAsserter<String> assertDuring = RxAsserter.on(future);
 		future.cancel(true);
 		assertDuring.assertTerminal(Optional.empty());
 
 		// subscribe to a cancelled future should terminate with CancellationException
-		RxAsserter<String> assertAfter = RxAsserter.create();
-		Rx.subscribe(future, assertAfter);
-		assertDuring.assertTerminal(Optional.empty());
+		RxAsserter<String> assertAfter = RxAsserter.on(future);
+		assertAfter.assertTerminal(Optional.empty());
 	}
 }
