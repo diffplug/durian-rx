@@ -16,6 +16,7 @@
 package com.diffplug.common.rx;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import rx.subjects.BehaviorSubject;
@@ -45,6 +46,7 @@ public class RateProbe {
 
 	/** Returns the average rate in hertz over the specified time period. */
 	public RxGetter<Double> rateHzOver(long timespan, TimeUnit unit) {
+		Objects.requireNonNull(unit);
 		return RxGetter.from(timestampNano.buffer(timespan, unit).map(RateProbe::toHz), 0.0);
 	}
 

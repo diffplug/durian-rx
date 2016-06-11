@@ -15,10 +15,11 @@
  */
 package com.diffplug.common.rx;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import com.diffplug.common.collect.Ordering;
@@ -77,7 +78,7 @@ public class OrderedLock {
 				++i;
 			}
 			for (Object lock : noDuplicates) {
-				Objects.requireNonNull(lock);
+				requireNonNull(lock);
 			}
 		}
 		return new OrderedLock(noDuplicates);
@@ -131,11 +132,13 @@ public class OrderedLock {
 
 	/** Returns a Runnable which will get and release the appropriate locks before executing its argument. */
 	public Runnable wrap(Runnable toWrap) {
+		requireNonNull(toWrap);
 		return () -> takeAndRun(toWrap);
 	}
 
 	/** Returns a Supplier which will get and release the appropriate locks before executing its argument. */
 	public <T> Supplier<T> wrap(Supplier<T> toWrap) {
+		requireNonNull(toWrap);
 		return () -> takeAndGet(toWrap);
 	}
 }

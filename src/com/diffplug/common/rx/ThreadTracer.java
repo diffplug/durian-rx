@@ -15,6 +15,7 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.diffplug.common.base.Errors;
@@ -30,7 +31,7 @@ public final class ThreadTracer {
 	private final AtomicReference<Thread> firstCall = new AtomicReference<>();
 
 	public ThreadTracer(String name) {
-		this.name = name;
+		this.name = Objects.requireNonNull(name);
 	}
 
 	public final void check() {

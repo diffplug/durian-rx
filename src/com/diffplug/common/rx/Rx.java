@@ -15,11 +15,15 @@
  */
 package com.diffplug.common.rx;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+
+import javax.annotation.Nullable;
 
 import rx.Observable;
 import rx.Observer;
@@ -104,8 +108,8 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	private final Consumer<Optional<Throwable>> onTerminate;
 
 	protected Rx(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
-		this.onValue = onValue;
-		this.onTerminate = onTerminate;
+		this.onValue = requireNonNull(onValue);
+		this.onTerminate = requireNonNull(onTerminate);
 	}
 
 	/**
@@ -148,7 +152,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		private final Consumer<Optional<Throwable>> onTerminate;
 
 		private DefaultTerminate(Consumer<Optional<Throwable>> onTerminate) {
-			this.onTerminate = onTerminate;
+			this.onTerminate = requireNonNull(onTerminate);
 		}
 
 		@Override
@@ -165,6 +169,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	 * or future completes with an error.
 	 */
 	public static <T> Rx<T> onFailure(Consumer<Throwable> onFailure) {
+		requireNonNull(onFailure);
 		return new Rx<T>(Consumers.doNothing(), error -> {
 			if (error.isPresent()) {
 				onFailure.accept(error.get());
@@ -193,6 +198,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	 * and onFailure if the stream or future completes with an error.
 	 */
 	public static <T> Rx<T> onValueOnFailure(Consumer<T> onValue, Consumer<Throwable> onFailure) {
+		requireNonNull(onFailure);
 		return new Rx<T>(onValue, error -> {
 			if (error.isPresent()) {
 				onFailure.accept(error.get());
@@ -204,7 +210,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	// Observer //
 	//////////////
 	@Override
-	public final void onNext(T t) {
+	public final void onNext(@Nullable T t) {
 		onValue.accept(t);
 	}
 
@@ -239,7 +245,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 	// Futures //
 	/////////////
 	@Override
-	public final void onSuccess(T result) {
+	public final void onSuccess(@Nullable T result) {
 		onValue.accept(result);
 		onTerminate.accept(Optional.empty());
 	}
@@ -317,19 +323,21 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 		private final RxTracingPolicy tracingPolicy;
 
 		private RxExecutor(Executor executor, Scheduler scheduler) {
-			this.executor = executor;
-			this.scheduler = scheduler;
+			this.executor = requireNonNull(executor);
+			this.scheduler = requireNonNull(scheduler);
 			this.tracingPolicy = getTracingPolicy();
 		}
 
 		@Override
 		public <T> Subscription subscribe(Observable<? extends T> observable, Rx<T> untracedListener) {
+			requireNonNull(untracedListener);
 			Rx<T> listener = tracingPolicy.hook(observable, untracedListener);
 			return observable.observeOn(scheduler).subscribe(listener);
 		}
 
 		@Override
 		public <T> Subscription subscribe(CompletionStage<? extends T> future, Rx<T> untracedListener) {
+			requireNonNull(untracedListener);
 			Rx<T> listener = tracingPolicy.hook(future, untracedListener);
 
 			// when we're unsubscribed, set the flag to false
@@ -349,6 +357,7 @@ public class Rx<T> implements Observer<T>, FutureCallback<T> {
 
 		@Override
 		public <T> Subscription subscribe(ListenableFuture<? extends T> future, Rx<T> untracedListener) {
+			requireNonNull(untracedListener);
 			Rx<T> listener = tracingPolicy.hook(future, untracedListener);
 			// when we're unsubscribed, set the flag to false
 			BooleanSubscription sub = BooleanSubscription.create();

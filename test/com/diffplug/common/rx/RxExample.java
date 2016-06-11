@@ -21,6 +21,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -37,6 +38,8 @@ import com.diffplug.common.collect.Immutables;
 public class RxExample extends JFrame {
 
 	public static void main(String[] args) {
+		Objects.requireNonNull(args);
+
 		JFrame frame = new JFrame("DurianRx Example");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
