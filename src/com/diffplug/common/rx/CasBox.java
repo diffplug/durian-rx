@@ -15,7 +15,6 @@
  */
 package com.diffplug.common.rx;
 
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import com.diffplug.common.base.Box;
@@ -56,52 +55,11 @@ public interface CasBox<T> extends Box<T> {
 
 	/** Returns a CasBox around the given value. */
 	public static <T> CasBox<T> of(T value) {
-		return new Default<>(value);
-	}
-
-	static class Default<T> implements CasBox<T> {
-		private final AtomicReference<T> ref;
-
-		Default(T value) {
-			ref = new AtomicReference<>(value);
-		}
-
-		@Override
-		public boolean compareAndSet(T expect, T update) {
-			return ref.compareAndSet(expect, update);
-		}
-
-		@Override
-		public T get() {
-			return ref.get();
-		}
-
-		@Override
-		public void set(T value) {
-			ref.set(value);
-		}
-
-		@Override
-		public String toString() {
-			return "CasBox.of[" + get() + "]";
-		}
+		return new CasBoxImp<>(value);
 	}
 
 	@Override
 	default <R> CasBox<R> map(Converter<T, R> converter) {
-		return new CasMapped<>(this, converter);
-	}
-
-	static class CasMapped<T, R> extends MappedImp<T, R, CasBox<T>> implements CasBox<R> {
-		public CasMapped(CasBox<T> delegate, Converter<T, R> converter) {
-			super(delegate, converter);
-		}
-
-		@Override
-		public boolean compareAndSet(R expect, R update) {
-			T expectOrig = converter.revertNonNull(expect);
-			T updateOrig = converter.revertNonNull(update);
-			return delegate.compareAndSet(expectOrig, updateOrig);
-		}
+		return new CasBoxImp.Mapped<>(this, converter);
 	}
 }
