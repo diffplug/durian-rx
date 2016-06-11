@@ -24,6 +24,7 @@ import com.diffplug.common.base.Box;
 /**
  * Utility class for wrapping one kind of box with another.
  *
+ * - For wrapping a {@link CasBox}, use {@link ForwardingBox.Cas}.
  * - For wrapping an {@link RxBox}, use {@link ForwardingBox.Rx}.
  * - For wrapping a {@link LockBox}, use {@link ForwardingBox.Lock}.
  * - For wrapping an {@link RxLockBox}, use {@link ForwardingBox.RxLock}.
@@ -48,6 +49,17 @@ public class ForwardingBox<T, BoxType extends Box<T>> implements Box<T> {
 	@Override
 	public T modify(Function<? super T, ? extends T> mutator) {
 		return delegate.modify(mutator);
+	}
+
+	public static class Cas<T> extends ForwardingBox<T, CasBox<T>> implements CasBox<T> {
+		protected Cas(CasBox<T> delegate) {
+			super(delegate);
+		}
+
+		@Override
+		public boolean compareAndSet(T expect, T update) {
+			return delegate.compareAndSet(expect, update);
+		}
 	}
 
 	public static class Rx<T> extends ForwardingBox<T, RxBox<T>> implements RxBox<T> {
