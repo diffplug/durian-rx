@@ -86,7 +86,7 @@ public interface RxTracingPolicy {
 				return listener;
 			} else {
 				// capture the stack at the time of the subscription
-				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(LogSubscriptionTrace.class, Rx.RxExecutor.class, Rx.class);
+				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(LogSubscriptionTrace.class, RxExecutor.class, Rx.class);
 				// create a new Rx which passes values unchanged, but instruments exceptions with the subscription stack
 				return Rx.onValueOnTerminate(listener::onNext, error -> {
 					if (error.isPresent()) {

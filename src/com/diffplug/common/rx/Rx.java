@@ -27,7 +27,6 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.BooleanSubscription;
 
 import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.DurianPlugins;
@@ -223,8 +222,8 @@ public class Rx {
 	public static RxExecutor on(Executor executor) {
 		if (executor == MoreExecutors.directExecutor()) {
 			return sameThreadExecutor();
-		} else if (executor instanceof HasRxExecutor) {
-			return ((HasRxExecutor) executor).getRxExecutor();
+		} else if (executor instanceof RxExecutor.Has) {
+			return ((RxExecutor.Has) executor).getRxExecutor();
 		} else {
 			return new RxExecutor(executor, Schedulers.from(executor));
 		}
@@ -233,78 +232,6 @@ public class Rx {
 	/** Mechanism for specifying a specific Executor (for ListenableFuture) and Scheduler (for Observable). */
 	public static RxExecutor on(Executor executor, Scheduler scheduler) {
 		return new RxExecutor(executor, scheduler);
-	}
-
-	/*** Marker interface which allows an Executor to specify its own Scheduler. */
-	public interface HasRxExecutor extends Executor {
-		RxExecutor getRxExecutor();
-	}
-
-	/**
-	 * This class holds an instance of Executor (for ListenableFuture) and
-	 * Scheduler (for Observable).  It has methods which match the signatures of Rx's
-	 * static methods, which allows users to   
-	 */
-	public static class RxExecutor implements RxSubscriber {
-		private final Executor executor;
-		private final Scheduler scheduler;
-		private final RxTracingPolicy tracingPolicy;
-
-		private RxExecutor(Executor executor, Scheduler scheduler) {
-			this.executor = requireNonNull(executor);
-			this.scheduler = requireNonNull(scheduler);
-			this.tracingPolicy = getTracingPolicy();
-		}
-
-		@Override
-		public <T> Subscription subscribe(Observable<? extends T> observable, RxListener<T> untracedListener) {
-			requireNonNull(untracedListener);
-			RxListener<T> listener = tracingPolicy.hook(observable, untracedListener);
-			return observable.observeOn(scheduler).subscribe(listener);
-		}
-
-		@Override
-		public <T> Subscription subscribe(CompletionStage<? extends T> future, RxListener<T> untracedListener) {
-			requireNonNull(untracedListener);
-			RxListener<T> listener = tracingPolicy.hook(future, untracedListener);
-
-			// when we're unsubscribed, set the flag to false
-			BooleanSubscription sub = BooleanSubscription.create();
-			future.whenCompleteAsync((value, exception) -> {
-				if (!sub.isUnsubscribed()) {
-					if (exception == null) {
-						listener.onSuccess(value);
-					} else {
-						listener.onFailure(exception);
-					}
-				}
-			}, executor);
-			// return the subscription
-			return sub;
-		}
-
-		@Override
-		public <T> Subscription subscribe(ListenableFuture<? extends T> future, RxListener<T> untracedListener) {
-			requireNonNull(untracedListener);
-			RxListener<T> listener = tracingPolicy.hook(future, untracedListener);
-			// when we're unsubscribed, set the flag to false
-			BooleanSubscription sub = BooleanSubscription.create();
-			// add a callback that guards on whether it is still subscribed
-			future.addListener(() -> {
-				try {
-					T value = future.get();
-					if (!sub.isUnsubscribed()) {
-						listener.onSuccess(value);
-					}
-				} catch (Throwable error) {
-					if (!sub.isUnsubscribed()) {
-						listener.onFailure(error);
-					}
-				}
-			}, executor);
-			// return the subscription
-			return sub;
-		}
 	}
 
 	@SuppressFBWarnings(value = "LI_LAZY_INIT_STATIC", justification = "This race condition is fine, as explained in the comment below.")
@@ -326,7 +253,7 @@ public class Rx {
 
 	/** Returns the global tracing policy. */
 	@SuppressFBWarnings(value = "LI_LAZY_INIT_STATIC", justification = "This race condition is fine, as explained in the comment below.")
-	private static RxTracingPolicy getTracingPolicy() {
+	static RxTracingPolicy getTracingPolicy() {
 		// There is an acceptable race condition here - see getSameThreadExecutor()
 		if (_tracingPolicy == null) {
 			_tracingPolicy = DurianPlugins.get(RxTracingPolicy.class, RxTracingPolicy.NONE);
