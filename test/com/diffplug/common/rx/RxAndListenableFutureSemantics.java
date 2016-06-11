@@ -17,15 +17,12 @@ package com.diffplug.common.rx;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import rx.subjects.AsyncSubject;
 import rx.subjects.BehaviorSubject;
 
-import com.diffplug.common.base.Box.Nullable;
 import com.diffplug.common.util.concurrent.SettableFuture;
 
 /**
@@ -138,38 +135,5 @@ public class RxAndListenableFutureSemantics {
 		RxAsserter<String> assertAfter = RxAsserter.create();
 		Rx.subscribe(future, assertAfter);
 		assertDuring.assertTerminal(Optional.empty());
-	}
-
-	private static class RxAsserter<T> extends Rx<T> {
-		private static <T> RxAsserter<T> create() {
-			Nullable<T> value = Nullable.ofVolatileNull();
-			Nullable<Optional<Throwable>> terminal = Nullable.ofVolatileNull();
-			return new RxAsserter<T>(val -> value.set(val), ter -> terminal.set(ter), value, terminal);
-		}
-
-		private final Nullable<T> value;
-		private final Nullable<Optional<Throwable>> terminal;
-
-		private RxAsserter(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminal, Nullable<T> value, Nullable<Optional<Throwable>> terminal) {
-			super(onValue, onTerminal);
-			this.value = value;
-			this.terminal = terminal;
-		}
-
-		/** Asserts that the given value was observed. */
-		public void assertValue(T expected) {
-			Assert.assertEquals(expected, value.get());
-		}
-
-		/** Asserts that the given terminal condition was observed. */
-		public void assertTerminal(Optional<Throwable> expected) {
-			Assert.assertEquals(expected, terminal.get());
-		}
-
-		/** Asserts that the given terminal condition was observed. */
-		public void assertTerminalExceptionClass(Class<? extends Throwable> clazz) {
-			Assert.assertTrue(terminal.get().isPresent());
-			Assert.assertEquals(clazz, terminal.get().get().getClass());
-		}
 	}
 }
