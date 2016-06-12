@@ -20,11 +20,13 @@ import rx.Scheduler;
 import rx.schedulers.Schedulers;
 
 import com.diffplug.common.base.Consumers;
+import com.diffplug.common.collect.ImmutableSet;
 import com.diffplug.common.testing.AbstractPackageSanityTests;
 
 public class PackageSanityTests extends AbstractPackageSanityTests {
 	public PackageSanityTests() {
 		publicApiOnly();
+		ignoreClasses(ImmutableSet.of(RxExample.class)::contains);
 		setDefault(Scheduler.class, Schedulers.immediate());
 		setDefault(RxListener.class, Rx.onValue(Consumers.doNothing()));
 		setDefault(Observable.class, Observable.just(""));
