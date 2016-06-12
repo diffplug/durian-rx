@@ -57,10 +57,12 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 	 * as the underlying `RxBox` (e.g. an enforced {@link RxLockBox} can still be
 	 * modified atomically).
 	 *
-	 * Conflicting calls to `enforce` can cause an infinite loop:
-	 * 
+	 * Conflicting calls to `enforce` can cause an infinite loop, see {@link Breaker}
+	 * for a possible solution.
+	 *
 	 * ```java
-	 * RxBox.of(1).enforce(i -> Math.abs(i)).enforce(i -> -Math.abs(i));
+	 * // this will not end well...
+	 * RxBox.of(1).enforce(Math::abs).enforce(i -> -Math.abs(i));
 	 * ```
 	 */
 	default RxBox<T> enforce(Function<? super T, ? extends T> enforcer) {
