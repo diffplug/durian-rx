@@ -270,4 +270,15 @@ public class Rx {
 		_sameThread = null;
 		_tracingPolicy = null;
 	}
+
+	/** Merges a bunch of {@link IObservable}s into a single {@link Observable} containing the most-recent value. */
+	@SafeVarargs
+	public static <T> Observable<T> merge(IObservable<? extends T>... toMerge) {
+		@SuppressWarnings("unchecked")
+		Observable<? extends T>[] unwrapped = new Observable[toMerge.length];
+		for (int i = 0; i < toMerge.length; ++i) {
+			unwrapped[i] = toMerge[i].asObservable();
+		}
+		return Observable.merge(unwrapped);
+	}
 }
