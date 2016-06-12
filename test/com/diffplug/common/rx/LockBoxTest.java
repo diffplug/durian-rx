@@ -16,6 +16,7 @@
 package com.diffplug.common.rx;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,22 +28,8 @@ import com.diffplug.common.debug.LapTimer;
 
 public class LockBoxTest {
 	@Test
-	public void testModifyIsLocked() {
-		testLockingBehavior(box -> box.modify(val -> val + "3"), "123");
-	}
-
-	@Test
-	public void testSetIsLocked() {
-		testLockingBehavior(box -> box.set("5"), "5");
-	}
-
-	@Test
-	public void testGetIsLocked() {
-		testLockingBehavior(box -> box.get(), "12");
-	}
-
-	static void testLockingBehavior(Consumer<LockBox<String>> timed, String expectedResult) {
-		testLockingBehavior(LockBox.of("1"), timed, expectedResult);
+	public void testGetSetModify() {
+		testLockingBehaviorGetSetModify("LockBox", LockBox::of);
 	}
 
 	@Test
@@ -53,26 +40,23 @@ public class LockBoxTest {
 	}
 
 	@Test
-	public void testMappedModifyIsLocked() {
-		testMappedLockingBehavior(box -> box.modify(val -> val + "3"), "123");
+	public void testMappedGetSetModify() {
+		Function<String, LockBox<String>> constructor = initial -> {
+			Integer initialInt = Integer.parseInt(initial);
+			LockBox<Integer> box = LockBox.of(initialInt);
+			return box.map(intConverter());
+		};
+		testLockingBehaviorGetSetModify("LockBox mapped", constructor);
 	}
 
-	@Test
-	public void testMappedSetIsLocked() {
-		testMappedLockingBehavior(box -> box.set("5"), "5");
+	static void testLockingBehaviorGetSetModify(String message, Function<String, LockBox<String>> constructor) {
+		testLockingBehavior(message + " get", constructor, box -> box.get(), "12");
+		testLockingBehavior(message + " set", constructor, box -> box.set("5"), "5");
+		testLockingBehavior(message + " modify", constructor, box -> box.modify(val -> val + "3"), "123");
 	}
 
-	@Test
-	public void testMappedGetIsLocked() {
-		testMappedLockingBehavior(box -> box.get(), "12");
-	}
-
-	static void testMappedLockingBehavior(Consumer<LockBox<String>> timed, String expectedResult) {
-		LockBox<Integer> box = LockBox.of(1);
-		testLockingBehavior(box.map(intConverter()), timed, expectedResult);
-	}
-
-	static void testLockingBehavior(LockBox<String> box, Consumer<LockBox<String>> timed, String expectedResult) {
+	static void testLockingBehavior(String message, Function<String, LockBox<String>> constructor, Consumer<LockBox<String>> timed, String expectedResult) {
+		LockBox<String> box = constructor.apply("1");
 		Box.Nullable<Double> elapsed = Box.Nullable.of(null);
 		ThreadHarness harness = new ThreadHarness();
 		harness.add(() -> {
@@ -88,9 +72,9 @@ public class LockBoxTest {
 		});
 		harness.run();
 		// make sure that the action which should have been delayed, was delayed for the proper time
-		Assert.assertEquals(0.1, elapsed.get().doubleValue(), 0.05);
+		Assert.assertEquals("Wrong delay time for " + message, 0.1, elapsed.get().doubleValue(), 0.05);
 		// make sure that the final result was what was expected
-		Assert.assertEquals(expectedResult, box.get());
+		Assert.assertEquals("Wrong result for " + message, expectedResult, box.get());
 	}
 
 	static Converter<Integer, String> intConverter() {
