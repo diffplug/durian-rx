@@ -62,17 +62,6 @@ public class ForwardingBox<T, BoxType extends Box<T>> implements Box<T> {
 		}
 	}
 
-	public static class Rx<T> extends ForwardingBox<T, RxBox<T>> implements RxBox<T> {
-		protected Rx(RxBox<T> delegate) {
-			super(delegate);
-		}
-
-		@Override
-		public Observable<T> asObservable() {
-			return delegate.asObservable();
-		}
-	}
-
 	public static class Lock<T> extends ForwardingBox<T, LockBox<T>> implements LockBox<T> {
 		protected Lock(LockBox<T> delegate) {
 			super(delegate);
@@ -81,6 +70,17 @@ public class ForwardingBox<T, BoxType extends Box<T>> implements Box<T> {
 		@Override
 		public Object lock() {
 			return delegate.lock();
+		}
+	}
+
+	public static class Rx<T> extends ForwardingBox<T, RxBox<T>> implements RxBox<T> {
+		protected Rx(RxBox<T> delegate) {
+			super(delegate);
+		}
+
+		@Override
+		public Observable<T> asObservable() {
+			return delegate.asObservable();
 		}
 	}
 
