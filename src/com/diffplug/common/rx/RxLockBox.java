@@ -19,8 +19,14 @@ import com.diffplug.common.base.Converter;
 
 /** {@link RxBox} and {@link LockBox} in one. */
 public interface RxLockBox<T> extends LockBox<T>, RxBox<T> {
+	/** Creates an `RxLockBox` containing the given value, which uses itself as the lock. */
 	public static <T> RxLockBox<T> of(T value) {
 		return new RxLockBoxImp<>(value);
+	}
+
+	/** Creates an `RxLockBox` containing the given value, which uses `lock` as the lock. */
+	public static <T> RxLockBox<T> of(T value, Object lock) {
+		return new RxLockBoxImp<>(value, lock);
 	}
 
 	/** RxLockBox must map to another kind of LockBox. */

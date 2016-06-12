@@ -21,14 +21,21 @@ import com.diffplug.common.base.Converter;
 
 class LockBoxImp<T> implements LockBox<T> {
 	protected T value;
+	protected final Object lock;
 
 	protected LockBoxImp(T value) {
-		set(value);
+		this.value = value;
+		this.lock = this;
+	}
+
+	protected LockBoxImp(T value, Object lock) {
+		this.value = value;
+		this.lock = lock;
 	}
 
 	@Override
 	public Object lock() {
-		return this;
+		return lock;
 	}
 
 	@Override

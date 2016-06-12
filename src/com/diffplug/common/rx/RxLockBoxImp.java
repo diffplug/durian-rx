@@ -21,16 +21,36 @@ import rx.subjects.BehaviorSubject;
 import com.diffplug.common.base.Converter;
 
 class RxLockBoxImp<T> extends LockBoxImp<T> implements RxLockBox<T> {
-	BehaviorSubject<T> subject = BehaviorSubject.create();
+	final BehaviorSubject<T> subject;
 
 	protected RxLockBoxImp(T value) {
 		super(value);
-		subject = BehaviorSubject.create();
+		subject = BehaviorSubject.create(value);
+	}
+
+	protected RxLockBoxImp(T value, Object lock) {
+		super(value, lock);
+		subject = BehaviorSubject.create(value);
+	}
+
+	@Override
+	public void set(T newValue) {
+		synchronized (lock()) {
+			if (!newValue.equals(value)) {
+				value = newValue;
+				subject.onNext(newValue);
+			}
+		}
 	}
 
 	@Override
 	public Observable<T> asObservable() {
 		return subject;
+	}
+
+	@Override
+	public String toString() {
+		return "RxLockBox.of[" + get() + "]";
 	}
 
 	static class Mapped<T, R> extends MappedImp<T, R, RxLockBox<T>> implements RxLockBox<R> {

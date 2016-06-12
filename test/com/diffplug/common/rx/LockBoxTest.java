@@ -22,21 +22,34 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.diffplug.common.base.Box;
-import com.diffplug.common.base.Converter;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.debug.LapTimer;
+import com.diffplug.common.primitives.Ints;
 
 public class LockBoxTest {
 	@Test
-	public void testGetSetModify() {
-		testLockingBehaviorGetSetModify("LockBox", LockBox::of);
+	public void testLockIdentity() {
+		LockBox<Integer> selfBox = LockBox.of(1);
+		Assert.assertSame(selfBox, selfBox.lock());
+
+		Object otherLock = new Object();
+		LockBox<Integer> otherBox = LockBox.of(1, otherLock);
+		Assert.assertSame(otherLock, otherBox.lock());
 	}
 
 	@Test
-	public void testMappedLock() {
+	public void testMappedLockIdentity() {
 		LockBox<Integer> intBox = LockBox.of(1);
-		LockBox<String> strBox = intBox.map(intConverter());
+		LockBox<String> strBox = intBox.map(Ints.stringConverter().reverse());
 		Assert.assertSame(intBox.lock(), strBox.lock());
+
+		Object otherLock = new Object();
+		Assert.assertSame(otherLock, LockBox.of(1, otherLock).map(Ints.stringConverter().reverse()).lock());
+	}
+
+	@Test
+	public void testGetSetModify() {
+		testLockingBehaviorGetSetModify("LockBox", LockBox::of);
 	}
 
 	@Test
@@ -44,7 +57,7 @@ public class LockBoxTest {
 		Function<String, LockBox<String>> constructor = initial -> {
 			Integer initialInt = Integer.parseInt(initial);
 			LockBox<Integer> box = LockBox.of(initialInt);
-			return box.map(intConverter());
+			return box.map(Ints.stringConverter().reverse());
 		};
 		testLockingBehaviorGetSetModify("LockBox mapped", constructor);
 	}
@@ -75,9 +88,5 @@ public class LockBoxTest {
 		Assert.assertEquals("Wrong delay time for " + message, 0.1, elapsed.get().doubleValue(), 0.05);
 		// make sure that the final result was what was expected
 		Assert.assertEquals("Wrong result for " + message, expectedResult, box.get());
-	}
-
-	static Converter<Integer, String> intConverter() {
-		return Converter.from(i -> Integer.toString(i), Integer::parseInt);
 	}
 }

@@ -49,9 +49,14 @@ public interface LockBox<T> extends Box<T> {
 		}
 	}
 
-	/** Creates a `LockBox` containing the given value. */
+	/** Creates a `LockBox` containing the given value, which uses itself as the lock. */
 	public static <T> LockBox<T> of(T value) {
 		return new LockBoxImp<>(value);
+	}
+
+	/** Creates a `LockBox` containing the given value, and using the given object as the lock. */
+	public static <T> LockBox<T> of(T value, Object lock) {
+		return new LockBoxImp<>(value, lock);
 	}
 
 	/**
