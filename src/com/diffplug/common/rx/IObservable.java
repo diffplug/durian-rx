@@ -25,4 +25,9 @@ import rx.Observable;
  */
 public interface IObservable<T> {
 	Observable<T> asObservable();
+
+	/** Wraps an actual observable as an IObservable. */
+	public static <T> IObservable<T> wrap(Observable<T> observable) {
+		return () -> observable;
+	}
 }
