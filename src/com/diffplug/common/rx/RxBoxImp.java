@@ -17,6 +17,8 @@ package com.diffplug.common.rx;
 
 import java.util.Objects;
 
+import com.diffplug.common.base.Converter;
+
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
@@ -53,5 +55,20 @@ class RxBoxImp<T> implements RxBox<T> {
 	@Override
 	public Observable<T> asObservable() {
 		return subject;
+	}
+
+	static class Mapped<T, R> extends MappedImp<T, R, RxBox<T>> implements RxBox<R> {
+		final Observable<R> observable;
+
+		public Mapped(RxBox<T> delegate, Converter<T, R> converter) {
+			super(delegate, converter);
+			Observable<R> mapped = delegate.asObservable().map(converter::convertNonNull);
+			observable = mapped.distinctUntilChanged();
+		}
+
+		@Override
+		public Observable<R> asObservable() {
+			return observable;
+		}
 	}
 }

@@ -36,7 +36,7 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 	/** Maps one {@code RxBox} to another {@code RxBox}. */
 	@Override
 	default <R> RxBox<R> map(Converter<T, R> converter) {
-		return from(map(converter::convertNonNull), toSet -> set(converter.revertNonNull(toSet)));
+		return new RxBoxImp.Mapped<>(this, converter);
 	}
 
 	/**
