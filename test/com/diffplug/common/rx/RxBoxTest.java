@@ -40,7 +40,7 @@ public class RxBoxTest {
 	static void assertObservableProperties(Function<String, RxBox<String>> constructor) {
 		RxBox<String> box = constructor.apply("1");
 		RxBox<Integer> mappedBox = box.map(Ints.stringConverter());
-		
+
 		RxAsserter<String> asserter = RxAsserter.on(box);
 		RxAsserter<Integer> mapped = RxAsserter.on(mappedBox);
 		asserter.assertValues("1");
@@ -61,5 +61,35 @@ public class RxBoxTest {
 		box.modify(val -> val + "9");
 		asserter.assertValues("1", "2", "1", "19");
 		mapped.assertValues(1, 2, 1, 19);
+	}
+
+	@Test
+	public void testEnforce() {
+		{
+			RxBox<Integer> positiveBox = RxBox.of(1).enforce(Math::abs);
+			RxAsserter<Integer> asserter = RxAsserter.on(positiveBox);
+			asserter.assertValues(1);
+			positiveBox.set(-1);
+			asserter.assertValues(1);
+			positiveBox.set(2);
+			asserter.assertValues(1, 2);
+			positiveBox.set(-2);
+			asserter.assertValues(1, 2);
+			positiveBox.modify(i -> -i);
+			asserter.assertValues(1, 2);
+		}
+		{
+			RxBox<Integer> positiveBox = RxBox.of(-1).enforce(Math::abs);
+			RxAsserter<Integer> asserter = RxAsserter.on(positiveBox);
+			asserter.assertValues(1);
+			positiveBox.set(-1);
+			asserter.assertValues(1);
+			positiveBox.set(-2);
+			asserter.assertValues(1, 2);
+			positiveBox.set(2);
+			asserter.assertValues(1, 2);
+			positiveBox.modify(i -> -i);
+			asserter.assertValues(1, 2);
+		}
 	}
 }

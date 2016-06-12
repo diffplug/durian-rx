@@ -15,6 +15,10 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.function.Function;
+
+import rx.Observable;
+
 import com.diffplug.common.base.Converter;
 
 /** {@link RxBox} and {@link LockBox} in one. */
@@ -33,5 +37,16 @@ public interface RxLockBox<T> extends LockBox<T>, RxBox<T> {
 	@Override
 	default <R> RxLockBox<R> map(Converter<T, R> converter) {
 		return new RxLockBoxImp.Mapped<T, R>(this, converter);
+	}
+
+	@Override
+	default RxLockBox<T> enforce(Function<? super T, ? extends T> enforcer) {
+		// this must be a plain-old observable, because it needs to fire
+		// every time an invariant is violated, not only when a violation
+		// of the invariant causes a change in the output
+		Observable<T> mapped = asObservable().map(enforcer::apply);
+		Rx.subscribe(mapped, this::set);
+		// now we can return the RxBox
+		return map(Converter.from(enforcer, enforcer));
 	}
 }

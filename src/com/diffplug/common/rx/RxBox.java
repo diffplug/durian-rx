@@ -21,7 +21,6 @@ import java.util.function.Function;
 import rx.Observable;
 
 import com.diffplug.common.base.Box;
-import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.Converter;
 
 /**
@@ -40,40 +39,29 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 	}
 
 	/**
-	 * Provides a mechanism for enforcing an invariant.
+	 * Provides a mechanism for enforcing an invariant on an existing
+	 * `RxBox`.
 	 *
-	 * For example, let's say that there is an `RxBox<List<T>>` which represents
-	 * a user's multiselection in some widget. You would like the user to select
-	 * a pair of values - you want to enforce that the selection doesn't grow
-	 * beyond 2 elements.
+	 * The returned `RxBox` and its observable will **always** satisfy the
+	 * given invariant.  If the underlying `RxBox` changes in a way which
+	 * does not satisfy the invariant, it will be set so that it does match
+	 * the invariant.
 	 *
-	 * You could write code like this:
+	 * During this process, the underlying `RxBox` will momentarily fail to
+	 * meet the invariant, and its `Observable` will emit values which fail
+	 * the invariant.  The returned `RxBox`, however, will always meet the
+	 * invariant, so downstream consumers can rely on the invariant holding
+	 * true at all times.
 	 *
+	 * The returned `RxBox` can be mapped, and has the same atomicity guarantees
+	 * as the underlying `RxBox` (e.g. an enforced {@link RxLockBox} can still be
+	 * modified atomically).
+	 *
+	 * Conflicting calls to `enforce` can cause an infinite loop:
+	 * 
 	 * ```java
-	 * RxBox<List<T>> selection = widget.rxSelection();
-	 * RxGetter<List<T>> onlyPairs = selection.map(list -> list.stream().limit(2).collect(Collectors.toList()));
-	 * Rx.subscribe(onlyPairs, selection);
+	 * RxBox.of(1).enforce(i -> Math.abs(i)).enforce(i -> -Math.abs(i));
 	 * ```
-	 *
-	 * But there's a subtle bug in this code.  Because {@link RxGetter} and {@link RxBox} only
-	 * fire their observables when their value changes, the selection invariant won't be enforced
-	 * unless `onlyPairs` actually changes.  It's easy to fix:
-	 *
-	 * ```java
-	 * RxBox<List<T>> selection = widget.rxSelection();
-	 * Observable<List<T>> onlyPairs = selection.asObservable().map(list -> list.stream().limit(2).collect(Collectors.toList()));
-	 * Rx.subscribe(onlyPairs, selection);
-	 * ```
-	 *
-	 * But there's still a problem - `selection` will momentarily contain values which violate the invariant. That
-	 * means you can't write listener code that relies on the invariant being true.  Which is why the `enforce()` method exists:
-	 *
-	 * ```java
-	 * RxBox<List<T>> onlyPairs = widget.rxSelection().enforce(list -> list.stream().limit(2).collect(Collectors.toList()));
-	 * ```
-	 *
-	 * This creates a new `RxBox` which will always satisfy the invariant, and it will enforce this invariant
-	 * on the original `RxBox`. 
 	 */
 	default RxBox<T> enforce(Function<? super T, ? extends T> enforcer) {
 		// this must be a plain-old observable, because it needs to fire
@@ -82,7 +70,7 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 		Observable<T> mapped = asObservable().map(enforcer::apply);
 		Rx.subscribe(mapped, this::set);
 		// now we can return the RxBox
-		return from(map(enforcer), Consumers.compose(enforcer, this::set));
+		return map(Converter.from(enforcer, enforcer));
 	}
 
 	/** Creates an `RxBox` with the given initial value. */

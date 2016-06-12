@@ -17,10 +17,10 @@ package com.diffplug.common.rx;
 
 import java.util.Objects;
 
-import com.diffplug.common.base.Converter;
-
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
+
+import com.diffplug.common.base.Converter;
 
 class RxBoxImp<T> implements RxBox<T> {
 	private T value;
