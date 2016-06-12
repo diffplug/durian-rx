@@ -24,6 +24,7 @@ import org.junit.Test;
 import com.diffplug.common.base.Box;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.debug.LapTimer;
+import com.diffplug.common.debug.ThreadHarness;
 import com.diffplug.common.primitives.Ints;
 
 public class LockBoxTest {

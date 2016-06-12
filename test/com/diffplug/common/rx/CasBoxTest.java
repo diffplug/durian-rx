@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import com.diffplug.common.base.Converter;
 import com.diffplug.common.base.Errors;
+import com.diffplug.common.debug.ThreadHarness;
 
 public class CasBoxTest {
 	@Test
