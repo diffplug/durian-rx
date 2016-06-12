@@ -93,7 +93,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <li>{@code Rx.on(someExecutor).subscribe( ... )}</li>
  * </ul>
  * Because RxJava's Observables use {@link rx.Scheduler}s rather than {@link java.util.concurrent.Executor}s,
- * a Scheduler is automatically created using {@link rx.Schedulers#from}. If you'd like to specify the Scheduler manually, you can use {@link Rx#on(Executor, Scheduler)}
+ * a Scheduler is automatically created using {@link rx.Schedulers#from}. If you'd like to specify the Scheduler manually, you can use {@link Rx#callbackOn(Executor, Scheduler)}
  * or you can create an executor which implements {@link Rx.HasRxExecutor}.
  * 
  * @see <a href="https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html">SwtExec</a>
@@ -221,7 +221,7 @@ public class Rx {
 	 * Mechanism for specifying a specific Executor.  A corresponding Scheduler will
 	 * be created using Schedulers.from(executor).
 	 */
-	public static RxExecutor on(Executor executor) {
+	public static RxExecutor callbackOn(Executor executor) {
 		if (executor == MoreExecutors.directExecutor()) {
 			return sameThreadExecutor();
 		} else if (executor instanceof RxExecutor.Has) {
@@ -232,7 +232,7 @@ public class Rx {
 	}
 
 	/** Mechanism for specifying a specific Executor (for ListenableFuture) and Scheduler (for Observable). */
-	public static RxExecutor on(Executor executor, Scheduler scheduler) {
+	public static RxExecutor callbackOn(Executor executor, Scheduler scheduler) {
 		return new RxExecutor(executor, scheduler);
 	}
 

@@ -50,8 +50,8 @@ public class RxTest {
 		// listener.subscribe(observable, executor);
 		// listener.subscribe(future, executor);
 		// which is why we only have these static methods
-		Rx.on(executor).subscribe(observable, listener);
-		Rx.on(executor).subscribe(future, listener);
+		Rx.callbackOn(executor).subscribe(observable, listener);
+		Rx.callbackOn(executor).subscribe(future, listener);
 	}
 
 	/** Hypothetical API: Subscribes the observer to the observable on the executor. */
