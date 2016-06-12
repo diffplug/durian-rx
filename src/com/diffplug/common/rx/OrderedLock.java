@@ -28,7 +28,7 @@ import com.diffplug.common.collect.Ordering;
  * All code which takes locks using this code is guaranteed to do so
  * in the same order, guaranteeing there won't be a deadlock.
  *
- * {@code OrderedLock} instances can be reused as many times as
+ * `OrderedLock` instances can be reused as many times as
  * you'd like, and they're expensive to create and cheap to keep
  * around, so reuse is highly recommended.
  *

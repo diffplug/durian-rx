@@ -30,8 +30,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p>
  * By default, no tracing is done. To enable tracing, do one of the following:
  * <ul>
- * <li>Execute this at the very beginning of your application: {@code DurianPlugins.set(RxTracingPolicy.class, new MyTracingPolicy());}</li>
- * <li>Set this system property: {@code durian.plugins.com.diffplug.common.rx.RxTracingPolicy=fully.qualified.name.to.MyTracingPolicy}</li>
+ * <li>Execute this at the very beginning of your application: `DurianPlugins.set(RxTracingPolicy.class, new MyTracingPolicy());`</li>
+ * <li>Set this system property: `durian.plugins.com.diffplug.common.rx.RxTracingPolicy=fully.qualified.name.to.MyTracingPolicy`</li>
  * </ul>
  * {@link LogSubscriptionTrace} is a useful tracing policy for debugging errors within callbacks.
  * @see DurianPlugins
@@ -39,7 +39,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public interface ThreadTracingPolicy {
 	/**
 	 * Given an observable, and an {@link Rx} which is about to be subscribed to this observable,
-	 * return a (possibly instrumented) {@code Rx}.
+	 * return a (possibly instrumented) `Rx`.
 	 * 
 	 * @param observable The {@link IObservable}, {@link Observable}, or {@link ListenableFuture} which is about to be subscribed to.
 	 * @param listener The {@link Rx} which is about to be subscribed.
@@ -48,7 +48,7 @@ public interface ThreadTracingPolicy {
 	 */
 	boolean trace(Box<?> toTrace);
 
-	/** An {@code RxTracingPolicy} which performs no tracing, and has very low overhead. */
+	/** An `RxTracingPolicy` which performs no tracing, and has very low overhead. */
 	public static final ThreadTracingPolicy NONE = new ThreadTracingPolicy() {
 		@Override
 		public boolean trace(Box<?> toTrace) {
@@ -56,7 +56,7 @@ public interface ThreadTracingPolicy {
 		}
 	};
 
-	/** An {@code RxTracingPolicy} which performs no tracing, and has very low overhead. */
+	/** An `RxTracingPolicy` which performs no tracing, and has very low overhead. */
 	public static final ThreadTracingPolicy ALL = new ThreadTracingPolicy() {
 		@Override
 		public boolean trace(Box<?> toTrace) {

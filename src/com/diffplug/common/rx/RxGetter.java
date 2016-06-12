@@ -25,28 +25,28 @@ import com.diffplug.common.base.Box;
 
 /** 
  * Represents a value which can be accessed through a traditional
- * {@code get()} method or by listening to its {@link rx.Observable}.
+ * `get()` method or by listening to its {@link rx.Observable}.
  * <p>
- * {@code RxGetter}'s {@code Observable} has the semantics of a
+ * `RxGetter`'s `Observable` has the semantics of a
  * {@link rx.BehaviorSubject}, meaning that as soon as a listener
- * subscribes to the {@code Observable}, it will emit the current value.
+ * subscribes to the `Observable`, it will emit the current value.
  * <p>
- * Any time the value changes, {@code RxGetter}'s {@code Observable} will notify
+ * Any time the value changes, `RxGetter`'s `Observable` will notify
  * of the change.  If the value did not change (e.g. a field is
  * set to its current value, which produces no change) then the
- * {@code Observable} will not fire.
+ * `Observable` will not fire.
  */
 public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 	/** 
-	 * Maps an {@code RxGetter} to a new {@code RxGetter} by applying the {@code mapper} function
+	 * Maps an `RxGetter` to a new `RxGetter` by applying the `mapper` function
 	 * to all of its values.
 	 * <p>
-	 * If the {@code Observable} of the source {@code RxGetter} changes, but the
-	 * {@code Function<T, R> mapper} collapses these values to produce 
-	 * no change, then the mapped {@code Observable} shall not emit a new value.
+	 * If the `Observable` of the source `RxGetter` changes, but the
+	 * `Function<T, R> mapper` collapses these values to produce 
+	 * no change, then the mapped `Observable` shall not emit a new value.
 	 * <ul>
-	 * <li>Incorrect: {@code ("A", "B", "C") -> map(String::length) = (1, 1, 1)}</li>
-	 * <li>Correct: {@code ("A", "B", "C") -> map(String::length) = (1)}</li>
+	 * <li>Incorrect: `("A", "B", "C") -> map(String::length) = (1, 1, 1)`</li>
+	 * <li>Correct: `("A", "B", "C") -> map(String::length) = (1)`</li>
 	 * </ul>
 	 */
 	default <R> RxGetter<R> map(Function<? super T, ? extends R> mapper) {
@@ -67,7 +67,7 @@ public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 	}
 
 	/**
-	 * Creates an {@code RxGetter} from the given {@code Observable} and {@code initialValue},
+	 * Creates an `RxGetter` from the given `Observable` and `initialValue`,
 	 * appropriate for observables which emit values on multiple threads.
 	 *
 	 * The value returned by {@link RxGetter#get()} will be the last value emitted by
@@ -90,7 +90,7 @@ public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 	}
 
 	/**
-	 * Creates an {@code RxGetter} from the given {@code Observable} and {@code initialValue},
+	 * Creates an `RxGetter` from the given `Observable` and `initialValue`,
 	 * appropriate for observables which emit values on a single thread.
 	 *
 	 * The value returned by {@link RxGetter#get()} will be the last value emitted by
@@ -113,7 +113,7 @@ public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 	}
 
 	/**
-	 * Creates an {@code RxGetter} which combines two {@code RxGetter}s using the {@code BiFunction combine}.
+	 * Creates an `RxGetter` which combines two `RxGetter`s using the `BiFunction combine`.
 	 * 
 	 * As with {@link #map}, the observable only emits a new value if its value has changed.
 	 */

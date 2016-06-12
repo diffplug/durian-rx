@@ -28,12 +28,12 @@ import com.diffplug.common.base.Converter;
  * {@link RxGetter} and {@link Box} combined in one: a value you can set, get, and subscribe to.
  */
 public interface RxBox<T> extends RxGetter<T>, Box<T> {
-	/** Returns a read-only version of this {@code RxBox}. */
+	/** Returns a read-only version of this `RxBox`. */
 	default RxGetter<T> readOnly() {
 		return this;
 	}
 
-	/** Maps one {@code RxBox} to another {@code RxBox}. */
+	/** Maps one `RxBox` to another `RxBox`. */
 	@Override
 	default <R> RxBox<R> map(Converter<T, R> converter) {
 		return new RxBoxImp.Mapped<>(this, converter);
@@ -41,56 +41,56 @@ public interface RxBox<T> extends RxGetter<T>, Box<T> {
 
 	/**
 	 * Provides a mechanism for enforcing an invariant.
-	 * <p>
-	 * For example, let's say that there is an {@code RxBox<List<T>>} which represents
+	 *
+	 * For example, let's say that there is an `RxBox<List<T>>` which represents
 	 * a user's multiselection in some widget. You would like the user to select
 	 * a pair of values - you want to enforce that the selection doesn't grow
 	 * beyond 2 elements.
-	 * <p>
+	 *
 	 * You could write code like this:
-	 * <pre>
-	 * {@code
+	 *
+	 * ```java
 	 * RxBox<List<T>> selection = widget.rxSelection();
 	 * RxGetter<List<T>> onlyPairs = selection.map(list -> list.stream().limit(2).collect(Collectors.toList()));
 	 * Rx.subscribe(onlyPairs, selection);
-	 * }
-	 * </pre>
+	 * ```
+	 *
 	 * But there's a subtle bug in this code.  Because {@link RxGetter} and {@link RxBox} only
 	 * fire their observables when their value changes, the selection invariant won't be enforced
-	 * unless {@code onlyPairs} actually changes.  It's easy to fix:
-	 * <pre>
-	 * {@code
+	 * unless `onlyPairs` actually changes.  It's easy to fix:
+	 *
+	 * ```java
 	 * RxBox<List<T>> selection = widget.rxSelection();
 	 * Observable<List<T>> onlyPairs = selection.asObservable().map(list -> list.stream().limit(2).collect(Collectors.toList()));
 	 * Rx.subscribe(onlyPairs, selection);
-	 * }
-	 * </pre>
-	 * But there's still a problem - {@code selection} will momentarily contain values which violate the invariant. That
-	 * means you can't write listener code that relies on the invariant being true.  Which is why the {@code enforce()} method exists:
-	 * <pre>
-	 * {@code
+	 * ```
+	 *
+	 * But there's still a problem - `selection` will momentarily contain values which violate the invariant. That
+	 * means you can't write listener code that relies on the invariant being true.  Which is why the `enforce()` method exists:
+	 *
+	 * ```java
 	 * RxBox<List<T>> onlyPairs = widget.rxSelection().enforce(list -> list.stream().limit(2).collect(Collectors.toList()));
-	 * }
-	 * </pre>
-	 * This creates a new {@code RxBox} which will always satisfy the invariant, and it will enforce this invariant
-	 * on the original {@code RxBox}. 
+	 * ```
+	 *
+	 * This creates a new `RxBox` which will always satisfy the invariant, and it will enforce this invariant
+	 * on the original `RxBox`. 
 	 */
-	default RxBox<T> enforce(Function<? super T, ? extends T> getMapper) {
+	default RxBox<T> enforce(Function<? super T, ? extends T> enforcer) {
 		// this must be a plain-old observable, because it needs to fire
 		// every time an invariant is violated, not only when a violation
 		// of the invariant causes a change in the output
-		Observable<T> mapped = asObservable().map(getMapper::apply);
+		Observable<T> mapped = asObservable().map(enforcer::apply);
 		Rx.subscribe(mapped, this::set);
 		// now we can return the RxBox
-		return from(map(getMapper), Consumers.compose(getMapper, this::set));
+		return from(map(enforcer), Consumers.compose(enforcer, this::set));
 	}
 
-	/** Creates an {@code RxBox} with the given initial value. */
+	/** Creates an `RxBox` with the given initial value. */
 	public static <T> RxBox<T> of(T initial) {
 		return new RxBoxImp<T>(initial);
 	}
 
-	/** Creates an {@code RxBox} which implements the "getter" part with {@code RxGetter}, and the setter part with {@code Consumer}. */
+	/** Creates an `RxBox` which implements the "getter" part with `RxGetter`, and the setter part with `Consumer`. */
 	public static <T> RxBox<T> from(RxGetter<T> getter, Consumer<T> setter) {
 		return new RxBox<T>() {
 			@Override

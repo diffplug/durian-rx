@@ -20,7 +20,7 @@ import rx.Observable;
 /**
  * An object which can be supplied in an {@link rx.Observable} form.
  * <p>
- * Ideally, {@code rx.Observable} would be an interface, which would make this interface unnecessary.  But
+ * Ideally, `rx.Observable` would be an interface, which would make this interface unnecessary.  But
  * so long as it isn't, this (combined with {@link Rx}) makes it fairly seamless to fix this.
  */
 public interface IObservable<T> {

@@ -31,8 +31,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p>
  * By default, no tracing is done. To enable tracing, do one of the following:
  * <ul>
- * <li>Execute this at the very beginning of your application: {@code DurianPlugins.set(RxTracingPolicy.class, new MyTracingPolicy());}</li>
- * <li>Set this system property: {@code durian.plugins.com.diffplug.common.rx.RxTracingPolicy=fully.qualified.name.to.MyTracingPolicy}</li>
+ * <li>Execute this at the very beginning of your application: `DurianPlugins.set(RxTracingPolicy.class, new MyTracingPolicy());`</li>
+ * <li>Set this system property: `durian.plugins.com.diffplug.common.rx.RxTracingPolicy=fully.qualified.name.to.MyTracingPolicy`</li>
  * </ul>
  * {@link LogSubscriptionTrace} is a useful tracing policy for debugging errors within callbacks.
  * @see DurianPlugins
@@ -40,7 +40,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public interface RxTracingPolicy {
 	/**
 	 * Given an observable, and an {@link Rx} which is about to be subscribed to this observable,
-	 * return a (possibly instrumented) {@code Rx}.
+	 * return a (possibly instrumented) `Rx`.
 	 * 
 	 * @param observable The {@link IObservable}, {@link Observable}, or {@link ListenableFuture} which is about to be subscribed to.
 	 * @param listener The {@link Rx} which is about to be subscribed.
@@ -49,7 +49,7 @@ public interface RxTracingPolicy {
 	 */
 	<T> RxListener<T> hook(Object observable, RxListener<T> listener);
 
-	/** An {@code RxTracingPolicy} which performs no tracing, and has very low overhead. */
+	/** An `RxTracingPolicy` which performs no tracing, and has very low overhead. */
 	public static final RxTracingPolicy NONE = new RxTracingPolicy() {
 		@Override
 		public <T> RxListener<T> hook(Object observable, RxListener<T> listener) {
@@ -68,8 +68,8 @@ public interface RxTracingPolicy {
 	 * <p>
 	 * To enable this tracing policy, do one of the following:
 	 * <ul>
-	 * <li>Execute this at the very beginning of your application: {@code DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace());}</li>
-	 * <li>Set this system property: {@code durian.plugins.com.diffplug.common.rx.RxTracingPolicy=com.diffplug.common.rx.RxTracingPolicy$LogSubscriptionTrace}</li>
+	 * <li>Execute this at the very beginning of your application: `DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace());`</li>
+	 * <li>Set this system property: `durian.plugins.com.diffplug.common.rx.RxTracingPolicy=com.diffplug.common.rx.RxTracingPolicy$LogSubscriptionTrace`</li>
 	 * </ul>
 	 * @see <a href="https://github.com/diffplug/durian-rx/blob/master/src/com/diffplug/common/rx/RxTracingPolicy.java?ts=4">LogSubscriptionTrace source code</a>
 	 * @see DurianPlugins

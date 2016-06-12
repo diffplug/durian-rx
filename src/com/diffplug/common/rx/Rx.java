@@ -51,19 +51,19 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * // call unsubscribe() on the subscription to cancel it 
  * rx.Subscription subscription = Rx.subscribe(listenableOrObservable, val -> doSomething);
  * </pre>
- * Long version: {@code Rx} implements both the {@link rx.Observer} and {@link com.diffplug.common.util.concurrent.FutureCallback}
- * interfaces by mapping them to two {@code Consumer}s:
+ * Long version: `Rx` implements both the {@link rx.Observer} and {@link com.diffplug.common.util.concurrent.FutureCallback}
+ * interfaces by mapping them to two `Consumer`s:
  * <ul>
- * <li>{@code Consumer<T> onValue}</li>
- * <li>{@code Consumer<Optional<Throwable>> onTerminate}</li>
+ * <li>`Consumer<T> onValue`</li>
+ * <li>`Consumer<Optional<Throwable>> onTerminate`</li>
  * </ul>
  * Which are mapped as follows:
  * <ul>
- * <li>{@code Observable.onNext(T value)          -> onValue.accept(value)}</li>
- * <li>{@code Observable.onCompleted()            -> onTerminate.accept(Optional.empty())}</li>
- * <li>{@code Observable.onError(Throwable error) -> onTerminate.accept(Optional.of(error))}</li>
- * <li>{@code FutureCallback.onSuccess(T value)       -> onValue.accept(value); onTerminate.accept(Optional.empty());}</li>
- * <li>{@code FutureCallback.onError(Throwable error) -> onTerminate.accept(Optional.of(error))}</li>
+ * <li>`Observable.onNext(T value)          -> onValue.accept(value)`</li>
+ * <li>`Observable.onCompleted()            -> onTerminate.accept(Optional.empty())`</li>
+ * <li>`Observable.onError(Throwable error) -> onTerminate.accept(Optional.of(error))`</li>
+ * <li>`FutureCallback.onSuccess(T value)       -> onValue.accept(value); onTerminate.accept(Optional.empty());`</li>
+ * <li>`FutureCallback.onError(Throwable error) -> onTerminate.accept(Optional.of(error))`</li>
  * </ul>
  * An instance of Rx is created by calling one of Rx's static creator methods:
  * <ul>
@@ -75,22 +75,22 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * </ul>
  * Once you have an instance of Rx, you can subscribe it using the normal RxJava or Guava calls:
  * <ul>
- * <li>{@code rxObservable.subscribe(Rx.onValue(val -> doSomething(val));}</li>
- * <li>{@code Futures.addCallback(listenableFuture, Rx.onValue(val -> doSomething(val));}</li>
+ * <li>`rxObservable.subscribe(Rx.onValue(val -> doSomething(val));`</li>
+ * <li>`Futures.addCallback(listenableFuture, Rx.onValue(val -> doSomething(val));`</li>
  * </ul>
  * But the recommended way to subscribe is to use:
  * <ul>
- * <li>{@code Rx.subscribe(listenableOrObservable, Rx.onValue(val -> doSomething(val)));}</li>
- * <li>{@code Rx.subscribe(listenableOrObservable, val -> doSomething(val)); // automatically uses Rx.onValue()}</li>
+ * <li>`Rx.subscribe(listenableOrObservable, Rx.onValue(val -> doSomething(val)));`</li>
+ * <li>`Rx.subscribe(listenableOrObservable, val -> doSomething(val)); // automatically uses Rx.onValue()`</li>
  * </ul>
  * The advantage of this latter method is that it returns {@link rx.Subscription} instances
  * which allow you to unsubscribe from futures in the same manner as for observables.
  * <ul>
- * <li>{@code subscription = Rx.subscribe( ... )}</li>
+ * <li>`subscription = Rx.subscribe( ... )`</li>
  * </ul>
  * If you wish to receive callbacks on a specific thread, you can use:
  * <ul>
- * <li>{@code Rx.on(someExecutor).subscribe( ... )}</li>
+ * <li>`Rx.on(someExecutor).subscribe( ... )`</li>
  * </ul>
  * Because RxJava's Observables use {@link rx.Scheduler}s rather than {@link java.util.concurrent.Executor}s,
  * a Scheduler is automatically created using {@link rx.Schedulers#from}. If you'd like to specify the Scheduler manually, you can use {@link Rx#callbackOn(Executor, Scheduler)}
