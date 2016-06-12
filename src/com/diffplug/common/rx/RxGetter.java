@@ -66,11 +66,38 @@ public interface RxGetter<T> extends IObservable<T>, Supplier<T> {
 		};
 	}
 
-	/** Creates an {@code RxGetter} from the given {@code Observable} and {@code initialValue}. */
-	public static <T> RxGetter<T> from(Observable<T> observableUnfiltered, T initialValue) {
-		Observable<T> observable = observableUnfiltered.distinctUntilChanged();
-
+	/**
+	 * Creates an {@code RxGetter} from the given {@code Observable} and {@code initialValue},
+	 * appropriate for observables which emit values on multiple threads.
+	 *
+	 * The value returned by {@link RxGetter#get()} will be the last value emitted by
+	 * the observable, as recorded by a volatile field.
+	 */
+	public static <T> RxGetter<T> fromVolatile(Observable<T> observable, T initialValue) {
 		Box<T> box = Box.ofVolatile(initialValue);
+		Rx.subscribe(observable, box::set);
+		return new RxGetter<T>() {
+			@Override
+			public Observable<T> asObservable() {
+				return observable;
+			}
+
+			@Override
+			public T get() {
+				return box.get();
+			}
+		};
+	}
+
+	/**
+	 * Creates an {@code RxGetter} from the given {@code Observable} and {@code initialValue},
+	 * appropriate for observables which emit values on a single thread.
+	 *
+	 * The value returned by {@link RxGetter#get()} will be the last value emitted by
+	 * the observable, as recorded by a non-volatile field.
+	 */
+	public static <T> RxGetter<T> from(Observable<T> observable, T initialValue) {
+		Box<T> box = Box.of(initialValue);
 		Rx.subscribe(observable, box::set);
 		return new RxGetter<T>() {
 			@Override
