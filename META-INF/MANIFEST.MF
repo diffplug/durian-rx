@@ -13,9 +13,8 @@ Export-Package: com.diffplug.common.rx;uses:="com.diffplug.common.base
  ,com.diffplug.common.util.concurrent,javax.annotation,rx";version="2.
  0.0"
 Import-Package: com.diffplug.common.base;version="[1.2,2)",com.diffplu
- g.common.collect;version="[1.2,2)",com.diffplug.common.debug;version=
- "[1.0,2)",com.diffplug.common.util.concurrent;version="[1.2,2)",javax
- .annotation,rx;version="[1.1,2)",rx.functions;version="[1.1,2)",rx.sc
- hedulers;version="[1.1,2)",rx.subjects;version="[1.1,2)",rx.subscript
- ions;version="[1.1,2)"
+ g.common.collect;version="[1.2,2)",com.diffplug.common.util.concurren
+ t;version="[1.2,2)",javax.annotation,rx;version="[1.1,2)",rx.function
+ s;version="[1.1,2)",rx.schedulers;version="[1.1,2)",rx.subjects;versi
+ on="[1.1,2)",rx.subscriptions;version="[1.1,2)"
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
