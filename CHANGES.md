@@ -1,6 +1,25 @@
 # DurianRx releases
 
-### Version 1.4.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
+### Version 2.0.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
+
+* `Immutables` has moved to `com.diffplug.durian:durian-collect`.
+* Removed collections-specific classes.
+	+ `RxOptional` -> `RxBox<Optional>`
+	+ `RxSet` -> `RxBox<ImmutableSet>`
+	+ This makes it possible to mix-and-match RxBox implementations and collection implementations.
+* `Box` and `RxBox` had poorly defined behavior around race conditions.  It is now implemented by the following well-defined classes:
+	+ `CasBox` for compare-and-swap atomic modifications.
+	+ `LockBox` for mutex-based atomic modifications.
+	+ `RxLockBox` for mutex-based atomic modification with RxJava-based notifications.
+* Broke the overly crowded `Rx` class into serveral pieces:
+	+ `Rx` is now only a collection of utility methods.
+	+ `RxListener` is now the listener interface for `Observer<T> & FutureCallback<T>`.
+	+ `Rx.RxExecutor` is now `RxExecutor`, and `Rx.HasRxExecutor` is `RxExecutor.Has`.
+	+ `RxGetter` no longer enforces `distinctUntilChanged`, and
+* Adopted Durian and its new `ConverterNonNull`.
+* Added `OrderedLock`, which takes multiple locks in a guaranteed lock-free way.
+* Added `Breaker`, for temporarily breaking a connection between observable values.
+* Added `ThreadTracer` for tracking which threads are in use at various times, and `ThreadTracingPolicy` for controlling automatic thread policy enforcement.
 
 ### Version 1.3.0 - February 9th 2015 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/1.3.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/1.3.0/view))
 

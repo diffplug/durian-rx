@@ -52,37 +52,7 @@ Debugging an error which involves lots of callbacks can be difficult.  To make t
 DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace()).
 ```
 
-Lastly, DurianRx provides convenience classes for manipulating Guava's immutable collections inside reactive containers, such as `RxSet<T> extends RxBox<ImmutableSet<T>>`, which can be used as such:
-
-```java
-public void mouseClicked(MouseEvent e) {
-	rxMouseOver.get().ifPresent(cell -> {
-		Set<Integer> currentSelection = rxSelection.get();
-		if (e.isControlDown()) {
-			// control => toggle mouseOver item in selection
-			if (currentSelection.contains(cell)) {
-				rxSelection.remove(cell);
-			} else {
-				rxSelection.add(cell);
-			}
-		} else {
-			// no control => set selection to mouseOver
-			rxSelection.set(Collections.singleton(cell));
-		}
-	});
-}
-
-...
-
-Rx.subscribe(rxSelection, set -> {
-	// take some action in response to
-	// selection change
-});
-```
-
-Perhaps most useful of all is the [Immutables](https://diffplug.github.io/durian-rx/javadoc/1.3.0/com/diffplug/common/rx/Immutables.html) utility class, which helps with all kinds of manipulations of Guava's immmutable collections.
-
-DurianRx's only requirements are [Guava](https://github.com/google/guava), [RxJava](https://github.com/reactivex/rxjava), and [Durian](https://github.com/diffplug/durian).
+DurianRx's only requirements are [durian-base, durian-collect, durian-concurrent](https://github.com/diffplug/durian), and [RxJava](https://github.com/reactivex/rxjava).
 
 <!---freshmark /javadoc -->
 
