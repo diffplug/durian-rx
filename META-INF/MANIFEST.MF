@@ -2,16 +2,16 @@ Manifest-Version: 1.0
 Bundle-Description: DurianRx - Reactive getters, powered by RxJava and
   ListenableFuture
 Bundle-DocURL: https://github.com/diffplug/durian-rx
-Bundle-License: https://github.com/diffplug/durian-rx/blob/v2.0.0-SNAP
+Bundle-License: https://github.com/diffplug/durian-rx/blob/v2.1.0-SNAP
  SHOT/LICENSE
 Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-SymbolicName: com.diffplug.durian.rx
 Bundle-Vendor: DiffPlug
-Bundle-Version: 2.0.0.SNAPSHOT
+Bundle-Version: 2.1.0.SNAPSHOT
 Export-Package: com.diffplug.common.rx;uses:="com.diffplug.common.base
  ,com.diffplug.common.util.concurrent,javax.annotation,rx";version="2.
- 0.0"
+ 1.0"
 Import-Package: com.diffplug.common.base;version="[1.2,2)",com.diffplu
  g.common.collect;version="[1.2,2)",com.diffplug.common.util.concurren
  t;version="[1.2,2)",javax.annotation,rx;version="[1.1,2)",rx.function
