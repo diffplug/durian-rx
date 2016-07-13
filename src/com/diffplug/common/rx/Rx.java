@@ -94,7 +94,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * </ul>
  * Because RxJava's Observables use {@link rx.Scheduler}s rather than {@link java.util.concurrent.Executor}s,
  * a Scheduler is automatically created using {@link rx.Schedulers#from}. If you'd like to specify the Scheduler manually, you can use {@link Rx#callbackOn(Executor, Scheduler)}
- * or you can create an executor which implements {@link Rx.HasRxExecutor}.
+ * or you can create an executor which implements {@link RxExecutor.Has}.
  * 
  * @see <a href="https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html">SwtExec</a>
  */
