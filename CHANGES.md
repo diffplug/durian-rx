@@ -15,11 +15,10 @@
 	+ `Rx` is now only a collection of utility methods.
 	+ `RxListener` is now the listener interface for `Observer<T> & FutureCallback<T>`.
 	+ `Rx.RxExecutor` is now `RxExecutor`, and `Rx.HasRxExecutor` is `RxExecutor.Has`.
-	+ `RxGetter` no longer enforces `distinctUntilChanged`, and
+	+ `RxGetter` no longer enforces `distinctUntilChanged`.
 * Adopted Durian and its new `ConverterNonNull`.
 * Added `OrderedLock`, which takes multiple locks in a guaranteed lock-free way.
 * Added `Breaker`, for temporarily breaking a connection between observable values.
-* Added `ThreadTracer` for tracking which threads are in use at various times, and `ThreadTracingPolicy` for controlling automatic thread policy enforcement.
 
 ### Version 1.3.0 - February 9th 2015 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/1.3.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/1.3.0/view))
 
