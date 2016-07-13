@@ -1,6 +1,8 @@
 # DurianRx releases
 
-### Version 2.0.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
+### Version 2.1.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
+
+### Version 2.0.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/2.0.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/2.0.0/view))
 
 * `Immutables` has moved to `com.diffplug.durian:durian-collect`.
 * Removed collections-specific classes.
@@ -8,9 +10,10 @@
 	+ `RxSet` -> `RxBox<ImmutableSet>`
 	+ This makes it possible to mix-and-match RxBox implementations and collection implementations.
 * `Box` and `RxBox` had poorly defined behavior around race conditions.  It is now implemented by the following well-defined classes:
-	+ `CasBox` for compare-and-swap atomic modifications.
-	+ `LockBox` for mutex-based atomic modifications.
-	+ `RxLockBox` for mutex-based atomic modification with RxJava-based notifications.
+	+ `RxBox.of(initialValue)` makes no atomicity guarantees.
+	+ `CasBox` supports compare-and-swap atomic modifications.
+	+ `LockBox` supports mutex-based atomic modifications.
+	+ `RxLockBox` supports mutex-based atomic modification with RxJava-based notifications.
 * Broke the overly crowded `Rx` class into serveral pieces:
 	+ `Rx` is now only a collection of utility methods.
 	+ `RxListener` is now the listener interface for `Observer<T> & FutureCallback<T>`.
