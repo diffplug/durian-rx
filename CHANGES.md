@@ -2,7 +2,7 @@
 
 ### Version 2.1.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
 
-### Version 2.0.0 - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/2.0.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/2.0.0/view))
+### Version 2.0.0 - July 13th 2016 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/2.0.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/2.0.0/view))
 
 * `Immutables` has moved to `com.diffplug.durian:durian-collect`.
 * Removed collections-specific classes.
@@ -23,7 +23,7 @@
 * Added `OrderedLock`, which takes multiple locks in a guaranteed lock-free way.
 * Added `Breaker`, for temporarily breaking a connection between observable values.
 
-### Version 1.3.0 - February 9th 2015 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/1.3.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/1.3.0/view))
+### Version 1.3.0 - February 9th 2016 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/1.3.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/1.3.0/view))
 
 * Ditched Guava for DurianGuava.
 
