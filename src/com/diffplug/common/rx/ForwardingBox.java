@@ -15,8 +15,6 @@
  */
 package com.diffplug.common.rx;
 
-import java.util.function.Function;
-
 import rx.Observable;
 
 import com.diffplug.common.base.Box;
@@ -28,6 +26,8 @@ import com.diffplug.common.base.Box;
  * - For wrapping an {@link RxBox}, use {@link ForwardingBox.Rx}.
  * - For wrapping a {@link LockBox}, use {@link ForwardingBox.Lock}.
  * - For wrapping an {@link RxLockBox}, use {@link ForwardingBox.RxLock}.
+ * 
+ * Especially useful for overridding set().
  */
 public class ForwardingBox<T, BoxType extends Box<T>> implements Box<T> {
 	protected final BoxType delegate;
@@ -44,11 +44,6 @@ public class ForwardingBox<T, BoxType extends Box<T>> implements Box<T> {
 	@Override
 	public void set(T value) {
 		delegate.set(value);
-	}
-
-	@Override
-	public T modify(Function<? super T, ? extends T> mutator) {
-		return delegate.modify(mutator);
 	}
 
 	public static class Cas<T> extends ForwardingBox<T, CasBox<T>> implements CasBox<T> {
