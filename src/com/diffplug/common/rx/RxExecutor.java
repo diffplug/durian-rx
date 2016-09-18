@@ -32,7 +32,7 @@ import com.diffplug.common.util.concurrent.ListenableFuture;
  * Scheduler (for Observable).  It has methods which match the signatures of Rx's
  * static methods, which allows users to   
  */
-public class RxExecutor implements RxSubscriber {
+public final class RxExecutor implements RxSubscriber {
 	private final Executor executor;
 	private final Scheduler scheduler;
 	private final RxTracingPolicy tracingPolicy;
@@ -41,6 +41,18 @@ public class RxExecutor implements RxSubscriber {
 		this.executor = requireNonNull(executor);
 		this.scheduler = requireNonNull(scheduler);
 		this.tracingPolicy = Rx.getTracingPolicy();
+	}
+
+	public Executor executor() {
+		return executor;
+	}
+
+	public Scheduler scheduler() {
+		return scheduler;
+	}
+
+	public RxTracingPolicy tracingPolicy() {
+		return tracingPolicy;
 	}
 
 	@Override
