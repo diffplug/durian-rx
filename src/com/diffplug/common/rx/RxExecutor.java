@@ -35,12 +35,10 @@ import com.diffplug.common.util.concurrent.ListenableFuture;
 public final class RxExecutor implements RxSubscriber {
 	private final Executor executor;
 	private final Scheduler scheduler;
-	private final RxTracingPolicy tracingPolicy;
 
 	RxExecutor(Executor executor, Scheduler scheduler) {
 		this.executor = requireNonNull(executor);
 		this.scheduler = requireNonNull(scheduler);
-		this.tracingPolicy = Rx.getTracingPolicy();
 	}
 
 	public Executor executor() {
@@ -51,21 +49,17 @@ public final class RxExecutor implements RxSubscriber {
 		return scheduler;
 	}
 
-	public RxTracingPolicy tracingPolicy() {
-		return tracingPolicy;
-	}
-
 	@Override
 	public <T> Subscription subscribe(Observable<? extends T> observable, RxListener<T> untracedListener) {
 		requireNonNull(untracedListener);
-		RxListener<T> listener = tracingPolicy.hook(observable, untracedListener);
+		RxListener<T> listener = Rx.getTracingPolicy().hook(observable, untracedListener);
 		return observable.observeOn(scheduler).subscribe(listener);
 	}
 
 	@Override
 	public <T> Subscription subscribe(CompletionStage<? extends T> future, RxListener<T> untracedListener) {
 		requireNonNull(untracedListener);
-		RxListener<T> listener = tracingPolicy.hook(future, untracedListener);
+		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
 
 		// when we're unsubscribed, set the flag to false
 		BooleanSubscription sub = BooleanSubscription.create();
@@ -85,7 +79,7 @@ public final class RxExecutor implements RxSubscriber {
 	@Override
 	public <T> Subscription subscribe(ListenableFuture<? extends T> future, RxListener<T> untracedListener) {
 		requireNonNull(untracedListener);
-		RxListener<T> listener = tracingPolicy.hook(future, untracedListener);
+		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
 		// when we're unsubscribed, set the flag to false
 		BooleanSubscription sub = BooleanSubscription.create();
 		// add a callback that guards on whether it is still subscribed
