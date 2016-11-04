@@ -15,22 +15,22 @@
  */
 package com.diffplug.common.rx;
 
-import rx.Observable;
-import rx.subjects.BehaviorSubject;
-
 import com.diffplug.common.base.Converter;
+
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
 
 class RxLockBoxImp<T> extends LockBoxImp<T> implements RxLockBox<T> {
 	final BehaviorSubject<T> subject;
 
 	protected RxLockBoxImp(T value) {
 		super(value);
-		subject = BehaviorSubject.create(value);
+		subject = BehaviorSubject.createDefault(value);
 	}
 
 	protected RxLockBoxImp(T value, Object lock) {
 		super(value, lock);
-		subject = BehaviorSubject.create(value);
+		subject = BehaviorSubject.createDefault(value);
 	}
 
 	@Override

@@ -17,26 +17,27 @@ package com.diffplug.common.rx;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
-import rx.Observable;
-import rx.Scheduler;
-import rx.Subscription;
-import rx.schedulers.Schedulers;
-
 import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 import com.diffplug.common.util.concurrent.MoreExecutors;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
- * Unifies the listener models of {@link rx.Observable RxJava's Observable} 
+ * Unifies the listener models of {@link io.reactivex.Observable RxJava's Observable} 
  * with <code><a href="https://code.google.com/p/guava-libraries/wiki/ListenableFutureExplained">Guava's ListenableFuture</a></code>
  * , and also adds tracing capabilities.
  * <p>
@@ -49,7 +50,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * // receive callbacks on a specific executor
  * Rx.on(someExecutor).subscribe(listenableOrObservable, val -> doSomething(val));
  * // call unsubscribe() on the subscription to cancel it 
- * rx.Subscription subscription = Rx.subscribe(listenableOrObservable, val -> doSomething);
+ * io.reactivex.disposables.Disposable subscription = Rx.subscribe(listenableOrObservable, val -> doSomething);
  * </pre>
  * Long version: `Rx` implements both the {@link rx.Observer} and {@link com.diffplug.common.util.concurrent.FutureCallback}
  * interfaces by mapping them to two `Consumer`s:
@@ -83,7 +84,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <li>`Rx.subscribe(listenableOrObservable, Rx.onValue(val -> doSomething(val)));`</li>
  * <li>`Rx.subscribe(listenableOrObservable, val -> doSomething(val)); // automatically uses Rx.onValue()`</li>
  * </ul>
- * The advantage of this latter method is that it returns {@link rx.Subscription} instances
+ * The advantage of this latter method is that it returns {@link io.reactivex.disposables.Disposable} instances
  * which allow you to unsubscribe from futures in the same manner as for observables.
  * <ul>
  * <li>`subscription = Rx.subscribe( ... )`</li>
@@ -168,37 +169,69 @@ public class Rx {
 	}
 
 	// Static versions
-	public static <T> Subscription subscribe(Observable<? extends T> observable, RxListener<T> listener) {
-		return sameThreadExecutor().subscribe(observable, listener);
+	public static <T> void subscribe(Observable<? extends T> observable, RxListener<T> listener) {
+		sameThreadExecutor().subscribe(observable, listener);
 	}
 
-	public static <T> Subscription subscribe(Observable<? extends T> observable, Consumer<T> listener) {
-		return subscribe(observable, Rx.onValue(listener));
+	public static <T> void subscribe(Observable<? extends T> observable, Consumer<T> listener) {
+		subscribe(observable, Rx.onValue(listener));
 	}
 
-	public static <T> Subscription subscribe(IObservable<? extends T> observable, RxListener<T> listener) {
-		return subscribe(observable.asObservable(), listener);
+	public static <T> void subscribe(IObservable<? extends T> observable, RxListener<T> listener) {
+		subscribe(observable.asObservable(), listener);
 	}
 
-	public static <T> Subscription subscribe(IObservable<? extends T> observable, Consumer<T> listener) {
-		return subscribe(observable.asObservable(), listener);
+	public static <T> void subscribe(IObservable<? extends T> observable, Consumer<T> listener) {
+		subscribe(observable.asObservable(), listener);
+	}
+
+	public static <T> void subscribe(ListenableFuture<? extends T> future, RxListener<T> listener) {
+		sameThreadExecutor().subscribe(future, listener);
+	}
+
+	public static <T> void subscribe(ListenableFuture<? extends T> future, Consumer<T> listener) {
+		subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
+	}
+
+	public static <T> void subscribe(CompletionStage<? extends T> future, RxListener<T> listener) {
+		sameThreadExecutor().subscribe(future, listener);
+	}
+
+	public static <T> void subscribe(CompletionStage<? extends T> future, Consumer<T> listener) {
+		subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
 	}
 
 	// Static versions
-	public static <T> Subscription subscribe(ListenableFuture<? extends T> future, RxListener<T> listener) {
-		return sameThreadExecutor().subscribe(future, listener);
+	public static <T> Disposable subscribeDisposable(Observable<? extends T> observable, RxListener<T> listener) {
+		return sameThreadExecutor().subscribeDisposable(observable, listener);
 	}
 
-	public static <T> Subscription subscribe(ListenableFuture<? extends T> future, Consumer<T> listener) {
-		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
+	public static <T> Disposable subscribeDisposable(Observable<? extends T> observable, Consumer<T> listener) {
+		return subscribeDisposable(observable, Rx.onValue(listener));
 	}
 
-	public static <T> Subscription subscribe(CompletionStage<? extends T> future, RxListener<T> listener) {
-		return sameThreadExecutor().subscribe(future, listener);
+	public static <T> Disposable subscribeDisposable(IObservable<? extends T> observable, RxListener<T> listener) {
+		return subscribeDisposable(observable.asObservable(), listener);
 	}
 
-	public static <T> Subscription subscribe(CompletionStage<? extends T> future, Consumer<T> listener) {
-		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
+	public static <T> Disposable subscribeDisposable(IObservable<? extends T> observable, Consumer<T> listener) {
+		return subscribeDisposable(observable.asObservable(), listener);
+	}
+
+	public static <T> Disposable subscribeDisposable(ListenableFuture<? extends T> future, RxListener<T> listener) {
+		return sameThreadExecutor().subscribeDisposable(future, listener);
+	}
+
+	public static <T> Disposable subscribeDisposable(ListenableFuture<? extends T> future, Consumer<T> listener) {
+		return subscribeDisposable(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
+	}
+
+	public static <T> Disposable subscribeDisposable(CompletionStage<? extends T> future, RxListener<T> listener) {
+		return sameThreadExecutor().subscribeDisposable(future, listener);
+	}
+
+	public static <T> Disposable subscribeDisposable(CompletionStage<? extends T> future, Consumer<T> listener) {
+		return subscribeDisposable(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
 	}
 
 	/** An error listener which tracks whether a future has been cancelled, so that it doesn't log the errors of cancelled futures. */
@@ -246,7 +279,7 @@ public class Rx {
 		// that getSameThreadExecutor() might return different instances (which each have the
 		// same behavior), rather than to incur the cost of some type of synchronization.
 		if (_sameThread == null) {
-			_sameThread = new RxExecutor(MoreExecutors.directExecutor(), Schedulers.immediate());
+			_sameThread = new RxExecutor(MoreExecutors.directExecutor(), Util.immediate());
 		}
 		return _sameThread;
 	}
@@ -279,6 +312,6 @@ public class Rx {
 		for (int i = 0; i < toMerge.length; ++i) {
 			unwrapped[i] = toMerge[i].asObservable();
 		}
-		return Observable.merge(unwrapped);
+		return Observable.merge(Arrays.asList(unwrapped));
 	}
 }

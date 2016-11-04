@@ -20,10 +20,10 @@ import java.util.concurrent.CompletableFuture;
 
 import org.junit.Test;
 
-import rx.subjects.AsyncSubject;
-import rx.subjects.BehaviorSubject;
-
 import com.diffplug.common.util.concurrent.SettableFuture;
+
+import io.reactivex.subjects.AsyncSubject;
+import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * This is a simple little test for confirming the behavior of
@@ -33,7 +33,7 @@ public class RxAndListenableFutureSemantics {
 	@Test
 	public void testBehaviorSubjectSubscribe() {
 		// create an behavior subject, subscribe pre, and pump test through
-		BehaviorSubject<String> testSubject = BehaviorSubject.create("initial");
+		BehaviorSubject<String> testSubject = BehaviorSubject.createDefault("initial");
 		RxAsserter<String> observer = RxAsserter.on(testSubject);
 		// the observer gets the value immediately
 		observer.assertValues("initial");
@@ -45,7 +45,6 @@ public class RxAndListenableFutureSemantics {
 
 	@Test
 	public void testAsyncSubjectSubscribeAfterComplete() {
-
 		// create an async subject, subscribe pre, and pump test through
 		AsyncSubject<String> testSubject = AsyncSubject.create();
 		RxAsserter<String> preObserver = RxAsserter.on(testSubject);
@@ -55,7 +54,7 @@ public class RxAndListenableFutureSemantics {
 		preObserver.assertValues();
 
 		// when the subject completes, pre should observe but not post
-		testSubject.onCompleted();
+		testSubject.onComplete();
 		preObserver.assertValues("test");
 
 		// and if we subscribe after the fact, everyone should get it

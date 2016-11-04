@@ -17,7 +17,7 @@ package com.diffplug.common.rx;
 
 import org.junit.Test;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public class RxTest {
 	@Test

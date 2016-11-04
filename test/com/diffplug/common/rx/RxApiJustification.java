@@ -19,16 +19,16 @@ import java.util.concurrent.Executor;
 
 import org.junit.Test;
 
-import rx.Observable;
-import rx.Observer;
-import rx.Subscription;
-import rx.schedulers.Schedulers;
-
 import com.diffplug.common.util.concurrent.FutureCallback;
 import com.diffplug.common.util.concurrent.Futures;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 import com.diffplug.common.util.concurrent.MoreExecutors;
 import com.diffplug.common.util.concurrent.SettableFuture;
+
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /** The point of this test is to demonstrate why the Rx API should be what it is. */
 @SuppressWarnings("null")
@@ -55,8 +55,8 @@ public class RxApiJustification {
 	}
 
 	/** Hypothetical API: Subscribes the observer to the observable on the executor. */
-	private static <T> Subscription addObserver(Observable<T> observable, Observer<? super T> observer, Executor executor) {
-		return observable.observeOn(Schedulers.from(executor)).subscribe(observer);
+	private static <T> Disposable addObserver(Observable<T> observable, Observer<? super T> observer, Executor executor) {
+		return observable.observeOn(Schedulers.from(executor)).subscribe(observer::onNext, observer::onError, observer::onComplete);
 	}
 
 	/** Explains why Futures(static).addCallback is better than future(instance).addListener */

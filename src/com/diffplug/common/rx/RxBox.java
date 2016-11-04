@@ -18,10 +18,9 @@ package com.diffplug.common.rx;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import rx.Observable;
-
 import com.diffplug.common.base.Box;
 import com.diffplug.common.base.Converter;
+import io.reactivex.Observable;
 
 /**
  * {@link RxGetter} and {@link Box} combined in one: a value you can set, get, and subscribe to.

@@ -23,7 +23,7 @@
  * ```java
  * // anytime an error is thrown in an Rx callback, the stack trace of the error
  * // will be wrapped by the stack trace of the original subscription
- * DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace()).
+ * DurianPlugins.set(RxTracingPolicy.class, new LogDisposableTrace()).
  * ```
  */
 

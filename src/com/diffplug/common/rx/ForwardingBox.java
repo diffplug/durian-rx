@@ -15,9 +15,8 @@
  */
 package com.diffplug.common.rx;
 
-import rx.Observable;
-
 import com.diffplug.common.base.Box;
+import io.reactivex.Observable;
 
 /**
  * Utility class for wrapping one kind of box with another.

@@ -23,9 +23,8 @@ import java.util.concurrent.CompletionStage;
 
 import org.junit.Assert;
 
-import rx.Observable;
-
 import com.diffplug.common.util.concurrent.ListenableFuture;
+import io.reactivex.Observable;
 
 final class RxAsserter<T> {
 	private final List<T> values = new ArrayList<>();

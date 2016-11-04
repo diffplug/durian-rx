@@ -17,7 +17,7 @@ package com.diffplug.common.rx;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import rx.Subscription;
+import io.reactivex.disposables.Disposable;
 
 /**
  * A mechanism for "turning off" an existing `RxBox`, much like a a circuit breaker. 
@@ -38,7 +38,7 @@ import rx.Subscription;
 public class Breaker<T> extends RxBoxImp<T> {
 	protected final RxBox<T> delegate;
 	private final AtomicBoolean closed = new AtomicBoolean(false);
-	private volatile Subscription subscription;
+	private volatile Disposable subscription;
 
 	Breaker(RxBox<T> delegate, boolean closed) {
 		super(delegate.get());
@@ -63,7 +63,7 @@ public class Breaker<T> extends RxBoxImp<T> {
 				// and start subscribing to the delegate value
 				subscription = delegate.asObservable().subscribe(super::set);
 			} else {
-				subscription.unsubscribe();
+				subscription.dispose();
 			}
 		}
 	}

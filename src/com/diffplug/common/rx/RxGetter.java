@@ -19,16 +19,15 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import rx.Observable;
-
 import com.diffplug.common.base.Box;
+import io.reactivex.Observable;
 
 /** 
  * Represents a value which can be accessed through a traditional
- * `get()` method or by listening to its {@link rx.Observable}.
+ * `get()` method or by listening to its {@link io.reactivex.Observable}.
  * <p>
  * `RxGetter`'s `Observable` has the semantics of a
- * {@link rx.BehaviorSubject}, meaning that as soon as a listener
+ * {@link io.reactivex.subjects.BehaviorSubject}, meaning that as soon as a listener
  * subscribes to the `Observable`, it will emit the current value.
  * <p>
  * Any time the value changes, `RxGetter`'s `Observable` will notify

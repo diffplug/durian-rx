@@ -15,16 +15,23 @@
  */
 package com.diffplug.common.rx;
 
-import rx.Observable;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 
 /**
- * An object which can be supplied in an {@link rx.Observable} form.
+ * An object which can be supplied in an {@link io.reactivex.Observable} form.
  *
- * Ideally, `rx.Observable` would be an interface, which would make this interface unnecessary.  But
+ * Ideally, `io.reactivex.Observable` would be an interface, which would make this interface unnecessary.  But
  * so long as it isn't, this (combined with {@link Rx}) makes it fairly seamless to fix this.
  */
-public interface IObservable<T> {
+public interface IObservable<T> extends ObservableSource<T> {
 	Observable<T> asObservable();
+
+	@Override
+	default void subscribe(Observer<? super T> observer) {
+		asObservable().subscribe(observer);
+	}
 
 	/** Wraps an actual observable as an IObservable. */
 	public static <T> IObservable<T> wrap(Observable<T> observable) {

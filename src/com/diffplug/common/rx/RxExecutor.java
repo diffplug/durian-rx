@@ -20,12 +20,12 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 
-import rx.Observable;
-import rx.Scheduler;
-import rx.Subscription;
-import rx.subscriptions.BooleanSubscription;
-
 import com.diffplug.common.util.concurrent.ListenableFuture;
+
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 
 /**
  * This class holds an instance of Executor (for ListenableFuture) and
@@ -33,6 +33,11 @@ import com.diffplug.common.util.concurrent.ListenableFuture;
  * static methods, which allows users to   
  */
 public final class RxExecutor implements RxSubscriber {
+	/*** Marker interface which allows an Executor to specify its own Scheduler. */
+	public interface Has extends Executor {
+		RxExecutor getRxExecutor();
+	}
+
 	private final Executor executor;
 	private final Scheduler scheduler;
 
@@ -50,21 +55,78 @@ public final class RxExecutor implements RxSubscriber {
 	}
 
 	@Override
-	public <T> Subscription subscribe(Observable<? extends T> observable, RxListener<T> untracedListener) {
+	public <T> void subscribe(Observable<? extends T> observable, RxListener<T> untracedListener) {
 		requireNonNull(untracedListener);
 		RxListener<T> listener = Rx.getTracingPolicy().hook(observable, untracedListener);
-		return observable.observeOn(scheduler).subscribe(listener);
+		observable.observeOn(scheduler).subscribe(listener);
 	}
 
 	@Override
-	public <T> Subscription subscribe(CompletionStage<? extends T> future, RxListener<T> untracedListener) {
+	public <T> void subscribe(ListenableFuture<? extends T> future, RxListener<T> untracedListener) {
+		requireNonNull(untracedListener);
+		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
+		// add a callback that guards on whether it is still subscribed
+		future.addListener(() -> {
+			try {
+				listener.onSuccess(future.get());
+			} catch (Throwable error) {
+				listener.onFailure(error);
+			}
+		}, executor);
+	}
+
+	@Override
+	public <T> void subscribe(CompletionStage<? extends T> future, RxListener<T> untracedListener) {
+		requireNonNull(untracedListener);
+		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
+		future.whenCompleteAsync((value, exception) -> {
+			if (exception == null) {
+				listener.onSuccess(value);
+			} else {
+				listener.onFailure(exception);
+			}
+		}, executor);
+	}
+
+	@Override
+	public <T> Disposable subscribeDisposable(Observable<? extends T> observable, RxListener<T> untracedListener) {
+		requireNonNull(untracedListener);
+		RxListener<T> listener = Rx.getTracingPolicy().hook(observable, untracedListener);
+		return observable.observeOn(scheduler).subscribe(listener::onNext, listener::onError, listener::onComplete);
+	}
+
+	@Override
+	public <T> Disposable subscribeDisposable(ListenableFuture<? extends T> future, RxListener<T> untracedListener) {
+		requireNonNull(untracedListener);
+		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
+		// when we're unsubscribed, set the flag to false
+		Disposable sub = Disposables.empty();
+		// add a callback that guards on whether it is still subscribed
+		future.addListener(() -> {
+			try {
+				T value = future.get();
+				if (!sub.isDisposed()) {
+					listener.onSuccess(value);
+				}
+			} catch (Throwable error) {
+				if (!sub.isDisposed()) {
+					listener.onFailure(error);
+				}
+			}
+		}, executor);
+		// return the subscription
+		return sub;
+	}
+
+	@Override
+	public <T> Disposable subscribeDisposable(CompletionStage<? extends T> future, RxListener<T> untracedListener) {
 		requireNonNull(untracedListener);
 		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
 
 		// when we're unsubscribed, set the flag to false
-		BooleanSubscription sub = BooleanSubscription.create();
+		Disposable sub = Disposables.empty();
 		future.whenCompleteAsync((value, exception) -> {
-			if (!sub.isUnsubscribed()) {
+			if (!sub.isDisposed()) {
 				if (exception == null) {
 					listener.onSuccess(value);
 				} else {
@@ -74,33 +136,5 @@ public final class RxExecutor implements RxSubscriber {
 		}, executor);
 		// return the subscription
 		return sub;
-	}
-
-	@Override
-	public <T> Subscription subscribe(ListenableFuture<? extends T> future, RxListener<T> untracedListener) {
-		requireNonNull(untracedListener);
-		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
-		// when we're unsubscribed, set the flag to false
-		BooleanSubscription sub = BooleanSubscription.create();
-		// add a callback that guards on whether it is still subscribed
-		future.addListener(() -> {
-			try {
-				T value = future.get();
-				if (!sub.isUnsubscribed()) {
-					listener.onSuccess(value);
-				}
-			} catch (Throwable error) {
-				if (!sub.isUnsubscribed()) {
-					listener.onFailure(error);
-				}
-			}
-		}, executor);
-		// return the subscription
-		return sub;
-	}
-
-	/*** Marker interface which allows an Executor to specify its own Scheduler. */
-	public interface Has extends Executor {
-		RxExecutor getRxExecutor();
 	}
 }

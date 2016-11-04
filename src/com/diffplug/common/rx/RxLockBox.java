@@ -17,9 +17,8 @@ package com.diffplug.common.rx;
 
 import java.util.function.Function;
 
-import rx.Observable;
-
 import com.diffplug.common.base.Converter;
+import io.reactivex.Observable;
 
 /** {@link RxBox} and {@link LockBox} in one. */
 public interface RxLockBox<T> extends LockBox<T>, RxBox<T> {

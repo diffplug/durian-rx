@@ -28,10 +28,9 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import rx.Observable;
-
 import com.diffplug.common.collect.ImmutableSet;
 import com.diffplug.common.collect.Immutables;
+import io.reactivex.Observable;
 
 @SuppressWarnings("serial")
 public class RxExample extends JFrame {

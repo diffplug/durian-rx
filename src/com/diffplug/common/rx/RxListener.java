@@ -22,11 +22,12 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import rx.Observer;
-
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.rx.Rx.TrackCancelled;
 import com.diffplug.common.util.concurrent.FutureCallback;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 public final class RxListener<T> implements Observer<T>, FutureCallback<T> {
 	private final Consumer<T> onValue;
@@ -41,12 +42,17 @@ public final class RxListener<T> implements Observer<T>, FutureCallback<T> {
 	// Observer //
 	//////////////
 	@Override
+	public void onSubscribe(Disposable d) {
+		requireNonNull(d);
+	}
+
+	@Override
 	public final void onNext(@Nullable T t) {
 		onValue.accept(t);
 	}
 
 	@Override
-	public final void onCompleted() {
+	public void onComplete() {
 		onTerminate.accept(Optional.empty());
 	}
 

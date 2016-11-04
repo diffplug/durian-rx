@@ -18,41 +18,70 @@ package com.diffplug.common.rx;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 
-import rx.Observable;
-import rx.Subscription;
-
 import com.diffplug.common.util.concurrent.ListenableFuture;
+
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 
 /**
  * An object which can subscribe observables to {@link RxListener} listeners.
  */
 public interface RxSubscriber {
 	/** Subscribes the given listener to the given observable. */
-	<T> Subscription subscribe(Observable<? extends T> observable, RxListener<T> listener);
+	<T> void subscribe(Observable<? extends T> observable, RxListener<T> listener);
 
 	/** Subscribes the given listener to the given Guava ListenableFuture. */
-	<T> Subscription subscribe(ListenableFuture<? extends T> future, RxListener<T> listener);
+	<T> void subscribe(ListenableFuture<? extends T> future, RxListener<T> listener);
 
 	/** Subscribes the given listener to the given Java 8 CompletableFuture. */
-	<T> Subscription subscribe(CompletionStage<? extends T> future, RxListener<T> listener);
+	<T> void subscribe(CompletionStage<? extends T> future, RxListener<T> listener);
 
-	default <T> Subscription subscribe(Observable<? extends T> observable, Consumer<T> listener) {
-		return subscribe(observable, Rx.onValue(listener));
+	default <T> void subscribe(Observable<? extends T> observable, Consumer<T> listener) {
+		subscribe(observable, Rx.onValue(listener));
 	}
 
-	default <T> Subscription subscribe(IObservable<? extends T> observable, RxListener<T> listener) {
-		return subscribe(observable.asObservable(), listener);
+	default <T> void subscribe(IObservable<? extends T> observable, RxListener<T> listener) {
+		subscribe(observable.asObservable(), listener);
 	}
 
-	default <T> Subscription subscribe(IObservable<? extends T> observable, Consumer<T> listener) {
-		return subscribe(observable, Rx.onValue(listener));
+	default <T> void subscribe(IObservable<? extends T> observable, Consumer<T> listener) {
+		subscribe(observable, Rx.onValue(listener));
 	}
 
-	default <T> Subscription subscribe(ListenableFuture<? extends T> future, Consumer<T> listener) {
-		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
+	default <T> void subscribe(ListenableFuture<? extends T> future, Consumer<T> listener) {
+		subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
 	}
 
-	default <T> Subscription subscribe(CompletionStage<? extends T> future, Consumer<T> listener) {
-		return subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
+	default <T> void subscribe(CompletionStage<? extends T> future, Consumer<T> listener) {
+		subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
+	}
+
+	/** Subscribes the given listener to the given observable. */
+	<T> Disposable subscribeDisposable(Observable<? extends T> observable, RxListener<T> listener);
+
+	/** Subscribes the given listener to the given Guava ListenableFuture. */
+	<T> Disposable subscribeDisposable(ListenableFuture<? extends T> future, RxListener<T> listener);
+
+	/** Subscribes the given listener to the given Java 8 CompletableFuture. */
+	<T> Disposable subscribeDisposable(CompletionStage<? extends T> future, RxListener<T> listener);
+
+	default <T> Disposable subscribeDisposable(Observable<? extends T> observable, Consumer<T> listener) {
+		return subscribeDisposable(observable, Rx.onValue(listener));
+	}
+
+	default <T> Disposable subscribeDisposable(IObservable<? extends T> observable, RxListener<T> listener) {
+		return subscribeDisposable(observable.asObservable(), listener);
+	}
+
+	default <T> Disposable subscribeDisposable(IObservable<? extends T> observable, Consumer<T> listener) {
+		return subscribeDisposable(observable, Rx.onValue(listener));
+	}
+
+	default <T> Disposable subscribeDisposable(ListenableFuture<? extends T> future, Consumer<T> listener) {
+		return subscribeDisposable(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future)));
+	}
+
+	default <T> Disposable subscribeDisposable(CompletionStage<? extends T> future, Consumer<T> listener) {
+		return subscribeDisposable(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
 	}
 }

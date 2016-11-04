@@ -17,10 +17,10 @@ package com.diffplug.common.rx;
 
 import java.util.Objects;
 
-import rx.Observable;
-import rx.subjects.BehaviorSubject;
-
 import com.diffplug.common.base.Converter;
+
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
 
 class RxBoxImp<T> implements RxBox<T> {
 	private T value;
@@ -28,7 +28,7 @@ class RxBoxImp<T> implements RxBox<T> {
 
 	/** Creates a Holder which holds the given value. */
 	RxBoxImp(T initial) {
-		this(initial, BehaviorSubject.create(initial));
+		this(initial, BehaviorSubject.createDefault(initial));
 	}
 
 	/** The constructor for implementing these selection models. */

@@ -15,19 +15,12 @@
  */
 package com.diffplug.common.rx;
 
-import com.diffplug.common.base.Consumers;
-import com.diffplug.common.collect.ImmutableSet;
-import com.diffplug.common.testing.AbstractPackageSanityTests;
-
-import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 
-public class PackageSanityTests extends AbstractPackageSanityTests {
-	public PackageSanityTests() {
-		publicApiOnly();
-		ignoreClasses(ImmutableSet.of(RxExample.class)::contains);
-		setDefault(Scheduler.class, Util.immediate());
-		setDefault(RxListener.class, Rx.onValue(Consumers.doNothing()));
-		setDefault(Observable.class, Observable.just(""));
+class Util {
+	/** Immediate was removed in RxJava 2, but I'm skeptical...  We'll use this to track where it used to be used. */
+	static Scheduler immediate() {
+		return Schedulers.trampoline();
 	}
 }

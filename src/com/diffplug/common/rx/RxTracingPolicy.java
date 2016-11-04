@@ -18,12 +18,12 @@ package com.diffplug.common.rx;
 import java.util.List;
 import java.util.function.BiPredicate;
 
-import rx.Observable;
-
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.util.concurrent.ListenableFuture;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.reactivex.Observable;
 
 /**
  * Plugin which gets notified of every call to {@link Rx#subscribe Rx.subscribe}, allowing various kinds of tracing.
@@ -33,7 +33,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <li>Execute this at the very beginning of your application: `DurianPlugins.set(RxTracingPolicy.class, new MyTracingPolicy());`</li>
  * <li>Set this system property: `durian.plugins.com.diffplug.common.rx.RxTracingPolicy=fully.qualified.name.to.MyTracingPolicy`</li>
  * </ul>
- * {@link LogSubscriptionTrace} is a useful tracing policy for debugging errors within callbacks.
+ * {@link LogDisposableTrace} is a useful tracing policy for debugging errors within callbacks.
  * @see DurianPlugins
  */
 public interface RxTracingPolicy {
@@ -60,17 +60,17 @@ public interface RxTracingPolicy {
 	 * An {@link RxTracingPolicy} which logs the stack trace of every subscription, so
 	 * that it can decorate any exceptions with the stack trace at the time they were subscribed.
 	 * <p>
-	 * This logging is fairly expensive, so you might want to set the {@link LogSubscriptionTrace#shouldLog} field,
+	 * This logging is fairly expensive, so you might want to set the {@link LogDisposableTrace#shouldLog} field,
 	 * which determines whether a subscription is logged or passed along untouched.
 	 * <p>
 	 * By default every {@link Rx#onValue} listener will be logged, but nothing else.
 	 * <p>
 	 * To enable this tracing policy, do one of the following:
 	 * <ul>
-	 * <li>Execute this at the very beginning of your application: `DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace());`</li>
-	 * <li>Set this system property: `durian.plugins.com.diffplug.common.rx.RxTracingPolicy=com.diffplug.common.rx.RxTracingPolicy$LogSubscriptionTrace`</li>
+	 * <li>Execute this at the very beginning of your application: `DurianPlugins.set(RxTracingPolicy.class, new LogDisposableTrace());`</li>
+	 * <li>Set this system property: `durian.plugins.com.diffplug.common.rx.RxTracingPolicy=com.diffplug.common.rx.RxTracingPolicy$LogDisposableTrace`</li>
 	 * </ul>
-	 * @see <a href="https://github.com/diffplug/durian-rx/blob/master/src/com/diffplug/common/rx/RxTracingPolicy.java?ts=4">LogSubscriptionTrace source code</a>
+	 * @see <a href="https://github.com/diffplug/durian-rx/blob/master/src/com/diffplug/common/rx/RxTracingPolicy.java?ts=4">LogDisposableTrace source code</a>
 	 * @see DurianPlugins
 	 */
 	public static class LogSubscriptionTrace implements RxTracingPolicy {
@@ -85,11 +85,11 @@ public interface RxTracingPolicy {
 				return listener;
 			} else {
 				// capture the stack at the time of the subscription
-				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(LogSubscriptionTrace.class, RxExecutor.class, Rx.class);
+				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(SubscriptionException.class, RxExecutor.class, Rx.class);
 				// create a new Rx which passes values unchanged, but instruments exceptions with the subscription stack
 				return Rx.onValueOnTerminate(listener::onNext, error -> {
 					if (error.isPresent()) {
-						// if there is an error, wrap it in a SubscriptionException and log it
+						// if there is an error, wrap it in a DisposableException and log it
 						SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
 						Errors.log().accept(subException);
 						// if the original listener was just logging exceptions, there's no need to notify it, as this would be a double-log
@@ -100,7 +100,7 @@ public interface RxTracingPolicy {
 						}
 					} else {
 						// pass clean terminations unchanged
-						listener.onCompleted();
+						listener.onComplete();
 					}
 				});
 			}
@@ -108,7 +108,7 @@ public interface RxTracingPolicy {
 
 		/** An Exception which has the stack trace of the Rx.subscription() call which created the subscription in which the cause was thrown. */
 		static class SubscriptionException extends Exception {
-			private static final long serialVersionUID = -265762944158637711L;
+			private static final long serialVersionUID = 1L;
 
 			public SubscriptionException(Throwable cause, List<StackTraceElement> stack) {
 				super(cause);
