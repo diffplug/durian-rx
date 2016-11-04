@@ -21,12 +21,13 @@ import com.diffplug.common.testing.AbstractPackageSanityTests;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 
 public class PackageSanityTests extends AbstractPackageSanityTests {
 	public PackageSanityTests() {
 		publicApiOnly();
 		ignoreClasses(ImmutableSet.of(RxExample.class)::contains);
-		setDefault(Scheduler.class, Util.immediate());
+		setDefault(Scheduler.class, Schedulers.trampoline());
 		setDefault(RxListener.class, Rx.onValue(Consumers.doNothing()));
 		setDefault(Observable.class, Observable.just(""));
 	}

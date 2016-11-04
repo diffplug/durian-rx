@@ -279,7 +279,7 @@ public class Rx {
 		// that getSameThreadExecutor() might return different instances (which each have the
 		// same behavior), rather than to incur the cost of some type of synchronization.
 		if (_sameThread == null) {
-			_sameThread = new RxExecutor(MoreExecutors.directExecutor(), Util.immediate());
+			_sameThread = new RxExecutor(MoreExecutors.directExecutor(), Schedulers.trampoline());
 		}
 		return _sameThread;
 	}
