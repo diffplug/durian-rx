@@ -289,7 +289,7 @@ public class Rx {
 	private static RxExecutor _sameThread;
 
 	/** Returns the global tracing policy. */
-	@SuppressFBWarnings(value = "LI_LAZY_INIT_STATIC", justification = "This race condition is fine, as explained in the comment below.")
+	@SuppressFBWarnings(value = {"LI_LAZY_INIT_STATIC", "LI_LAZY_INIT_UPDATE_STATIC"}, justification = "This race condition is fine, as explained in the comment below.")
 	static RxTracingPolicy getTracingPolicy() {
 		// There is an acceptable race condition here - see getSameThreadExecutor()
 		if (_tracingPolicy == null) {

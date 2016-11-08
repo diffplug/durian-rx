@@ -88,25 +88,35 @@ public interface RxTracingPolicy {
 				// capture the stack at the time of the subscription
 				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(LogSubscriptionTrace.class, RxExecutor.class, Rx.class);
 				// create a new Rx which passes values unchanged, but instruments exceptions with the subscription stack
-				return Rx.onValueOnTerminate(listener::onNext, new RxListener.IsLogging() {
-					@Override
-					public void accept(Optional<Throwable> error) {
-						if (error.isPresent()) {
-							// if there is an error, wrap it in a DisposableException and log it
-							SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
-							Errors.log().accept(subException);
-							// if the original listener was just logging exceptions, there's no need to notify it, as this would be a double-log
-							if (!listener.isLogging()) {
-								// the listener isn't a simple logger, so we should pass the original exception
-								// to ensure that our logging doesn't change the program's behavior
-								listener.onError(error.get());
-							}
-						} else {
-							// pass clean terminations unchanged
-							listener.onComplete();
-						}
+				return Rx.onValueOnTerminate(listener::onNext, new RxJavaOnTerminateBridge(listener, subscriptionTrace));
+			}
+		}
+
+		static class RxJavaOnTerminateBridge implements RxListener.IsLogging {
+			final RxListener<?> listener;
+			final List<StackTraceElement> subscriptionTrace;
+
+			public RxJavaOnTerminateBridge(RxListener<?> listener, List<StackTraceElement> subscriptionTrace) {
+				this.listener = listener;
+				this.subscriptionTrace = subscriptionTrace;
+			}
+
+			@Override
+			public void accept(Optional<Throwable> error) {
+				if (error.isPresent()) {
+					// if there is an error, wrap it in a DisposableException and log it
+					SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
+					Errors.log().accept(subException);
+					// if the original listener was just logging exceptions, there's no need to notify it, as this would be a double-log
+					if (!listener.isLogging()) {
+						// the listener isn't a simple logger, so we should pass the original exception
+						// to ensure that our logging doesn't change the program's behavior
+						listener.onError(error.get());
 					}
-				});
+				} else {
+					// pass clean terminations unchanged
+					listener.onComplete();
+				}
 			}
 		}
 
