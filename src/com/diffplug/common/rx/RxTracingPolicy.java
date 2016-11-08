@@ -16,6 +16,7 @@
 package com.diffplug.common.rx;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 
 import com.diffplug.common.base.DurianPlugins;
@@ -70,7 +71,7 @@ public interface RxTracingPolicy {
 	 * <li>Execute this at the very beginning of your application: `DurianPlugins.set(RxTracingPolicy.class, new LogDisposableTrace());`</li>
 	 * <li>Set this system property: `durian.plugins.com.diffplug.common.rx.RxTracingPolicy=com.diffplug.common.rx.RxTracingPolicy$LogDisposableTrace`</li>
 	 * </ul>
-	 * @see <a href="https://github.com/diffplug/durian-rx/blob/master/src/com/diffplug/common/rx/RxTracingPolicy.java?ts=4">LogDisposableTrace source code</a>
+	 * @see <a href="https://github.com/diffplug/durian-rx/blob/master/src/com/diffplug/common/rx/RxTracingPolicy.java?ts=4">LogSubscriptionTrace source code</a>
 	 * @see DurianPlugins
 	 */
 	public static class LogSubscriptionTrace implements RxTracingPolicy {
@@ -85,22 +86,25 @@ public interface RxTracingPolicy {
 				return listener;
 			} else {
 				// capture the stack at the time of the subscription
-				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(SubscriptionException.class, RxExecutor.class, Rx.class);
+				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(LogSubscriptionTrace.class, RxExecutor.class, Rx.class);
 				// create a new Rx which passes values unchanged, but instruments exceptions with the subscription stack
-				return Rx.onValueOnTerminate(listener::onNext, error -> {
-					if (error.isPresent()) {
-						// if there is an error, wrap it in a DisposableException and log it
-						SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
-						Errors.log().accept(subException);
-						// if the original listener was just logging exceptions, there's no need to notify it, as this would be a double-log
-						if (!listener.isLogging()) {
-							// the listener isn't a simple logger, so we should pass the original exception
-							// to ensure that our logging doesn't change the program's behavior
-							listener.onError(error.get());
+				return Rx.onValueOnTerminate(listener::onNext, new RxListener.IsLogging() {
+					@Override
+					public void accept(Optional<Throwable> error) {
+						if (error.isPresent()) {
+							// if there is an error, wrap it in a DisposableException and log it
+							SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
+							Errors.log().accept(subException);
+							// if the original listener was just logging exceptions, there's no need to notify it, as this would be a double-log
+							if (!listener.isLogging()) {
+								// the listener isn't a simple logger, so we should pass the original exception
+								// to ensure that our logging doesn't change the program's behavior
+								listener.onError(error.get());
+							}
+						} else {
+							// pass clean terminations unchanged
+							listener.onComplete();
 						}
-					} else {
-						// pass clean terminations unchanged
-						listener.onComplete();
 					}
 				});
 			}

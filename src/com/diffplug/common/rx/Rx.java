@@ -32,8 +32,10 @@ import com.diffplug.common.util.concurrent.MoreExecutors;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -235,7 +237,7 @@ public class Rx {
 	}
 
 	/** An error listener which tracks whether a future has been cancelled, so that it doesn't log the errors of cancelled futures. */
-	static class TrackCancelled implements Consumer<Optional<Throwable>> {
+	static class TrackCancelled implements RxListener.IsLogging {
 		private final Future<?> future;
 
 		public TrackCancelled(Future<?> future) {
@@ -292,6 +294,46 @@ public class Rx {
 		// There is an acceptable race condition here - see getSameThreadExecutor()
 		if (_tracingPolicy == null) {
 			_tracingPolicy = DurianPlugins.get(RxTracingPolicy.class, RxTracingPolicy.NONE);
+			if (_tracingPolicy != RxTracingPolicy.NONE) {
+				RxJavaPlugins.setOnObservableSubscribe((observable, observer) -> {
+					if (observer instanceof RxListener) {
+						// if it's an RxListener, then _tracingPolicy handled it already
+						return observer;
+					} else {
+						// if it isn't an RxListener, then we'll apply _tracing policy
+						@SuppressWarnings("unchecked")
+						RxListener<Object> listener = Rx.onValueOnTerminate(observer::onNext, errorOpt -> {
+							if (errorOpt.isPresent()) {
+								observer.onError(errorOpt.get());
+							} else {
+								observer.onComplete();
+							}
+						});
+						RxListener<Object> traced = _tracingPolicy.hook(observable, listener);
+						return new Observer<Object>() {
+							@Override
+							public void onSubscribe(Disposable d) {
+								observer.onSubscribe(d);
+							}
+
+							@Override
+							public void onNext(Object value) {
+								traced.onNext(value);
+							}
+
+							@Override
+							public void onError(Throwable e) {
+								traced.onError(e);
+							}
+
+							@Override
+							public void onComplete() {
+								traced.onComplete();
+							}
+						};
+					}
+				});
+			}
 		}
 		return _tracingPolicy;
 	}

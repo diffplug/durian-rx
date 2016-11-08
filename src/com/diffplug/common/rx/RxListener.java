@@ -23,7 +23,6 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 import com.diffplug.common.base.Errors;
-import com.diffplug.common.rx.Rx.TrackCancelled;
 import com.diffplug.common.util.concurrent.FutureCallback;
 
 import io.reactivex.Observer;
@@ -77,17 +76,20 @@ public final class RxListener<T> implements Observer<T>, FutureCallback<T> {
 
 	/** Returns true iff the given Rx is a logging Rx. */
 	boolean isLogging() {
-		return onTerminate == logErrors || onTerminate instanceof DefaultTerminate || onTerminate instanceof TrackCancelled;
+		return onTerminate == logErrors || onTerminate instanceof IsLogging;
 	}
 
-	static final Consumer<Optional<Throwable>> logErrors = error -> {
+	@FunctionalInterface
+	static interface IsLogging extends Consumer<Optional<Throwable>> {};
+
+	static final IsLogging logErrors = error -> {
 		if (error.isPresent()) {
 			Errors.log().accept(error.get());
 		}
 	};
 
 	/** An error listener which promises to pass log all errors, without requiring the user to. */
-	static class DefaultTerminate implements Consumer<Optional<Throwable>> {
+	static class DefaultTerminate implements IsLogging {
 		private final Consumer<Optional<Throwable>> onTerminate;
 
 		DefaultTerminate(Consumer<Optional<Throwable>> onTerminate) {
