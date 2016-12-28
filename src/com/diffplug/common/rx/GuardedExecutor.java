@@ -59,6 +59,7 @@ public class GuardedExecutor implements Executor, RxSubscriber {
 
 	/** Creates a runnable which runs on this Executor iff the guard widget is not disposed. */
 	public final Runnable wrap(Runnable delegate) {
+		Objects.requireNonNull(delegate);
 		return () -> execute(getGuard().guard(delegate));
 	}
 

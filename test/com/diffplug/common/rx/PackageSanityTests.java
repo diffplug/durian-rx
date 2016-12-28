@@ -30,5 +30,6 @@ public class PackageSanityTests extends AbstractPackageSanityTests {
 		setDefault(Scheduler.class, Schedulers.trampoline());
 		setDefault(RxListener.class, Rx.onValue(Consumers.doNothing()));
 		setDefault(Observable.class, Observable.just(""));
+		setDefault(RxExecutor.class, Rx.sameThreadExecutor());
 	}
 }
