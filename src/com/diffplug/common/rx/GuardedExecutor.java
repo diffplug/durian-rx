@@ -29,79 +29,76 @@ import io.reactivex.disposables.Disposables;
 /**
  * GuardedExecutor is an {@link Executor} and {@link RxSubscriber}
  * which promises to cancel its subscriptions and stop executing tasks
- * once its {@link #guard()} has been disposed.
+ * once its {@link #getGuard()} has been disposed.
  * 
  * Useful for tying asynchronous tasks to gui elements.
  */
-public interface GuardedExecutor extends Executor, RxSubscriber {
+public class GuardedExecutor implements Executor, RxSubscriber {
+	private final RxExecutor delegate;
+	private final DisposableEar guard;
+
+	public GuardedExecutor(RxExecutor delegate, DisposableEar guard) {
+		this.delegate = Objects.requireNonNull(delegate);
+		this.guard = Objects.requireNonNull(guard);
+	}
+
+	/** The underlying executor which is being delegated to. */
+	public final RxExecutor getDelegateRxExecutor() {
+		return delegate;
+	}
+
 	/** The element on which all executions and subscriptions are guarded. */
-	DisposableEar guard();
+	public final DisposableEar getGuard() {
+		return guard;
+	}
 
-	/** Standard implementation of GuardedExecutor. */
-	public abstract class AbstractGuardedExecutor implements GuardedExecutor {
-		private final DisposableEar guard;
+	@Override
+	public final void execute(Runnable command) {
+		delegate.executor().execute(getGuard().guard(command));
+	}
 
-		public AbstractGuardedExecutor(DisposableEar guard) {
-			this.guard = Objects.requireNonNull(guard);
+	/** Creates a runnable which runs on this Executor iff the guard widget is not disposed. */
+	public final Runnable wrap(Runnable delegate) {
+		return () -> execute(getGuard().guard(delegate));
+	}
+
+	private Disposable subscribe(Supplier<Disposable> subscriber) {
+		if (!getGuard().isDisposed()) {
+			Disposable subscription = subscriber.get();
+			getGuard().runWhenDisposed(() -> subscription.dispose());
+			return subscription;
+		} else {
+			return Disposables.disposed();
 		}
+	}
 
-		@Override
-		public DisposableEar guard() {
-			return guard;
-		}
+	@Override
+	public final <T> Disposable subscribeDisposable(Observable<? extends T> observable, RxListener<T> listener) {
+		return subscribe(() -> delegate.subscribeDisposable(observable, listener));
+	}
 
-		protected abstract Executor delegateExecutor();
+	@Override
+	public final <T> Disposable subscribeDisposable(ListenableFuture<? extends T> future, RxListener<T> listener) {
+		return subscribe(() -> delegate.subscribeDisposable(future, listener));
+	}
 
-		protected abstract RxSubscriber delegateSubscriber();
+	@Override
+	public final <T> Disposable subscribeDisposable(CompletionStage<? extends T> future, RxListener<T> listener) {
+		return subscribe(() -> delegate.subscribeDisposable(future, listener));
+	}
 
-		@Override
-		public void execute(Runnable command) {
-			delegateExecutor().execute(guard().guard(command));
-		}
+	@Override
+	public final <T> void subscribe(Observable<? extends T> observable, RxListener<T> listener) {
+		subscribeDisposable(observable, listener);
+	}
 
-		/** Creates a runnable which runs on this Executor iff the guard widget is not disposed. */
-		public Runnable wrap(Runnable delegate) {
-			return () -> execute(guard().guard(delegate));
-		}
+	@Override
+	public final <T> void subscribe(ListenableFuture<? extends T> future, RxListener<T> listener) {
+		subscribeDisposable(future, listener);
+	}
 
-		private Disposable subscribe(Supplier<Disposable> subscriber) {
-			if (!guard().isDisposed()) {
-				Disposable subscription = subscriber.get();
-				guard().runWhenDisposed(() -> subscription.dispose());
-				return subscription;
-			} else {
-				return Disposables.disposed();
-			}
-		}
-
-		@Override
-		public <T> Disposable subscribeDisposable(Observable<? extends T> observable, RxListener<T> listener) {
-			return subscribe(() -> delegateSubscriber().subscribeDisposable(observable, listener));
-		}
-
-		@Override
-		public <T> Disposable subscribeDisposable(ListenableFuture<? extends T> future, RxListener<T> listener) {
-			return subscribe(() -> delegateSubscriber().subscribeDisposable(future, listener));
-		}
-
-		@Override
-		public <T> Disposable subscribeDisposable(CompletionStage<? extends T> future, RxListener<T> listener) {
-			return subscribe(() -> delegateSubscriber().subscribeDisposable(future, listener));
-		}
-
-		@Override
-		public <T> void subscribe(Observable<? extends T> observable, RxListener<T> listener) {
-			subscribeDisposable(observable, listener);
-		}
-
-		@Override
-		public <T> void subscribe(ListenableFuture<? extends T> future, RxListener<T> listener) {
-			subscribeDisposable(future, listener);
-		}
-
-		@Override
-		public <T> void subscribe(CompletionStage<? extends T> future, RxListener<T> listener) {
-			subscribeDisposable(future, listener);
-		}
+	@Override
+	public final <T> void subscribe(CompletionStage<? extends T> future, RxListener<T> listener) {
+		subscribeDisposable(future, listener);
 	}
 }
