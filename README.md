@@ -49,7 +49,7 @@ Debugging an error which involves lots of callbacks can be difficult.  To make t
 ```java
 // anytime an error is thrown in an Rx callback, the stack trace of the error
 // will be wrapped by the stack trace of the original subscription
-DurianPlugins.set(RxTracingPolicy.class, new LogSubscriptionTrace()).
+DurianPlugins.register(RxTracingPolicy.class, new LogSubscriptionTrace()).
 ```
 
 DurianRx's only requirements are [durian-base, durian-collect, durian-concurrent](https://github.com/diffplug/durian), and [RxJava](https://github.com/reactivex/rxjava).
