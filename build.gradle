@@ -1,6 +1,6 @@
 plugins {
 	// osgi
-	id "com.diffplug.gradle.osgi.bndmanifest" version "3.7.0"
+	id "com.diffplug.gradle.osgi.bndmanifest" version "3.3.0"
 	// code formatting
 	id "com.diffplug.gradle.spotless" version "3.0.0"
 	// bintray uploading
@@ -92,6 +92,7 @@ tasks.eclipse.dependsOn(cleanEclipse)
 ////////////
 // FORMAT //
 ////////////
+group='com.diffplug.durian'	// https://discuss.gradle.org/t/separation-between-gradle-classpath-and-the-compiled-classpath/19042/6
 spotless {
 	java {
 		licenseHeaderFile	'gradle/spotless.license.java'		// License header file
@@ -107,6 +108,9 @@ spotless {
 	freshmark {
 		target '*.md'
 		propertiesFile('gradle.properties')
+		properties {
+			it.put('group', group)
+		}
 	}
 }
 
@@ -277,8 +281,3 @@ githubPages {
 	}
 }
 tasks.prepareGhPages.dependsOn(":javadoc")
-
-// helps external scripts detect version
-task printVersion << {
-	println version
-}
