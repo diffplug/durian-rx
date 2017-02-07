@@ -2,6 +2,12 @@
 
 ### Version 3.1.0-SNAPSHOT - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
 
+### Version 3.0.0.BETA - February 7th 2017 ([javadoc](http://diffplug.github.io/durian-swt/javadoc/3.0.0.BETA/), [jcenter](https://bintray.com/diffplug/opensource/durian-swt/3.0.0.BETA/view))
+
+* Added `DisposableEar` and `GuardedExecutor`.
+* Fixed a bug in `ForwardingBox.modify()`.
+* `RxExecutor` now exposes the underlying `Executor`, `Scheduler`, and `RxTracingPolicy`.
+
 ### Version 3.0.0.ALPHA - November 11th 2016 ([javadoc](http://diffplug.github.io/durian-swt/javadoc/3.0.0.ALPHA/), [jcenter](https://bintray.com/diffplug/opensource/durian-swt/3.0.0.ALPHA/view))
 
 * Bumped RxJava to 2.0, and incorporated `RxTracingPolicy` into `RxJavaPlugins`.
