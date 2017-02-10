@@ -75,7 +75,7 @@ public final class RxListener<T> implements Observer<T>, FutureCallback<T> {
 	}
 
 	/** Returns true iff the given Rx is a logging Rx. */
-	boolean isLogging() {
+	public boolean isLogging() {
 		return onTerminate == logErrors || onTerminate instanceof IsLogging;
 	}
 
