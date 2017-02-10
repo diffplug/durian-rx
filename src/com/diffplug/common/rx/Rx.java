@@ -237,10 +237,11 @@ public class Rx {
 	}
 
 	/** An error listener which tracks whether a future has been cancelled, so that it doesn't log the errors of cancelled futures. */
-	static class TrackCancelled implements RxListener.IsLogging {
+	static class TrackCancelled extends RxListener.DefaultTerminate {
 		private final Future<?> future;
 
 		public TrackCancelled(Future<?> future) {
+			super(Consumers.doNothing());
 			this.future = future;
 		}
 

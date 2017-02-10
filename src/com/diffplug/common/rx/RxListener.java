@@ -74,22 +74,32 @@ public final class RxListener<T> implements Observer<T>, FutureCallback<T> {
 		onTerminate.accept(Optional.of(e));
 	}
 
-	/** Returns true iff the given Rx is a logging Rx. */
-	public boolean isLogging() {
-		return onTerminate == logErrors || onTerminate instanceof IsLogging;
+	public void onErrorDontLog(Throwable e) {
+		if (onTerminate == logErrors) {
+			return;
+		} else {
+			Optional<Throwable> optError = Optional.of(e);
+			if (onTerminate instanceof DefaultTerminate) {
+				((DefaultTerminate) onTerminate).onTerminate.accept(optError);
+			} else {
+				onTerminate.accept(optError);
+			}
+		}
 	}
 
-	@FunctionalInterface
-	static interface IsLogging extends Consumer<Optional<Throwable>> {};
+	/** Returns true iff the given Rx is a logging Rx. */
+	public boolean isLogging() {
+		return onTerminate == logErrors || onTerminate instanceof DefaultTerminate;
+	}
 
-	static final IsLogging logErrors = error -> {
+	static final Consumer<Optional<Throwable>> logErrors = error -> {
 		if (error.isPresent()) {
 			Errors.log().accept(error.get());
 		}
 	};
 
 	/** An error listener which promises to pass log all errors, without requiring the user to. */
-	static class DefaultTerminate implements IsLogging {
+	static class DefaultTerminate implements Consumer<Optional<Throwable>> {
 		private final Consumer<Optional<Throwable>> onTerminate;
 
 		DefaultTerminate(Consumer<Optional<Throwable>> onTerminate) {

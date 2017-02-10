@@ -18,6 +18,7 @@ package com.diffplug.common.rx;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
@@ -92,7 +93,7 @@ public interface RxTracingPolicy {
 			}
 		}
 
-		static class RxJavaOnTerminateBridge implements RxListener.IsLogging {
+		static class RxJavaOnTerminateBridge implements Consumer<Optional<Throwable>> {
 			final RxListener<?> listener;
 			final List<StackTraceElement> subscriptionTrace;
 
