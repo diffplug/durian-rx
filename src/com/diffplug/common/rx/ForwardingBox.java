@@ -54,6 +54,11 @@ public class ForwardingBox<T, BoxType extends Box<T>> implements Box<T> {
 		public boolean compareAndSet(T expect, T update) {
 			return delegate.compareAndSet(expect, update);
 		}
+
+		@Override
+		public T getAndSet(T newValue) {
+			return delegate.getAndSet(newValue);
+		}
 	}
 
 	public static class Lock<T> extends ForwardingBox<T, LockBox<T>> implements LockBox<T> {

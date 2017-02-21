@@ -32,6 +32,11 @@ class CasBoxImp<T> implements CasBox<T> {
 	}
 
 	@Override
+	public T getAndSet(T newValue) {
+		return ref.getAndSet(newValue);
+	}
+
+	@Override
 	public T get() {
 		return ref.get();
 	}
@@ -56,6 +61,13 @@ class CasBoxImp<T> implements CasBox<T> {
 			T expectOrig = converter.revertNonNull(expect);
 			T updateOrig = converter.revertNonNull(update);
 			return delegate.compareAndSet(expectOrig, updateOrig);
+		}
+
+		@Override
+		public R getAndSet(R newValue) {
+			T newValueOrig = converter.revertNonNull(newValue);
+			T oldValueOrig = delegate.getAndSet(newValueOrig);
+			return converter.convertNonNull(oldValueOrig);
 		}
 	}
 }

@@ -31,6 +31,9 @@ public interface CasBox<T> extends Box<T> {
 	/** The compare and set method which this box is capable of using. */
 	boolean compareAndSet(T expect, T update);
 
+	/** Gets the current value, and sets it with a new one. */
+	T getAndSet(T newValue);
+
 	/**
 	 * Applies the given mutator function to this box, which may require
 	 * calling the function more than once, so make sure it's pure!
