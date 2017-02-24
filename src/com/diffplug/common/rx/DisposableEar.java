@@ -17,7 +17,6 @@ package com.diffplug.common.rx;
 
 import java.util.ArrayList;
 
-import com.diffplug.common.base.Preconditions;
 import io.reactivex.disposables.Disposable;
 
 /**
@@ -75,9 +74,10 @@ public interface DisposableEar {
 
 		@Override
 		public synchronized void dispose() {
-			Preconditions.checkState(runWhenDisposed != null);
-			runWhenDisposed.forEach(Runnable::run);
-			runWhenDisposed = null;
+			if (runWhenDisposed != null) {
+				runWhenDisposed.forEach(Runnable::run);
+				runWhenDisposed = null;
+			}
 		}
 
 		@Override
