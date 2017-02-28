@@ -15,9 +15,11 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 public class RxJavaCompat {
@@ -25,5 +27,9 @@ public class RxJavaCompat {
 		CompletableFuture<T> future = new CompletableFuture<>();
 		single.subscribe(future::complete, future::completeExceptionally);
 		return future;
+	}
+
+	public static <T> CompletionStage<Optional<T>> toFuture(Maybe<T> single) {
+		return toFuture(single.map(Optional::of).toSingle(Optional.empty()));
 	}
 }
