@@ -2,6 +2,16 @@
 
 ### Version 3.1.0-SNAPSHOT - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
 
+### Version 3.0.0.BETA2 - March 8th 2017 ([javadoc](http://diffplug.github.io/durian-swt/javadoc/3.0.0.BETA2/), [jcenter](https://bintray.com/diffplug/opensource/durian-swt/3.0.0.BETA2/view))
+
+* Got rid of the `RxListener.IsLogging` marker interface.
+* Made `RxListener.isLogging()` public, and added `RxListener.onErrorDontLog(Throwable)`.
+	+ Combined, these methods make it possible for an external framework to detect and hijack logging for a specific listener.
+	+ Used by the Agent framework in DiffPlug 2+
+* Added `CasBox.getAndSet()`.
+* `DispoableEar.Settable` now allows `dispose()` to be called multiple times, to comply with the `Disposable` contract.
+* An `RxJavaCompat` layer for turning `Single` and `Maybe` into `CompletionStage`.
+
 ### Version 3.0.0.BETA - February 7th 2017 ([javadoc](http://diffplug.github.io/durian-swt/javadoc/3.0.0.BETA/), [jcenter](https://bintray.com/diffplug/opensource/durian-swt/3.0.0.BETA/view))
 
 * Added `DisposableEar` and `GuardedExecutor`.
