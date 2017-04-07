@@ -1,12 +1,14 @@
 plugins {
 	// osgi
-	id "com.diffplug.gradle.osgi.bndmanifest" version "3.3.0"
+	id "com.diffplug.gradle.osgi.bndmanifest" version "3.7.0"
 	// code formatting
-	id "com.diffplug.gradle.spotless" version "3.0.0"
+	id "com.diffplug.gradle.spotless" version "3.2.0"
 	// bintray uploading
 	id "com.jfrog.bintray" version "1.7.3"
 	// github pages
 	id "org.ajoberstar.github-pages" version "1.6.0"
+	// errorprone
+	id "net.ltgt.errorprone" version "0.0.9"
 }
 
 repositories {
