@@ -8,7 +8,7 @@ plugins {
 	// github pages
 	id "org.ajoberstar.github-pages" version "1.6.0"
 	// errorprone
-	id "net.ltgt.errorprone" version "0.0.9"
+	id "net.ltgt.errorprone" version "0.0.10"
 }
 
 repositories {
@@ -140,6 +140,7 @@ tasks.withType(FindBugs) {
 dependencies {
 	compile 'com.google.code.findbugs:annotations:3.0.0'
 	compile 'com.google.code.findbugs:jsr305:3.0.0'
+	errorprone 'com.google.errorprone:error_prone_core:2.0.19'
 }
 
 ///////////
