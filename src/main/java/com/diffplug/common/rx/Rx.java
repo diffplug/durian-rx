@@ -291,7 +291,7 @@ public class Rx {
 
 	/** Returns the global tracing policy. */
 	@SuppressFBWarnings(value = {"LI_LAZY_INIT_STATIC", "LI_LAZY_INIT_UPDATE_STATIC"}, justification = "This race condition is fine, as explained in the comment below.")
-	static RxTracingPolicy getTracingPolicy() {
+	public static RxTracingPolicy getTracingPolicy() {
 		// There is an acceptable race condition here - see getSameThreadExecutor()
 		if (_tracingPolicy == null) {
 			_tracingPolicy = DurianPlugins.get(RxTracingPolicy.class, RxTracingPolicy.NONE);

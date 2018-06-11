@@ -64,10 +64,10 @@ public class OrderedLock {
 			}
 		}
 		int numDuplicates = isDuplicate.cardinality();
-		Object[] noDuplicates = new Object[locks.length - numDuplicates];
 		if (numDuplicates == 0) {
-			System.arraycopy(locks, 0, noDuplicates, 0, locks.length);
+			return new OrderedLock(locks);
 		} else {
+			Object[] noDuplicates = new Object[locks.length - numDuplicates];
 			int idx = 0;
 			int i = 0;
 			while (idx < noDuplicates.length) {
@@ -80,8 +80,8 @@ public class OrderedLock {
 			for (Object lock : noDuplicates) {
 				requireNonNull(lock);
 			}
+			return new OrderedLock(noDuplicates);
 		}
-		return new OrderedLock(noDuplicates);
 	}
 
 	private final Object[] locks;

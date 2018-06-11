@@ -81,7 +81,7 @@ public interface DisposableEar {
 		}
 
 		@Override
-		public boolean isDisposed() {
+		public synchronized boolean isDisposed() {
 			return runWhenDisposed == null;
 		}
 
