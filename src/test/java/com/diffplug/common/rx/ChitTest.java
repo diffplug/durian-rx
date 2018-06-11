@@ -20,32 +20,32 @@ import org.junit.Test;
 
 import com.diffplug.common.base.Box;
 
-public class DisposableEarTest {
+public class ChitTest {
 	@Test
 	public void alreadyDisposed() {
-		assertDisposedBehavior(DisposableEar.alreadyDisposed());
+		assertDisposedBehavior(Chit.alreadyDisposed());
 	}
 
 	@Test
 	public void settable() {
-		DisposableEar.Settable ear = DisposableEar.settable();
-		Assert.assertFalse(ear.isDisposed());
+		Chit.Settable chit = Chit.settable();
+		Assert.assertFalse(chit.isDisposed());
 
 		Box<Boolean> hasBeenDisposed = Box.of(false);
-		ear.runWhenDisposed(() -> hasBeenDisposed.set(true));
+		chit.runWhenDisposed(() -> hasBeenDisposed.set(true));
 
 		Assert.assertFalse(hasBeenDisposed.get());
-		ear.dispose();
+		chit.dispose();
 		Assert.assertTrue(hasBeenDisposed.get());
-		Assert.assertTrue(ear.isDisposed());
+		Assert.assertTrue(chit.isDisposed());
 
-		assertDisposedBehavior(ear);
+		assertDisposedBehavior(chit);
 	}
 
-	private void assertDisposedBehavior(DisposableEar ear) {
-		Assert.assertTrue(ear.isDisposed());
+	private void assertDisposedBehavior(Chit chit) {
+		Assert.assertTrue(chit.isDisposed());
 		Box<Boolean> hasBeenDisposed = Box.of(false);
-		ear.runWhenDisposed(() -> hasBeenDisposed.set(true));
+		chit.runWhenDisposed(() -> hasBeenDisposed.set(true));
 		Assert.assertTrue(hasBeenDisposed.get());
 	}
 }

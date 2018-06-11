@@ -17,14 +17,14 @@ package com.diffplug.common.rx;
 
 import java.util.Objects;
 
-class DisposableEarImpl {
-	private DisposableEarImpl() {}
+class ChitImpl {
+	private ChitImpl() {}
 
 	static final class GuardedRunnable implements Runnable {
-		final DisposableEar guard;
+		final Chit guard;
 		final Runnable delegate;
 
-		public GuardedRunnable(DisposableEar guard, Runnable delegate) {
+		public GuardedRunnable(Chit guard, Runnable delegate) {
 			this.guard = Objects.requireNonNull(guard);
 			this.delegate = Objects.requireNonNull(delegate);
 		}
@@ -37,7 +37,7 @@ class DisposableEarImpl {
 		}
 	}
 
-	static final class AlreadyDisposed implements DisposableEar {
+	static final class AlreadyDisposed implements Chit {
 		@Override
 		public boolean isDisposed() {
 			return true;

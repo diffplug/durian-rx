@@ -31,7 +31,7 @@ import io.reactivex.disposables.Disposable;
  * 
  * @see com.diffplug.common.swt.SwtRx#disposableEar(Widget)
  */
-public interface DisposableEar {
+public interface Chit {
 	/**
 	 * Returns whether the resource is disposed. May be called from any thread,
 	 * and may suffer from glitches, but only of the kind where the resource is
@@ -53,12 +53,12 @@ public interface DisposableEar {
 	 * according to {@link #isDisposed()}.
 	 */
 	default Runnable guard(Runnable delegate) {
-		return new DisposableEarImpl.GuardedRunnable(this, delegate);
+		return new ChitImpl.GuardedRunnable(this, delegate);
 	}
 
-	/** Returns a {@link DisposableEar} which has already been disposed. */
-	public static DisposableEar alreadyDisposed() {
-		return new DisposableEarImpl.AlreadyDisposed();
+	/** Returns a {@link Chit} which has already been disposed. */
+	public static Chit alreadyDisposed() {
+		return new ChitImpl.AlreadyDisposed();
 	}
 
 	/** Creates a Settable Disposable ear. */
@@ -67,7 +67,7 @@ public interface DisposableEar {
 	}
 
 	/** The standard implementation of DisposableEar. */
-	public final class Settable implements DisposableEar, Disposable {
+	public final class Settable implements Chit, Disposable {
 		ArrayList<Runnable> runWhenDisposed = new ArrayList<>();
 
 		private Settable() {}

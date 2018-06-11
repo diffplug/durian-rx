@@ -35,9 +35,9 @@ import io.reactivex.disposables.Disposables;
  */
 public class GuardedExecutor implements Executor, RxSubscriber {
 	private final RxExecutor delegate;
-	private final DisposableEar guard;
+	private final Chit guard;
 
-	public GuardedExecutor(RxExecutor delegate, DisposableEar guard) {
+	public GuardedExecutor(RxExecutor delegate, Chit guard) {
 		this.delegate = Objects.requireNonNull(delegate);
 		this.guard = Objects.requireNonNull(guard);
 	}
@@ -48,7 +48,7 @@ public class GuardedExecutor implements Executor, RxSubscriber {
 	}
 
 	/** The element on which all executions and subscriptions are guarded. */
-	public final DisposableEar getGuard() {
+	public final Chit getGuard() {
 		return guard;
 	}
 
