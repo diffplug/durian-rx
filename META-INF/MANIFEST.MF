@@ -8,7 +8,7 @@ Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-SymbolicName: com.diffplug.durian.rx
 Bundle-Vendor: DiffPlug
-Bundle-Version: 3.0.0.I201703080201
+Bundle-Version: 3.0.0.I201807230946
 Export-Package: com.diffplug.common.rx;uses:="com.diffplug.common.base
  ,com.diffplug.common.util.concurrent,io.reactivex,io.reactivex.dispos
  ables,javax.annotation";version="3.0.0"

@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.MF text eol=crlf
+*.exe binary
+*.pfx binary
+*.tar binary
+*.docx binary
+*.jar binary
