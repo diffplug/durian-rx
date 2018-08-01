@@ -4,7 +4,7 @@ plugins {
 	// code formatting
 	id "com.diffplug.gradle.spotless" version "3.2.0"
 	// bintray uploading
-	id "com.jfrog.bintray" version "1.7.3"
+	id "com.jfrog.bintray" version "1.8.4"
 	// github pages
 	id "org.ajoberstar.github-pages" version "1.6.0"
 	// errorprone
