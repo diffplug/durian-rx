@@ -24,8 +24,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
+import com.diffplug.common.base.Box;
 import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.DurianPlugins;
+import com.diffplug.common.base.Either;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 import com.diffplug.common.util.concurrent.MoreExecutors;
@@ -356,5 +358,67 @@ public class Rx {
 			unwrapped[i] = toMerge[i].asObservable();
 		}
 		return Observable.merge(Arrays.asList(unwrapped));
+	}
+
+	/** Reliable way to sync two RxBox to each other. */
+	public static <T> void sync(RxBox<T> left, RxBox<T> right) {
+		sync(Rx.sameThreadExecutor(), left, right);
+	}
+
+	/** Reliable way to sync two RxBox to each other, using the given RxSubscriber to listen for changes */
+	public static <T> void sync(RxSubscriber subscriber, RxBox<T> left, RxBox<T> right) {
+		Box.Nullable<Either<T, T>> firstChange = Box.Nullable.ofNull();
+		subscriber.subscribe(left, leftVal -> {
+			// the left changed before we could acknowledge it
+			if (!leftVal.equals(left.get())) {
+				return;
+			}
+			boolean doSet;
+			synchronized (firstChange) {
+				Either<T, T> change = firstChange.get();
+				doSet = change == null || change.isLeft();
+				if (!doSet) {
+					// this means the right set something before we did
+					if (leftVal.equals(change.getRight())) {
+						// if we're setting to the value that the right
+						// requested, then we're just responding to them,
+						// and there's no need to fire another event
+						firstChange.set(null);
+					} else {
+						// otherwise, we'll record that we set it first
+						firstChange.set(Either.createLeft(leftVal));
+					}
+				}
+			}
+			if (doSet) {
+				right.set(leftVal);
+			}
+		});
+		subscriber.subscribe(right, rightVal -> {
+			// the right changed before we could acknowledge it
+			if (!rightVal.equals(right.get())) {
+				return;
+			}
+			boolean doSet;
+			synchronized (firstChange) {
+				Either<T, T> change = firstChange.get();
+				doSet = change == null || change.isRight();
+				if (!doSet) {
+					// this means the left set something before we did
+					if (rightVal.equals(change.getLeft())) {
+						// if we're setting to the value that the left
+						// requested, then we're just responding to them,
+						// and there's no need to fire another event
+						firstChange.set(null);
+					} else {
+						// otherwise, we'll record that we set it first
+						firstChange.set(Either.createRight(rightVal));
+					}
+				}
+			}
+			if (doSet) {
+				left.set(rightVal);
+			}
+		});
 	}
 }
