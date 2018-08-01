@@ -22,6 +22,7 @@ import com.diffplug.common.testing.AbstractPackageSanityTests;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 
 public class PackageSanityTests extends AbstractPackageSanityTests {
 	public PackageSanityTests() {
@@ -31,5 +32,6 @@ public class PackageSanityTests extends AbstractPackageSanityTests {
 		setDefault(RxListener.class, Rx.onValue(Consumers.doNothing()));
 		setDefault(Observable.class, Observable.just(""));
 		setDefault(RxExecutor.class, Rx.sameThreadExecutor());
+		setDefault(PublishSubject.class, PublishSubject.create());
 	}
 }

@@ -17,6 +17,7 @@ package com.diffplug.common.rx;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import com.diffplug.common.base.Preconditions;
@@ -93,6 +94,7 @@ public class RxOrderedSet<T> extends ForwardingBox.Rx<ImmutableList<T>> {
 	}
 
 	private static <T> ImmutableList<T> filter(ImmutableList<T> newList, OnDuplicate policy) {
+		Objects.requireNonNull(policy);
 		Map<T, Integer> indexToTake = Maps.newHashMap();
 
 		// put all of the new values into the newList

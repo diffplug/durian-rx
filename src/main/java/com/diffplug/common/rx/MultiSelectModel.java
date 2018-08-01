@@ -15,6 +15,7 @@
  */
 package com.diffplug.common.rx;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import com.diffplug.common.base.Box;
@@ -33,9 +34,9 @@ public class MultiSelectModel<T> {
 
 	/** Creates a MultiSelectModel from the given SelectionModels. */
 	public MultiSelectModel(RxBox<Optional<T>> mouseOver, RxBox<ImmutableSet<T>> selection, PublishSubject<T> clicked) {
-		this.mouseOver = mouseOver;
-		this.selection = selection;
-		this.clicked = clicked;
+		this.mouseOver = Objects.requireNonNull(mouseOver);
+		this.selection = Objects.requireNonNull(selection);
+		this.clicked = Objects.requireNonNull(clicked);
 	}
 
 	/** Creates an MultiSelectModel from scratch. */
