@@ -17,9 +17,11 @@ package com.diffplug.common.rx;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 
+import com.diffplug.common.base.Errors;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 
 import io.reactivex.Observable;
@@ -80,10 +82,14 @@ public final class RxExecutor implements RxSubscriber {
 		requireNonNull(untracedListener);
 		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
 		future.whenCompleteAsync((value, exception) -> {
-			if (exception == null) {
-				listener.onSuccess(value);
-			} else {
-				listener.onFailure(exception);
+			try {
+				if (exception == null) {
+					listener.onSuccess(value);
+				} else {
+					listener.onFailure(exception);
+				}
+			} catch (Throwable t) {
+				Errors.log().accept(new CompletionException("Exception within rx handler", t));
 			}
 		}, executor);
 	}
