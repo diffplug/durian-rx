@@ -7,8 +7,6 @@ plugins {
 	id "com.diffplug.gradle.spotless" version "3.25.0"
 	// bintray uploading
 	id "com.jfrog.bintray" version "1.8.4"
-	// github pages
-	id "org.ajoberstar.github-pages" version "1.7.2"
 	// spotbugs
 	id "com.github.spotbugs" version "2.0.0"
 }
@@ -251,20 +249,3 @@ if (!isSnapshot) {
 	publish.dependsOn(bintrayUpload)
 	bintrayUpload.dependsOn(['generatePomFileForMavenJavaPublication', jar, sourcesJar, javadocJar])
 }
-
-//////////////////
-// GITHUB PAGES //
-//////////////////
-githubPages {
-	repoUri = "https://github.com/${project.org}/${project.name}"
-	deleteExistingFiles = false
-	pages {
-		from javadoc.destinationDir
-		into "javadoc/${verSnapshot(version)}"
-	}
-	credentials {
-		username = cred('gh_token')
-		password = ''
-	}
-}
-tasks.prepareGhPages.dependsOn(":javadoc")
