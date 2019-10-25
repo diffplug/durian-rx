@@ -1,14 +1,14 @@
 plugins {
+	// dependencyUpdates
+	id "com.github.ben-manes.versions" version "0.27.0"
 	// osgi
-	id "com.diffplug.gradle.osgi.bndmanifest" version "3.16.0"
+	id "com.diffplug.gradle.osgi.bndmanifest" version "3.18.1"
 	// code formatting
-	id "com.diffplug.gradle.spotless" version "3.14.0"
+	id "com.diffplug.gradle.spotless" version "3.25.0"
 	// bintray uploading
 	id "com.jfrog.bintray" version "1.8.4"
 	// github pages
-	id "org.ajoberstar.github-pages" version "1.6.0"
-	// errorprone
-	id "net.ltgt.errorprone" version "0.0.16"
+	id "org.ajoberstar.github-pages" version "1.7.2"
 	// spotbugs
 	id "com.github.spotbugs" version "2.0.0"
 }
@@ -29,18 +29,18 @@ repositories {
 //////////
 // JAVA //
 //////////
-apply plugin: 'java'
+apply plugin: 'java-library'
 sourceCompatibility = VER_JAVA
 targetCompatibility = VER_JAVA
 
 dependencies {
-	compile "com.diffplug.durian:durian-core:${VER_DURIAN}"
-	compile "com.diffplug.durian:durian-collect:${VER_DURIAN}"
-	compile "com.diffplug.durian:durian-concurrent:${VER_DURIAN}"
-	compile "io.reactivex.rxjava2:rxjava:${VER_RXJAVA}"
-	testCompile "junit:junit:${VER_JUNIT}"
-	testCompile "com.diffplug.durian:durian-testlib:${VER_DURIAN}"
-	testCompile "com.diffplug.durian:durian-debug:${VER_DURIAN_DEBUG}"
+	implementation "com.diffplug.durian:durian-core:${VER_DURIAN}"
+	implementation "com.diffplug.durian:durian-collect:${VER_DURIAN}"
+	implementation "com.diffplug.durian:durian-concurrent:${VER_DURIAN}"
+	api "io.reactivex.rxjava2:rxjava:${VER_RXJAVA}"
+	testImplementation "junit:junit:${VER_JUNIT}"
+	testImplementation "com.diffplug.durian:durian-testlib:${VER_DURIAN}"
+	testImplementation "com.diffplug.durian:durian-debug:${VER_DURIAN_DEBUG}"
 }
 
 //////////
@@ -123,9 +123,8 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
 }
 // we'll want the findbugs annotations (they don't have a 3.0.1 version)
 dependencies {
-	compile 'com.google.code.findbugs:annotations:3.0.0'
-	compile 'com.google.code.findbugs:jsr305:3.0.0'
-	errorprone 'com.google.errorprone:error_prone_core:2.0.19'
+	compileOnly 'com.google.code.findbugs:annotations:3.0.0'
+	compileOnly 'com.google.code.findbugs:jsr305:3.0.0'
 }
 
 ///////////
