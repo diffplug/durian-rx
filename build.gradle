@@ -9,6 +9,8 @@ plugins {
 	id "org.ajoberstar.github-pages" version "1.6.0"
 	// errorprone
 	id "net.ltgt.errorprone" version "0.0.16"
+	// spotbugs
+	id "com.github.spotbugs" version "2.0.0"
 }
 
 repositories {
@@ -33,6 +35,7 @@ targetCompatibility = VER_JAVA
 
 dependencies {
 	compile "com.diffplug.durian:durian-core:${VER_DURIAN}"
+	compile "com.diffplug.durian:durian-collect:${VER_DURIAN}"
 	compile "com.diffplug.durian:durian-concurrent:${VER_DURIAN}"
 	compile "io.reactivex.rxjava2:rxjava:${VER_RXJAVA}"
 	testCompile "junit:junit:${VER_JUNIT}"
@@ -103,9 +106,7 @@ spotless {
 //////////////
 // FINDBUGS //
 //////////////
-apply plugin: 'findbugs'
-findbugs {
-	toolVersion = VER_FINDBUGS
+spotbugs {
 	sourceSets = [sourceSets.main]	// don't check the test code
 	ignoreFailures = false 	// bug free or it doesn't ship!
 	reportsDir = file('build/findbugs')
@@ -114,7 +115,7 @@ findbugs {
 	omitVisitors = []		// bugs that we want to ignore
 }
 // HTML instead of XML
-tasks.withType(FindBugs) {
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
 	reports {
 		xml.enabled = false
 		html.enabled = true
