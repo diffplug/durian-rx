@@ -21,7 +21,6 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 
-import com.diffplug.common.base.Errors;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 
 import io.reactivex.Observable;
@@ -69,10 +68,17 @@ public final class RxExecutor implements RxSubscriber {
 		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
 		// add a callback that guards on whether it is still subscribed
 		future.addListener(() -> {
+			T value;
 			try {
-				listener.onSuccess(future.get());
+				value = future.get();
 			} catch (Throwable error) {
 				listener.onFailure(error);
+				return;
+			}
+			try {
+				listener.onSuccess(value);
+			} catch (Throwable error) {
+				listener.onFailure(new CompletionException(error));
 			}
 		}, executor);
 	}
@@ -82,14 +88,14 @@ public final class RxExecutor implements RxSubscriber {
 		requireNonNull(untracedListener);
 		RxListener<T> listener = Rx.getTracingPolicy().hook(future, untracedListener);
 		future.whenCompleteAsync((value, exception) -> {
-			try {
-				if (exception == null) {
+			if (exception == null) {
+				try {
 					listener.onSuccess(value);
-				} else {
-					listener.onFailure(exception);
+				} catch (Throwable t) {
+					listener.onFailure(new CompletionException(t));
 				}
-			} catch (Throwable t) {
-				Errors.log().accept(new CompletionException("Exception within rx handler", t));
+			} else {
+				listener.onFailure(exception);
 			}
 		}, executor);
 	}
@@ -109,15 +115,21 @@ public final class RxExecutor implements RxSubscriber {
 		Disposable sub = Disposables.empty();
 		// add a callback that guards on whether it is still subscribed
 		future.addListener(() -> {
+			T value;
 			try {
-				T value = future.get();
-				if (!sub.isDisposed()) {
-					listener.onSuccess(value);
-				}
+				value = future.get();
 			} catch (Throwable error) {
 				if (!sub.isDisposed()) {
 					listener.onFailure(error);
 				}
+				return;
+			}
+			try {
+				if (!sub.isDisposed()) {
+					listener.onSuccess(value);
+				}
+			} catch (Throwable error) {
+				listener.onFailure(new CompletionException(error));
 			}
 		}, executor);
 		// return the subscription
@@ -134,7 +146,11 @@ public final class RxExecutor implements RxSubscriber {
 		future.whenCompleteAsync((value, exception) -> {
 			if (!sub.isDisposed()) {
 				if (exception == null) {
-					listener.onSuccess(value);
+					try {
+						listener.onSuccess(value);
+					} catch (Throwable t) {
+						listener.onFailure(new CompletionException(t));
+					}
 				} else {
 					listener.onFailure(exception);
 				}
