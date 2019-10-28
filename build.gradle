@@ -150,10 +150,10 @@ javadoc {
 	options.addStringOption('Xdoclint:none', '-quiet')
 	options.header javadocInfo
 	options.footer javadocInfo
-	options.links('https://diffplug.github.io/durian/javadoc/durian-core/' + verSnapshot(VER_DURIAN) + '/')
-	options.links('https://diffplug.github.io/durian/javadoc/durian-collect/' + verSnapshot(VER_DURIAN) + '/')
-	options.links('https://diffplug.github.io/durian/javadoc/durian-concurrent/' + verSnapshot(VER_DURIAN) + '/')
-	options.links('https://diffplug.github.io/durian-debug/javadoc/' + verSnapshot(VER_DURIAN_DEBUG) + '/')
+	options.links('https://javadoc.io/doc/com.diffplug.durian/durian-core/' + verSnapshot(VER_DURIAN) + '/')
+	options.links('https://javadoc.io/doc/com.diffplug.durian/durian-collect/' + verSnapshot(VER_DURIAN) + '/')
+	options.links('https://javadoc.io/doc/com.diffplug.durian/durian-concurrent/' + verSnapshot(VER_DURIAN) + '/')
+	options.links('https://javadoc.io/doc/com.diffplug.durian/durian-debug/' + verSnapshot(VER_DURIAN_DEBUG) + '/')
 	options.links('https://docs.oracle.com/javase/8/docs/api/')
 	options.links('http://reactivex.io/RxJava/javadoc/')
 }
