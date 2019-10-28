@@ -8,7 +8,7 @@ plugins {
 	// bintray uploading
 	id "com.jfrog.bintray" version "1.8.4"
 	// spotbugs
-	id "com.github.spotbugs" version "2.0.0"
+	id "com.github.spotbugs" version "2.0.1"
 }
 
 repositories {
@@ -123,6 +123,9 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
 dependencies {
 	compileOnly 'com.google.code.findbugs:annotations:3.0.0'
 	compileOnly 'com.google.code.findbugs:jsr305:3.0.0'
+}
+configurations {
+	testImplementation.extendsFrom compileOnly
 }
 
 ///////////
