@@ -2,7 +2,9 @@
 
 ### Version 3.1.0-SNAPSHOT - TBD ([javadoc](http://diffplug.github.io/durian-rx/javadoc/snapshot/) [snapshot](https://oss.sonatype.org/content/repositories/snapshots/com/diffplug/durian/durian-rx/))
 
-* When an exception was thrown in a callback within `RxSubscriber.subscribe(CompletionStage, RxListener)`, it would be swallowed.  It is now passed to `Errors.log()`.
+### Version 3.0.1 - November 12th 2019 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/3.0.1/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/3.0.1/view))
+
+* RxExecutor is now more consistent about failure - if the `onSuccess` throws an exception, it will always be passed to the `onFailure` handler as a `CompletionException`.
 
 ### Version 3.0.0 - August 1st 2018 ([javadoc](http://diffplug.github.io/durian-rx/javadoc/3.0.0/), [jcenter](https://bintray.com/diffplug/opensource/durian-rx/3.0.0/view))
 
