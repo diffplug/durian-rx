@@ -13,6 +13,7 @@ apply plugin: 'java-library'
 apply from: 干.file('base/java8.gradle')
 apply from: 干.file('base/osgi.gradle')
 apply from: 干.file('spotless/freshmark.gradle')
+apply from: 干.file('spotless/java.gradle')
 
 dependencies {
 	implementation "com.diffplug.durian:durian-core:${VER_DURIAN}"
@@ -34,18 +35,6 @@ ext.javadoc_links = [
 ].join(' ')
 apply from: 干.file('base/maven.gradle')
 apply from: 干.file('base/bintray.gradle')
-
-////////////
-// FORMAT //
-////////////
-group='com.diffplug.durian'	// https://discuss.gradle.org/t/separation-between-gradle-classpath-and-the-compiled-classpath/19042/6
-spotless {
-	java {
-		licenseHeaderFile		'gradle/spotless.license.java'		// License header file
-		importOrderFile			'gradle/spotless.importorder'		// An import ordering file, exported from Eclipse
-		eclipse().configFile	'gradle/spotless.eclipseformat.xml'	// XML file dumped out by the Eclipse formatter
-	}
-}
 
 ////////////////////////
 // SPOTBUGS (someday) //

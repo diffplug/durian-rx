@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 DiffPlug
+ * Copyright 2020 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,20 +15,18 @@
  */
 package com.diffplug.common.rx;
 
-import java.util.concurrent.Executor;
-
-import org.junit.Test;
 
 import com.diffplug.common.util.concurrent.FutureCallback;
 import com.diffplug.common.util.concurrent.Futures;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 import com.diffplug.common.util.concurrent.MoreExecutors;
 import com.diffplug.common.util.concurrent.SettableFuture;
-
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import java.util.concurrent.Executor;
+import org.junit.Test;
 
 /** The point of this test is to demonstrate why the Rx API should be what it is. */
 @SuppressWarnings("null")
