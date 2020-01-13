@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 DiffPlug
+ * Copyright 2020 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,13 +17,6 @@ package com.diffplug.common.rx;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
-import java.util.function.Consumer;
-
 import com.diffplug.common.base.Box;
 import com.diffplug.common.base.Consumers;
 import com.diffplug.common.base.DurianPlugins;
@@ -31,7 +24,6 @@ import com.diffplug.common.base.Either;
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.util.concurrent.ListenableFuture;
 import com.diffplug.common.util.concurrent.MoreExecutors;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -39,6 +31,12 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 /**
  * Unifies the listener models of {@link io.reactivex.Observable RxJava's Observable} 

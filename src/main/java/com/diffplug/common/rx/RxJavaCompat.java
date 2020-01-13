@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 DiffPlug
+ * Copyright 2020 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +15,12 @@
  */
 package com.diffplug.common.rx;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 public class RxJavaCompat {
 	public static <T> CompletionStage<T> toFuture(Single<T> single) {

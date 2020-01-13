@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 DiffPlug
+ * Copyright 2020 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,17 +17,15 @@ package com.diffplug.common.rx;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executor;
-
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.util.concurrent.ListenableFuture;
-
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.Executor;
 
 /**
  * This class holds an instance of Executor (for ListenableFuture) and
