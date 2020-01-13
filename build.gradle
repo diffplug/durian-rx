@@ -1,14 +1,9 @@
 plugins {
-	// dependencyUpdates
-	id "com.github.ben-manes.versions" version "0.27.0"
-	// osgi
-	id "com.diffplug.gradle.osgi.bndmanifest" version "3.18.1"
-	// code formatting
-	id "com.diffplug.gradle.spotless" version "3.25.0"
-	// bintray uploading
-	id "com.jfrog.bintray" version "1.8.4"
-	// spotbugs
-	id "com.github.spotbugs" version "2.0.1"
+	id "com.github.ben-manes.versions"
+	id "com.diffplug.gradle.osgi.bndmanifest"
+	id "com.diffplug.gradle.spotless"
+	id "com.jfrog.bintray"
+	id "com.github.spotbugs" version '3.0.0'
 }
 
 repositories {
