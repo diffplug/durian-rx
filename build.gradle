@@ -10,6 +10,7 @@ plugins {
 apply plugin: 'java-library'
 apply from: 干.file('base/java8.gradle')
 apply from: 干.file('base/osgi.gradle')
+
 dependencies {
 	implementation "com.diffplug.durian:durian-core:${VER_DURIAN}"
 	implementation "com.diffplug.durian:durian-collect:${VER_DURIAN}"
@@ -19,6 +20,16 @@ dependencies {
 	testImplementation "com.diffplug.durian:durian-testlib:${VER_DURIAN}"
 	testImplementation "com.diffplug.durian:durian-debug:${VER_DURIAN_DEBUG}"
 }
+
+ext.javadoc_links = [
+	"https://javadoc.io/doc/com.diffplug.durian/durian-core/${VER_DURIAN}",
+	"https://javadoc.io/doc/com.diffplug.durian/durian-collect/${VER_DURIAN}",
+	"https://javadoc.io/doc/com.diffplug.durian/durian-concurrent/${VER_DURIAN}",
+	"https://javadoc.io/doc/com.diffplug.durian/durian-debug/${VER_DURIAN_DEBUG}",
+	"https://javadoc.io/doc/io.reactivex.rxjava2/rxjava/${VER_RXJAVA}",
+	'https://docs.oracle.com/javase/8/docs/api/'].join(' ')
+apply from: 干.file('base/maven.gradle')
+apply from: 干.file('base/bintray.gradle')
 
 ////////////
 // FORMAT //
@@ -70,39 +81,4 @@ dependencies {
 }
 configurations {
 	testImplementation.extendsFrom compileOnly
-}
-
-///////////
-// MAVEN //
-///////////
-apply plugin: 'maven-publish'
-
-task sourcesJar(type: Jar) {
-	classifier = 'sources'
-	from sourceSets.main.allJava
-}
-
-def verSnapshot = { it.endsWith('-SNAPSHOT') ? 'snapshot' : it }
-// Where it's possible to name parameters and methods clearly enough
-// that javadoc is not necessary, why make the code bigger?
-//
-// Thus, no javadoc warnings.
-def makeLink = { url, text -> "<a href=\"${url}\" style=\"text-transform: none;\">${text}</a>" }
-def javadocInfo = '<h2>' + makeLink("https://github.com/${org}/${name}", "${group}:${name}:${version}") +
-' by ' + makeLink('http://www.diffplug.com', 'DiffPlug') + '</h2>'
-javadoc {
-	options.addStringOption('Xdoclint:none', '-quiet')
-	options.header javadocInfo
-	options.footer javadocInfo
-	options.links('https://javadoc.io/doc/com.diffplug.durian/durian-core/' + verSnapshot(VER_DURIAN) + '/')
-	options.links('https://javadoc.io/doc/com.diffplug.durian/durian-collect/' + verSnapshot(VER_DURIAN) + '/')
-	options.links('https://javadoc.io/doc/com.diffplug.durian/durian-concurrent/' + verSnapshot(VER_DURIAN) + '/')
-	options.links('https://javadoc.io/doc/com.diffplug.durian/durian-debug/' + verSnapshot(VER_DURIAN_DEBUG) + '/')
-	options.links('https://docs.oracle.com/javase/8/docs/api/')
-	options.links('http://reactivex.io/RxJava/javadoc/')
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier = 'javadoc'
-	from javadoc.destinationDir
 }
