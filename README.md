@@ -2,28 +2,26 @@
 
 <!---freshmark shields
 output = [
-	link(shield('Maven artifact', 'mavenCentral', '{{group}}:{{name}}', 'blue'), 'https://bintray.com/{{org}}/opensource/{{name}}/view'),
-	link(shield('Latest version', 'latest', '{{stable}}', 'blue'), 'https://github.com/{{org}}/{{name}}/releases/latest'),
-	link(shield('Javadoc', 'javadoc', 'OK', 'blue'), 'https://javadoc.io/doc/com.diffplug.durian/durian-rx/{{stable}}/'),
-	link(shield('License Apache', 'license', 'Apache', 'blue'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
-	'',
-	link(shield('Changelog', 'changelog', '{{version}}', 'brightgreen'), 'CHANGES.md'),
-	link(image('Travis CI', 'https://travis-ci.org/{{org}}/{{name}}.svg?branch=master'), 'https://travis-ci.org/{{org}}/{{name}}'),
-	link(shield('Live chat', 'gitter', 'live chat', 'brightgreen'), 'https://gitter.im/diffplug/durian')
-	].join('\n');
+    link(shield('Maven central', 'mavencentral', 'com.diffplug.durian:durian-rx', 'blue'), 'https://search.maven.org/artifact/com.diffplug.durian/durian-rx'),
+    link(shield('Apache 2.0', 'license', 'apache-2.0', 'blue'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
+    '',
+    link(shield('Changelog', 'changelog', versionLast, 'brightgreen'), 'CHANGES.md'),
+    link(shield('Javadoc', 'javadoc', 'yes', 'brightgreen'), 'https://javadoc.io/doc/com.diffplug.durian/durian-rx/{{versionLast}}/'),
+    link(shield('Live chat', 'gitter', 'chat', 'brightgreen'), 'https://gitter.im/diffplug/durian'),
+    link(image('JitCI', 'https://jitci.com/gh/diffplug/durian-rx/svg'), 'https://jitci.com/gh/diffplug/durian-rx')
+    ].join('\n');
 -->
-[![Maven artifact](https://img.shields.io/badge/mavenCentral-com.diffplug.durian%3Adurian--rx-blue.svg)](https://bintray.com/diffplug/opensource/durian-rx/view)
-[![Latest version](https://img.shields.io/badge/latest-3.0.1-blue.svg)](https://github.com/diffplug/durian-rx/releases/latest)
-[![Javadoc](https://img.shields.io/badge/javadoc-OK-blue.svg)](https://javadoc.io/doc/com.diffplug.durian/durian-rx/3.0.1/)
-[![License Apache](https://img.shields.io/badge/license-Apache-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
+[![Maven central](https://img.shields.io/badge/mavencentral-com.diffplug.durian%3Adurian--rx-blue.svg)](https://search.maven.org/artifact/com.diffplug.durian/durian-rx)
+[![Apache 2.0](https://img.shields.io/badge/license-apache--2.0-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
 [![Changelog](https://img.shields.io/badge/changelog-3.0.1-brightgreen.svg)](CHANGES.md)
-[![Travis CI](https://travis-ci.org/diffplug/durian-rx.svg?branch=master)](https://travis-ci.org/diffplug/durian-rx)
-[![Live chat](https://img.shields.io/badge/gitter-live_chat-brightgreen.svg)](https://gitter.im/diffplug/durian)
+[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug.durian/durian-rx/3.0.1/)
+[![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/durian)
+[![JitCI](https://jitci.com/gh/diffplug/durian-rx/svg)](https://jitci.com/gh/diffplug/durian-rx)
 <!---freshmark /shields -->
 
 <!---freshmark javadoc
-output = prefixDelimiterReplace(input, 'https://javadoc.io/doc/com.diffplug.durian/durian-rx/', '/', stable);
+output = prefixDelimiterReplace(input, 'https://javadoc.io/static/com.diffplug.durian/durian-rx/', '/', versionLast);
 -->
 DurianRx unifies RxJava's [Observable](http://reactivex.io/documentation/observable.html) with Guava's [ListenableFuture](https://code.google.com/p/guava-libraries/wiki/ListenableFutureExplained).  If you happen to be using SWT as a widget toolkit, then you'll want to look at [DurianSwt](https://github.com/diffplug/durian-swt) as well.
 

@@ -1,15 +1,18 @@
 plugins {
 	id "com.diffplug.blowdryer"
-	id "com.github.ben-manes.versions"
-	id "com.diffplug.gradle.osgi.bndmanifest"
-	id "com.diffplug.gradle.spotless"
-	id "com.jfrog.bintray"
-	id "com.github.spotbugs" version '3.0.0'
+	id "com.diffplug.spotless-changelog"
+	id "jp.skypencil.spotbugs.snom" version '0.4.9'
 }
 
+spotlessChangelog {
+	changelogFile 'CHANGES.md'
+}
+
+apply from: 干.file('base/changelog.gradle')
 apply plugin: 'java-library'
 apply from: 干.file('base/java8.gradle')
 apply from: 干.file('base/osgi.gradle')
+apply from: 干.file('spotless/freshmark.gradle')
 
 dependencies {
 	implementation "com.diffplug.durian:durian-core:${VER_DURIAN}"
@@ -27,7 +30,8 @@ ext.javadoc_links = [
 	"https://javadoc.io/doc/com.diffplug.durian/durian-concurrent/${VER_DURIAN}",
 	"https://javadoc.io/doc/com.diffplug.durian/durian-debug/${VER_DURIAN_DEBUG}",
 	"https://javadoc.io/doc/io.reactivex.rxjava2/rxjava/${VER_RXJAVA}",
-	'https://docs.oracle.com/javase/8/docs/api/'].join(' ')
+	'https://docs.oracle.com/javase/8/docs/api/'
+].join(' ')
 apply from: 干.file('base/maven.gradle')
 apply from: 干.file('base/bintray.gradle')
 
@@ -41,40 +45,11 @@ spotless {
 		importOrderFile			'gradle/spotless.importorder'		// An import ordering file, exported from Eclipse
 		eclipse().configFile	'gradle/spotless.eclipseformat.xml'	// XML file dumped out by the Eclipse formatter
 	}
-	format 'misc', {
-		target '*.gitignore', '*.gradle', '*.md', '.ci/*.sh'
-		indentWithTabs()
-		trimTrailingWhitespace()
-		endWithNewline()
-	}
-	freshmark {
-		target '*.md'
-		propertiesFile('gradle.properties')
-		properties {
-			it.put('group', group)
-		}
-	}
 }
 
-//////////////
-// FINDBUGS //
-//////////////
-spotbugs {
-	sourceSets = [sourceSets.main]	// don't check the test code
-	ignoreFailures = false 	// bug free or it doesn't ship!
-	reportsDir = file('build/findbugs')
-	effort = 'max'			// min|default|max
-	reportLevel = 'low'		// low|medium|high (low = sensitive to even minor mistakes)
-	omitVisitors = []		// bugs that we want to ignore
-}
-// HTML instead of XML
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-	reports {
-		xml.enabled = false
-		html.enabled = true
-	}
-}
-// we'll want the findbugs annotations (they don't have a 3.0.1 version)
+////////////////////////
+// SPOTBUGS (someday) //
+////////////////////////
 dependencies {
 	compileOnly 'com.google.code.findbugs:annotations:3.0.0'
 	compileOnly 'com.google.code.findbugs:jsr305:3.0.0'
