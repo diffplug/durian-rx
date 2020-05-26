@@ -1,7 +1,6 @@
 plugins {
 	id "com.diffplug.blowdryer"
 	id "com.diffplug.spotless-changelog"
-	id "jp.skypencil.spotbugs.snom" version '0.4.9'
 }
 
 spotlessChangelog {
