@@ -18,6 +18,7 @@ package com.diffplug.common.rx;
 
 import io.reactivex.disposables.Disposable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Makes it possible to receive a notification when a resource is disposed.
@@ -34,9 +35,8 @@ import java.util.ArrayList;
 public interface Chit {
 	/**
 	 * Returns whether the resource is disposed. May be called from any thread,
-	 * and may suffer from glitches, but only of the kind where the resource is
-	 * actually disposed but this method incorrectly returns false due to a threading
-	 * glitch which will eventually be resolved.
+	 * and must return true as soon as `dispose()` is called, no matter which thread
+	 * `dispose()` was called from.
 	 */
 	boolean isDisposed();
 
@@ -73,10 +73,14 @@ public interface Chit {
 		private Settable() {}
 
 		@Override
-		public synchronized void dispose() {
-			if (runWhenDisposed != null) {
-				runWhenDisposed.forEach(Runnable::run);
+		public void dispose() {
+			List<Runnable> toDispose;
+			synchronized (this) {
+				toDispose = runWhenDisposed;
 				runWhenDisposed = null;
+			}
+			if (toDispose != null) {
+				toDispose.forEach(Runnable::run);
 			}
 		}
 
