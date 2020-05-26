@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+
+## [3.0.2] - 2020-05-26
 ### Fixed
 * `Chit.isDisposed()` now returns true before calling the `runWhenDisposed` callbacks.
 
