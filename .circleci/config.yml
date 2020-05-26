@@ -19,7 +19,7 @@ anchors:
   set_git_origin_to_https: &set_git_origin_to_https
     run:
       name: set git origin to https
-      command: git remote set-url --push origin https://github.com/diffplug/spotless
+      command: git remote set-url --push origin https://github.com/diffplug/durian-rx
 version: 2
 jobs:
   # gradlew spotlessCheck assemble testClasses
@@ -57,8 +57,8 @@ jobs:
       - *restore_cache_deps
       - *set_git_origin_to_https
       - run:
-          name: gradlew :changelogPush
-          command: ./gradlew :changelogPush -Prelease=true --stacktrace
+          name: gradlew changelogPush
+          command: ./gradlew changelogPush --stacktrace
 workflows:
   version: 2
   test:
