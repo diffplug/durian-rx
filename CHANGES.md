@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Fixed
+* `Chit.isDisposed()` now returns true before calling the `runWhenDisposed` callbacks.
 
 ## [3.0.1] - 2019-11-12
 * RxExecutor is now more consistent about failure - if the `onSuccess` throws an exception, it will always be passed to the `onFailure` handler as a `CompletionException`.
