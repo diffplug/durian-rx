@@ -63,7 +63,7 @@ workflows:
       - changelog_print:
           filters:
             branches:
-              only: master
+              only: main
       - release:
           type: approval
           requires:
