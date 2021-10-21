@@ -15,6 +15,15 @@ apply from: 干.file('base/osgi.gradle')
 apply from: 干.file('spotless/freshmark.gradle')
 apply from: 干.file('spotless/java.gradle')
 
+spotless {
+	kotlin {
+		toggleOffOn()
+		licenseHeaderFile 干.file("spotless/license-${license}.java")
+		ktfmt('0.25')
+		indentWithTabs(2)
+	}
+}
+
 def VER_DURIAN='1.2.0'
 def VER_DURIAN_DEBUG='1.0.0'
 def VER_RXJAVA='2.0.0'
