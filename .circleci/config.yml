@@ -52,7 +52,7 @@ jobs:
       - *set_git_origin_to_https
       - run:
           name: gradlew changelogPush
-          command: ./gradlew changelogPush --stacktrace
+          command: ./gradlew changelogPush -Penable_publishing=true --stacktrace
 workflows:
   version: 2
   test:
