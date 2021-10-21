@@ -38,6 +38,14 @@ public interface RxSubscriber {
 
 	<T> void subscribe(CompletionStage<? extends T> future, RxListener<T> listener);
 
+	default <T> void subscribe(Flow<? extends T> observable, Consumer<T> listener) {
+		subscribe(observable, Rx.onValue(listener));
+	}
+
+	default <T> void subscribe(Deferred<? extends T> deferred, Consumer<T> listener) {
+		subscribe(deferred, Rx.onValue(listener));
+	}
+
 	default <T> void subscribe(Observable<? extends T> observable, Consumer<T> listener) {
 		subscribe(observable, Rx.onValue(listener));
 	}
@@ -67,6 +75,14 @@ public interface RxSubscriber {
 	<T> Disposable subscribeDisposable(ListenableFuture<? extends T> future, RxListener<T> listener);
 
 	<T> Disposable subscribeDisposable(CompletionStage<? extends T> future, RxListener<T> listener);
+
+	default <T> Disposable subscribeDisposable(Flow<? extends T> flow, Consumer<T> listener) {
+		return subscribeDisposable(flow, Rx.onValue(listener));
+	}
+
+	default <T> Disposable subscribeDisposable(Deferred<? extends T> deferred, Consumer<T> listener) {
+		return subscribeDisposable(deferred, Rx.onValue(listener));
+	}
 
 	default <T> Disposable subscribeDisposable(Observable<? extends T> observable, Consumer<T> listener) {
 		return subscribeDisposable(observable, Rx.onValue(listener));

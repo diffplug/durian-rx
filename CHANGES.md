@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Fixed
+* Added some missing default methods in `RxSubscriber`
 
 ## [3.1.0] - 2021-10-21
 ### Added
