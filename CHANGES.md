@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+
+## [3.1.0] - 2021-10-21
 ### Added
 * Added support for kotlinx `Flow` and `Deferred`. ([#6](https://github.com/diffplug/durian-rx/pull/6))
 
