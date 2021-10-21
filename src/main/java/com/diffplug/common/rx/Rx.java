@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2021 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ import java.util.function.Consumer;
  * // call unsubscribe() on the subscription to cancel it 
  * io.reactivex.disposables.Disposable subscription = Rx.subscribe(listenableOrObservable, val -> doSomething);
  * </pre>
- * Long version: `Rx` implements both the {@link rx.Observer} and {@link com.diffplug.common.util.concurrent.FutureCallback}
+ * Long version: `Rx` implements both the {@link io.reactivex.Observer} and {@link com.diffplug.common.util.concurrent.FutureCallback}
  * interfaces by mapping them to two `Consumer`s:
  * <ul>
  * <li>`Consumer<T> onValue`</li>
@@ -95,8 +95,8 @@ import java.util.function.Consumer;
  * <ul>
  * <li>`Rx.on(someExecutor).subscribe( ... )`</li>
  * </ul>
- * Because RxJava's Observables use {@link rx.Scheduler}s rather than {@link java.util.concurrent.Executor}s,
- * a Scheduler is automatically created using {@link rx.Schedulers#from}. If you'd like to specify the Scheduler manually, you can use {@link Rx#callbackOn(Executor, Scheduler)}
+ * Because RxJava's Observables use {@link io.reactivex.Scheduler}s rather than {@link java.util.concurrent.Executor}s,
+ * a Scheduler is automatically created using {@link Schedulers#from(Executor)}. If you'd like to specify the Scheduler manually, you can use {@link Rx#callbackOn(Executor, Scheduler)}
  * or you can create an executor which implements {@link RxExecutor.Has}.
  * 
  * @see <a href="https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html">SwtExec</a>
@@ -303,7 +303,7 @@ public class Rx {
 					} else {
 						// if it isn't an RxListener, then we'll apply _tracing policy
 						@SuppressWarnings("unchecked")
-						RxListener<Object> listener = Rx.onValueOnTerminate(observer::onNext, errorOpt -> {
+						RxListener<Object> listener = Rx.<Object> onValueOnTerminate(observer::onNext, errorOpt -> {
 							if (errorOpt.isPresent()) {
 								observer.onError(errorOpt.get());
 							} else {
