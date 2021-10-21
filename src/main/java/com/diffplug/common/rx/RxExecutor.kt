@@ -52,11 +52,11 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 	fun executor() = executor
 	fun scheduler() = scheduler
 
-	override fun <T> subscribe(flow: Flow<out T>, listener: RxListener<T>) {
+	override fun <T> subscribe(flow: Flow<T>, listener: RxListener<T>) {
 		subscribeDisposable(flow, listener)
 	}
 
-	override fun <T> subscribe(deferred: Deferred<out T>, listener: RxListener<T>) {
+	override fun <T> subscribe(deferred: Deferred<T>, listener: RxListener<T>) {
 		subscribeDisposable(deferred, listener)
 	}
 
