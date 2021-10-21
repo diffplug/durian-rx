@@ -37,6 +37,8 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import kotlinx.coroutines.Deferred;
+import kotlinx.coroutines.flow.Flow;
 
 /**
  * Unifies the listener models of {@link io.reactivex.Observable RxJava's Observable} 
@@ -171,6 +173,22 @@ public class Rx {
 	}
 
 	// Static versions
+	public static <T> void subscribe(Flow<? extends T> flow, RxListener<T> listener) {
+		sameThreadExecutor().subscribe(flow, listener);
+	}
+
+	public static <T> void subscribe(Flow<? extends T> flow, Consumer<T> listener) {
+		subscribe(flow, Rx.onValue(listener));
+	}
+
+	public static <T> void subscribe(Deferred<? extends T> deferred, RxListener<T> listener) {
+		sameThreadExecutor().subscribe(deferred, listener);
+	}
+
+	public static <T> void subscribe(Deferred<? extends T> deferred, Consumer<T> listener) {
+		subscribe(deferred, Rx.onValue(listener));
+	}
+
 	public static <T> void subscribe(Observable<? extends T> observable, RxListener<T> listener) {
 		sameThreadExecutor().subscribe(observable, listener);
 	}
@@ -204,6 +222,22 @@ public class Rx {
 	}
 
 	// Static versions
+	public static <T> Disposable subscribeDisposable(Flow<? extends T> flow, RxListener<T> listener) {
+		return sameThreadExecutor().subscribeDisposable(flow, listener);
+	}
+
+	public static <T> Disposable subscribeDisposable(Flow<? extends T> flow, Consumer<T> listener) {
+		return subscribeDisposable(flow, Rx.onValue(listener));
+	}
+
+	public static <T> Disposable subscribeDisposable(Deferred<? extends T> deferred, RxListener<T> listener) {
+		return sameThreadExecutor().subscribeDisposable(deferred, listener);
+	}
+
+	public static <T> Disposable subscribeDisposable(Deferred<? extends T> deferred, Consumer<T> listener) {
+		return subscribeDisposable(deferred, Rx.onValue(listener));
+	}
+
 	public static <T> Disposable subscribeDisposable(Observable<? extends T> observable, RxListener<T> listener) {
 		return sameThreadExecutor().subscribeDisposable(observable, listener);
 	}
