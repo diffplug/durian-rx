@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2021 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@ import java.util.function.Consumer;
  * An object which can subscribe observables to {@link RxListener} listeners.
  */
 public interface RxSubscriber {
-	/** Subscribes the given listener to the given observable. */
 	<T> void subscribe(Observable<? extends T> observable, RxListener<T> listener);
 
-	/** Subscribes the given listener to the given Guava ListenableFuture. */
 	<T> void subscribe(ListenableFuture<? extends T> future, RxListener<T> listener);
 
-	/** Subscribes the given listener to the given Java 8 CompletableFuture. */
 	<T> void subscribe(CompletionStage<? extends T> future, RxListener<T> listener);
 
 	default <T> void subscribe(Observable<? extends T> observable, Consumer<T> listener) {
@@ -55,13 +52,10 @@ public interface RxSubscriber {
 		subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
 	}
 
-	/** Subscribes the given listener to the given observable. */
 	<T> Disposable subscribeDisposable(Observable<? extends T> observable, RxListener<T> listener);
 
-	/** Subscribes the given listener to the given Guava ListenableFuture. */
 	<T> Disposable subscribeDisposable(ListenableFuture<? extends T> future, RxListener<T> listener);
 
-	/** Subscribes the given listener to the given Java 8 CompletableFuture. */
 	<T> Disposable subscribeDisposable(CompletionStage<? extends T> future, RxListener<T> listener);
 
 	default <T> Disposable subscribeDisposable(Observable<? extends T> observable, Consumer<T> listener) {
