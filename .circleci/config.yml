@@ -1,13 +1,7 @@
 anchors:
   env_gradle: &env_gradle
-    environment:
-      # java doesn't play nice with containers, it tries to hog the entire machine
-      # https://circleci.com/blog/how-to-handle-java-oom-errors/
-      # try the experimental JVM option
-      _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-      GRADLE_OPTS: "-Dorg.gradle.workers.max=2" # and we're only allowed to use 2 vCPUs
     docker:
-      - image: cimg/openjdk:8.0
+      - image: cimg/openjdk:11.0
   restore_cache_wrapper: &restore_cache_wrapper
     restore_cache:
       key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}

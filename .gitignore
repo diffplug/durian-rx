@@ -1,3 +1,5 @@
+# IntelliJ stuff
+.idea/
 
 # mac stuff
 *.DS_Store

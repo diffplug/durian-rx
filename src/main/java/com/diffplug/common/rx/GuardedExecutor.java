@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2021 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import java.util.Objects;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
+import kotlinx.coroutines.Deferred;
+import kotlinx.coroutines.flow.Flow;
 
 /**
  * GuardedExecutor is an {@link Executor} and {@link RxSubscriber}
@@ -73,6 +75,16 @@ public class GuardedExecutor implements Executor, RxSubscriber {
 	}
 
 	@Override
+	public <T> Disposable subscribeDisposable(Flow<? extends T> flow, RxListener<T> listener) {
+		return subscribe(() -> delegate.subscribeDisposable(flow, listener));
+	}
+
+	@Override
+	public <T> Disposable subscribeDisposable(Deferred<? extends T> deferred, RxListener<T> listener) {
+		return subscribe(() -> delegate.subscribeDisposable(deferred, listener));
+	}
+
+	@Override
 	public final <T> Disposable subscribeDisposable(Observable<? extends T> observable, RxListener<T> listener) {
 		return subscribe(() -> delegate.subscribeDisposable(observable, listener));
 	}
@@ -85,6 +97,16 @@ public class GuardedExecutor implements Executor, RxSubscriber {
 	@Override
 	public final <T> Disposable subscribeDisposable(CompletionStage<? extends T> future, RxListener<T> listener) {
 		return subscribe(() -> delegate.subscribeDisposable(future, listener));
+	}
+
+	@Override
+	public <T> void subscribe(Flow<? extends T> flow, RxListener<T> listener) {
+		subscribeDisposable(flow, listener);
+	}
+
+	@Override
+	public <T> void subscribe(Deferred<? extends T> deferred, RxListener<T> listener) {
+		subscribeDisposable(deferred, listener);
 	}
 
 	@Override
