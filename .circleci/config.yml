@@ -71,3 +71,6 @@ workflows:
       - do_release:
           requires:
             - release
+          context:
+            - SonatypeDeploy
+
