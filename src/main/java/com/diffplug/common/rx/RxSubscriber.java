@@ -21,11 +21,17 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
+import kotlinx.coroutines.Deferred;
+import kotlinx.coroutines.flow.Flow;
 
 /**
  * An object which can subscribe observables to {@link RxListener} listeners.
  */
 public interface RxSubscriber {
+	<T> void subscribe(Flow<? extends T> flow, RxListener<T> listener);
+
+	<T> void subscribe(Deferred<? extends T> deferred, RxListener<T> listener);
+
 	<T> void subscribe(Observable<? extends T> observable, RxListener<T> listener);
 
 	<T> void subscribe(ListenableFuture<? extends T> future, RxListener<T> listener);
@@ -51,6 +57,10 @@ public interface RxSubscriber {
 	default <T> void subscribe(CompletionStage<? extends T> future, Consumer<T> listener) {
 		subscribe(future, Rx.onValueOnTerminate(listener, new Rx.TrackCancelled(future.toCompletableFuture())));
 	}
+
+	<T> Disposable subscribeDisposable(Flow<? extends T> flow, RxListener<T> listener);
+
+	<T> Disposable subscribeDisposable(Deferred<? extends T> deferred, RxListener<T> listener);
 
 	<T> Disposable subscribeDisposable(Observable<? extends T> observable, RxListener<T> listener);
 

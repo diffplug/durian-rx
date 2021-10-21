@@ -25,6 +25,15 @@ import java.lang.Error
 import java.util.concurrent.CompletionException
 import java.util.concurrent.CompletionStage
 import java.util.concurrent.Executor
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 /**
 * This class holds an instance of Executor (for ListenableFuture) and Scheduler (for Observable).
@@ -33,6 +42,8 @@ import java.util.concurrent.Executor
 class RxExecutor
 internal constructor(private val executor: Executor, private val scheduler: Scheduler) :
 		RxSubscriber {
+	val coroutineScope = CoroutineScope(executor.asCoroutineDispatcher())
+
 	/** * Marker interface which allows an Executor to specify its own Scheduler. */
 	interface Has : Executor {
 		val rxExecutor: RxExecutor
@@ -40,6 +51,14 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 
 	fun executor() = executor
 	fun scheduler() = scheduler
+
+	override fun <T> subscribe(flow: Flow<out T>, listener: RxListener<T>) {
+		subscribeDisposable(flow, listener)
+	}
+
+	override fun <T> subscribe(deferred: Deferred<out T>, listener: RxListener<T>) {
+		subscribeDisposable(deferred, listener)
+	}
 
 	override fun <T> subscribe(observable: Observable<out T>, untracedListener: RxListener<T>) {
 		val listener = Rx.getTracingPolicy().hook(observable, untracedListener)
@@ -90,6 +109,38 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 					}
 				},
 				executor)
+	}
+
+	override fun <T : Any?> subscribeDisposable(
+			flow: Flow<T>,
+			untracedListener: RxListener<T>
+	): Disposable {
+		val listener = Rx.getTracingPolicy().hook(flow, untracedListener)
+		val job =
+				flow.onEach(listener::onNext)
+						.onCompletion {
+							if (it != null && it !is CancellationException) {
+								listener.onError(it)
+							} else listener.onComplete()
+						}
+						.launchIn(coroutineScope)
+		return Disposables.fromRunnable(job::cancel)
+	}
+
+	override fun <T : Any?> subscribeDisposable(
+			deferred: Deferred<T>,
+			untracedListener: RxListener<T>
+	): Disposable {
+		val listener = Rx.getTracingPolicy().hook(deferred, untracedListener)
+		val job =
+				coroutineScope.launch {
+					try {
+						listener.onSuccess(deferred.await())
+					} catch (e: Throwable) {
+						listener.onFailure(e)
+					}
+				}
+		return Disposables.fromRunnable(job::cancel)
 	}
 
 	override fun <T> subscribeDisposable(
