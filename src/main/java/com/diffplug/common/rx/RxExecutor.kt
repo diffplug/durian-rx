@@ -1,18 +1,18 @@
 /*
-* Copyright (C) 2020-2021 DiffPlug
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     https://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (C) 2020-2022 DiffPlug
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.diffplug.common.rx
 
 import com.diffplug.common.base.Errors
@@ -36,9 +36,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
-* This class holds an instance of Executor (for ListenableFuture) and Scheduler (for Observable).
-* It has methods which match the signatures of Rx's static methods, which allows users to
-*/
+ * This class holds an instance of Executor (for ListenableFuture) and Scheduler (for Observable).
+ * It has methods which match the signatures of Rx's static methods, which allows users to
+ */
 class RxExecutor
 internal constructor(private val executor: Executor, private val scheduler: Scheduler) :
 		RxSubscriber {
@@ -61,12 +61,12 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 	}
 
 	override fun <T> subscribe(observable: Observable<out T>, untracedListener: RxListener<T>) {
-		val listener = Rx.getTracingPolicy().hook(observable, untracedListener)
+		val listener = Rx.tracingPolicy.hook(observable, untracedListener)
 		observable.observeOn(scheduler).subscribe(listener)
 	}
 
 	override fun <T> subscribe(future: ListenableFuture<out T>, untracedListener: RxListener<T>) {
-		val listener = Rx.getTracingPolicy().hook(future, untracedListener)
+		val listener = Rx.tracingPolicy.hook(future, untracedListener)
 		// add a callback that guards on whether it is still subscribed
 		future.addListener(
 				{
@@ -91,7 +91,7 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 	}
 
 	override fun <T> subscribe(future: CompletionStage<out T>, untracedListener: RxListener<T>) {
-		val listener = Rx.getTracingPolicy().hook(future, untracedListener)
+		val listener = Rx.tracingPolicy.hook(future, untracedListener)
 		future.whenCompleteAsync(
 				{ value: T, exception: Throwable? ->
 					try {
@@ -115,7 +115,7 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 			flow: Flow<T>,
 			untracedListener: RxListener<T>
 	): Disposable {
-		val listener = Rx.getTracingPolicy().hook(flow, untracedListener)
+		val listener = Rx.tracingPolicy.hook(flow, untracedListener)
 		val job =
 				flow.onEach(listener::onNext)
 						.onCompletion {
@@ -131,7 +131,7 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 			deferred: Deferred<T>,
 			untracedListener: RxListener<T>
 	): Disposable {
-		val listener = Rx.getTracingPolicy().hook(deferred, untracedListener)
+		val listener = Rx.tracingPolicy.hook(deferred, untracedListener)
 		val job =
 				coroutineScope.launch {
 					try {
@@ -147,7 +147,7 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 			observable: Observable<out T>,
 			untracedListener: RxListener<T>
 	): Disposable {
-		val listener = Rx.getTracingPolicy().hook(observable, untracedListener)
+		val listener = Rx.tracingPolicy.hook(observable, untracedListener)
 		return observable.observeOn(scheduler).subscribe(
 						{ t: T -> listener.onNext(t) }, { e: Throwable -> listener.onError(e) }) {
 			listener.onComplete()
@@ -158,7 +158,7 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 			future: ListenableFuture<out T>,
 			untracedListener: RxListener<T>
 	): Disposable {
-		val listener = Rx.getTracingPolicy().hook(future, untracedListener)
+		val listener = Rx.tracingPolicy.hook(future, untracedListener)
 		// when we're unsubscribed, set the flag to false
 		val sub = Disposables.empty()
 		// add a callback that guards on whether it is still subscribed
@@ -194,7 +194,7 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 			future: CompletionStage<out T>,
 			untracedListener: RxListener<T>
 	): Disposable {
-		val listener = Rx.getTracingPolicy().hook(future, untracedListener)
+		val listener = Rx.tracingPolicy.hook(future, untracedListener)
 
 		// when we're unsubscribed, set the flag to false
 		val sub = Disposables.empty()
