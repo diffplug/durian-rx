@@ -1,6 +1,11 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Changed (important)
+* **BREAKING** `RxBox`, `RxGetter`, and `IObservable` are now based on kotlin `Flow` rather than `RxJava`.
+### Changed (but probably doesn't affect you)
+* **BREAKING** `Chit.Settable` no longer implements `io.reactivex.disposables.Disposable`.
+* **BREAKING** Removed `RxGetter.fromVolatile`, `Breaker`, and `RateProbe`.
 
 ## [3.1.2] - 2021-10-21
 ### Fixed
