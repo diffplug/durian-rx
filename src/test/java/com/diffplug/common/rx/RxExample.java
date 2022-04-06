@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.diffplug.common.rx;
 
 import com.diffplug.common.collect.ImmutableSet;
 import com.diffplug.common.collect.Immutables;
-import io.reactivex.Observable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -30,6 +29,7 @@ import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import kotlinx.coroutines.flow.FlowKt;
 
 @SuppressWarnings("serial")
 public class RxExample extends JFrame {
@@ -105,7 +105,7 @@ public class RxExample extends JFrame {
 			});
 
 			// trigger a repaint on any change
-			Rx.subscribe(Observable.merge(rxMouseOver.asObservable(), rxSelection.asObservable()), anyChange -> {
+			Rx.subscribe(FlowKt.merge(rxMouseOver.asObservable(), rxSelection.asObservable()), anyChange -> {
 				this.repaint();
 			});
 		}

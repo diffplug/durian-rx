@@ -18,9 +18,10 @@ package com.diffplug.common.rx
 import com.diffplug.common.base.Box
 import com.diffplug.common.base.Converter
 import com.diffplug.common.rx.Rx.subscribe
-import io.reactivex.Observable
 import java.util.function.Consumer
 import java.util.function.Function
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /** [RxGetter] and [Box] combined in one: a value you can set, get, and subscribe to. */
 interface RxBox<T> : RxGetter<T>, Box<T> {
@@ -81,7 +82,7 @@ interface RxBox<T> : RxGetter<T>, Box<T> {
 		@JvmStatic
 		fun <T> from(getter: RxGetter<T>, setter: Consumer<T>): RxBox<T> {
 			return object : RxBox<T> {
-				override fun asObservable(): Observable<T> {
+				override fun asObservable(): Flow<T> {
 					return getter.asObservable()
 				}
 

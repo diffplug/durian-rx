@@ -17,10 +17,13 @@ package com.diffplug.common.rx
 
 import com.diffplug.common.base.Box
 import com.diffplug.common.rx.Rx.subscribe
-import io.reactivex.Observable
 import java.util.function.BiFunction
 import java.util.function.Function
 import java.util.function.Supplier
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 /**
  * Represents a value which can be accessed through a traditional `get()` method or by listening to
@@ -49,7 +52,7 @@ interface RxGetter<T> : IObservable<T>, Supplier<T> {
 		val mapped = src.asObservable().map { t: T -> mapper.apply(t) }
 		val observable = mapped.distinctUntilChanged()
 		return object : RxGetter<R> {
-			override fun asObservable(): Observable<R> {
+			override fun asObservable(): Flow<R> {
 				return observable
 			}
 
@@ -68,11 +71,11 @@ interface RxGetter<T> : IObservable<T>, Supplier<T> {
 		 * recorded by a non-volatile field.
 		 */
 		@JvmStatic
-		fun <T> from(observable: Observable<T>, initialValue: T): RxGetter<T> {
+		fun <T> from(observable: Flow<T>, initialValue: T): RxGetter<T> {
 			val box = Box.of(initialValue)
 			subscribe(observable) { value: T -> box.set(value) }
 			return object : RxGetter<T> {
-				override fun asObservable(): Observable<T> {
+				override fun asObservable(): Flow<T> {
 					return observable
 				}
 
@@ -93,10 +96,8 @@ interface RxGetter<T> : IObservable<T>, Supplier<T> {
 				u: RxGetter<out T2>,
 				combine: BiFunction<in T1, in T2, out R>
 		): RxGetter<R> {
-			val result: Observable<R> =
-					Observable.combineLatest(t.asObservable(), u.asObservable()) { a: T1, b: T2 ->
-						combine.apply(a, b)
-					}
+			val result: Flow<R> =
+					t.asObservable().combine(u.asObservable()) { a, b -> combine.apply(a, b) }
 			return from(result.distinctUntilChanged(), combine.apply(t.get(), u.get()))
 		}
 	}

@@ -15,32 +15,35 @@
  */
 package com.diffplug.common.rx
 
+import com.diffplug.common.base.Box
 import com.diffplug.common.base.Converter
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
 import java.util.function.Function
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 internal class RxLockBoxImp<T> : LockBoxImp<T>, RxLockBox<T> {
-	val subject: BehaviorSubject<T>
+	val subject: MutableStateFlow<T>
 
 	constructor(value: T) : super(value) {
-		subject = BehaviorSubject.createDefault(value)
+		subject = MutableStateFlow(value)
 	}
 
 	constructor(value: T, lock: Any) : super(value, lock) {
-		subject = BehaviorSubject.createDefault(value)
+		subject = MutableStateFlow(value)
 	}
 
 	override fun set(newValue: T) {
 		synchronized(lock()) {
 			if (newValue != value) {
 				value = newValue
-				subject.onNext(newValue)
+				subject.value = newValue
 			}
 		}
 	}
 
-	override fun asObservable(): Observable<T> {
+	override fun asObservable(): Flow<T> {
 		return subject
 	}
 
@@ -50,7 +53,7 @@ internal class RxLockBoxImp<T> : LockBoxImp<T>, RxLockBox<T> {
 
 	internal class Mapped<T, R>(delegate: RxLockBox<T>, converter: Converter<T, R>) :
 			MappedImp<T, R, RxLockBox<T>>(delegate, converter), RxLockBox<R> {
-		val observable: Observable<R>
+		val observable: Flow<R>
 
 		init {
 			val mapped = delegate.asObservable().map { a: T -> converter.convertNonNull(a) }
@@ -61,12 +64,18 @@ internal class RxLockBoxImp<T> : LockBoxImp<T>, RxLockBox<T> {
 			return delegate.lock()
 		}
 
-		override fun asObservable(): Observable<R> {
+		override fun asObservable(): Flow<R> {
 			return observable
 		}
 
 		override fun modify(mutator: Function<in R, out R>): R {
-			return (this as RxLockBox<R>).modify(mutator)
+			val result = Box.Nullable.ofNull<R>()
+			delegate.modify { input: T ->
+				val unmappedResult = mutator.apply(converter.convertNonNull(input))
+				result.set(unmappedResult)
+				converter.revertNonNull(unmappedResult)
+			}
+			return result.get()
 		}
 	}
 }

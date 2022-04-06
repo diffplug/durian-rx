@@ -16,7 +16,7 @@
 package com.diffplug.common.rx
 
 import com.diffplug.common.base.Box
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Utility class for wrapping one kind of box with another.
@@ -58,7 +58,7 @@ protected constructor(protected val delegate: BoxType) : Box<T> {
 
 	open class Rx<T> protected constructor(delegate: RxBox<T>) :
 			ForwardingBox<T, RxBox<T>>(delegate), RxBox<T> {
-		override fun asObservable(): Observable<T> {
+		override fun asObservable(): Flow<T> {
 			return delegate.asObservable()
 		}
 	}
@@ -69,7 +69,7 @@ protected constructor(protected val delegate: BoxType) : Box<T> {
 			return delegate.lock()
 		}
 
-		override fun asObservable(): Observable<T> {
+		override fun asObservable(): Flow<T> {
 			return delegate.asObservable()
 		}
 	}

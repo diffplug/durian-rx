@@ -16,17 +16,19 @@
 package com.diffplug.common.rx
 
 import com.diffplug.common.base.Converter
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
 import java.util.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
-internal open class RxBoxImp<T> private constructor(initial: T, subject: BehaviorSubject<T>) :
+internal open class RxBoxImp<T> private constructor(initial: T, subject: MutableStateFlow<T>) :
 		RxBox<T> {
 	private var value: T
-	private val subject: BehaviorSubject<T>
+	private val subject: MutableStateFlow<T>
 
 	/** Creates a Holder which holds the given value. */
-	constructor(initial: T) : this(initial, BehaviorSubject.createDefault<T>(initial)) {}
+	constructor(initial: T) : this(initial, MutableStateFlow(initial)) {}
 
 	/** The constructor for implementing these selection models. */
 	init {
@@ -38,7 +40,7 @@ internal open class RxBoxImp<T> private constructor(initial: T, subject: Behavio
 	override fun set(newValue: T) {
 		if (newValue != value) {
 			value = newValue
-			subject.onNext(newValue)
+			subject.value = newValue
 		}
 	}
 
@@ -47,20 +49,20 @@ internal open class RxBoxImp<T> private constructor(initial: T, subject: Behavio
 		return value
 	}
 
-	override fun asObservable(): Observable<T> {
+	override fun asObservable(): Flow<T> {
 		return subject
 	}
 
 	internal class Mapped<T, R>(delegate: RxBox<T>, converter: Converter<T, R>) :
 			MappedImp<T, R, RxBox<T>>(delegate, converter), RxBox<R> {
-		val observable: Observable<R>
+		val observable: Flow<R>
 
 		init {
 			val mapped = delegate.asObservable().map { a: T -> converter.convertNonNull(a) }
 			observable = mapped.distinctUntilChanged()
 		}
 
-		override fun asObservable(): Observable<R> {
+		override fun asObservable(): Flow<R> {
 			return observable
 		}
 	}

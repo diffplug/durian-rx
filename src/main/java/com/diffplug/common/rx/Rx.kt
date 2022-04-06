@@ -38,6 +38,7 @@ import java.util.concurrent.Future
 import java.util.function.Consumer
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.merge
 
 /**
  * Unifies the listener models of [RxJava&#39;s Observable][io.reactivex.Observable] with `
@@ -376,9 +377,8 @@ object Rx {
 						} else {
 							// if it isn't an RxListener, then we'll apply _tracing policy
 							val listener =
-									onValueOnTerminate({ value: Any ->
-										(observer as Observer<Any>).onNext(value)
-									}) { errorOpt: Optional<Throwable> ->
+									onValueOnTerminate({ value: Any -> (observer as Observer<Any>).onNext(value) }) {
+											errorOpt: Optional<Throwable> ->
 										if (errorOpt.isPresent) {
 											observer.onError(errorOpt.get())
 										} else {
@@ -422,12 +422,8 @@ object Rx {
 	 */
 	@JvmStatic
 	@SafeVarargs
-	fun <T> merge(vararg toMerge: IObservable<out T>): Observable<T> {
-		val unwrapped: Array<Observable<out T>?> = arrayOfNulls(toMerge.size)
-		for (i in toMerge.indices) {
-			unwrapped[i] = toMerge[i].asObservable()
-		}
-		return Observable.merge(listOf(*unwrapped))
+	fun <T> merge(vararg toMerge: IObservable<out T>): Flow<T> {
+		return toMerge.map { it.asObservable() }.merge()
 	}
 
 	/** Reliable way to sync two RxBox to each other. */

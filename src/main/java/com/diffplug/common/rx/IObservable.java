@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
 package com.diffplug.common.rx;
 
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
+import kotlinx.coroutines.flow.Flow;
 
 /**
  * An object which can be supplied in an {@link io.reactivex.Observable} form.
@@ -26,16 +24,11 @@ import io.reactivex.Observer;
  * Ideally, `io.reactivex.Observable` would be an interface, which would make this interface unnecessary.  But
  * so long as it isn't, this (combined with {@link Rx}) makes it fairly seamless to fix this.
  */
-public interface IObservable<T> extends ObservableSource<T> {
-	Observable<T> asObservable();
-
-	@Override
-	default void subscribe(Observer<? super T> observer) {
-		asObservable().subscribe(observer);
-	}
+public interface IObservable<T> {
+	Flow<T> asObservable();
 
 	/** Wraps an actual observable as an IObservable. */
-	public static <T> IObservable<T> wrap(Observable<T> observable) {
+	public static <T> IObservable<T> wrap(Flow<T> observable) {
 		return () -> observable;
 	}
 }
