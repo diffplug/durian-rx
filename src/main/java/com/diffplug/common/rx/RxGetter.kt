@@ -62,27 +62,6 @@ interface RxGetter<T> : IObservable<T>, Supplier<T> {
 	companion object {
 		/**
 		 * Creates an `RxGetter` from the given `Observable` and `initialValue`, appropriate for
-		 * observables which emit values on multiple threads.
-		 *
-		 * The value returned by [RxGetter.get] will be the last value emitted by the observable, as
-		 * recorded by a volatile field.
-		 */
-		fun <T> fromVolatile(observable: Observable<T>, initialValue: T): RxGetter<T> {
-			val box = Box.ofVolatile(initialValue)
-			subscribe(observable) { value: T -> box.set(value) }
-			return object : RxGetter<T> {
-				override fun asObservable(): Observable<T> {
-					return observable
-				}
-
-				override fun get(): T {
-					return box.get()
-				}
-			}
-		}
-
-		/**
-		 * Creates an `RxGetter` from the given `Observable` and `initialValue`, appropriate for
 		 * observables which emit values on a single thread.
 		 *
 		 * The value returned by [RxGetter.get] will be the last value emitted by the observable, as
