@@ -40,11 +40,11 @@ import kotlinx.coroutines.launch
  * It has methods which match the signatures of Rx's static methods, which allows users to
  */
 class RxExecutor
-internal constructor(private val executor: Executor,
-					 private val scheduler: Scheduler,
-					 val dispatcher: CoroutineDispatcher) :
-		RxSubscriber {
-
+internal constructor(
+		private val executor: Executor,
+		private val scheduler: Scheduler,
+		val dispatcher: CoroutineDispatcher
+) : RxSubscriber {
 
 	/** * Marker interface which allows an Executor to specify its own Scheduler. */
 	interface Has : Executor {
@@ -133,7 +133,8 @@ internal constructor(private val executor: Executor,
 			untracedListener: RxListener<T>
 	): Disposable {
 		val listener = Rx.tracingPolicy.hook(deferred, untracedListener)
-		val job = CoroutineScope(dispatcher).launch {
+		val job =
+				CoroutineScope(dispatcher).launch {
 					try {
 						listener.onSuccess(deferred.await())
 					} catch (e: Throwable) {

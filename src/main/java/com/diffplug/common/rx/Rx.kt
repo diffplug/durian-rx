@@ -122,7 +122,6 @@ object Rx {
 		}
 	}
 
-
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever a value is received. Any
 	 * errors are sent to ErrorHandler.log().
@@ -353,7 +352,11 @@ object Rx {
 	}
 
 	@JvmStatic
-	fun callbackOn(executor: Executor, scheduler: Scheduler, dispatcher: CoroutineDispatcher): RxExecutor {
+	fun callbackOn(
+			executor: Executor,
+			scheduler: Scheduler,
+			dispatcher: CoroutineDispatcher
+	): RxExecutor {
 		return RxExecutor(executor, scheduler, dispatcher)
 	}
 
@@ -370,7 +373,11 @@ object Rx {
 		// that getSameThreadExecutor() might return different instances (which each have the
 		// same behavior), rather than to incur the cost of some type of synchronization.
 		if (_sameThread == null) {
-			_sameThread = RxExecutor(MoreExecutors.directExecutor(), Schedulers.trampoline(), MoreExecutors.directExecutor().asCoroutineDispatcher())
+			_sameThread =
+					RxExecutor(
+							MoreExecutors.directExecutor(),
+							Schedulers.trampoline(),
+							MoreExecutors.directExecutor().asCoroutineDispatcher())
 		}
 		return _sameThread!!
 	}
