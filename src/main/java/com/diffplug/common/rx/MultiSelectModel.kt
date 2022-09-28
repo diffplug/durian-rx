@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 class MultiSelectModel<T>(
 		val mouseOver: RxBox<Optional<T>> = RxBox.of(Optional.empty()),
 		val selection: RxBox<ImmutableSet<T>> = RxBox.of(ImmutableSet.of()),
-		val clicked: MutableSharedFlow<T> = Rx.createEventStream()
+		val clicked: MutableSharedFlow<T> = Rx.createEmitFlow()
 ) {
 	var isCtrl = false
 

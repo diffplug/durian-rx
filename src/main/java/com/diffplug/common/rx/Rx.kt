@@ -38,7 +38,6 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Future
 import java.util.function.Consumer
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
@@ -113,7 +112,7 @@ import kotlinx.coroutines.flow.merge
  * (https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html)
  */
 object Rx {
-	fun <T> createEventStream() =
+	fun <T> createEmitFlow() =
 			MutableSharedFlow<T>(replay = 0, extraBufferCapacity = 1, BufferOverflow.SUSPEND)
 
 	@JvmStatic
