@@ -95,10 +95,7 @@ class MultiSelectModel<T>(
 			val mouseOver: RxBox<Either<Optional<T>, Optional<U>>>,
 			val selection: RxBox<Either<ImmutableSet<T>, ImmutableSet<U>>>
 	) {
-		fun merge(
-				isReallySecondary: (T) -> U?,
-				wrap: (U) -> T
-		): MultiSelectModel<T> {
+		fun merge(isReallySecondary: (T) -> U?, wrap: (U) -> T): MultiSelectModel<T> {
 			fun toEither(t: T): Either<T, U> =
 					isReallySecondary(t)?.let { Either.createRight(it) } ?: Either.createLeft(t)
 			val convOpt =
