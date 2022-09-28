@@ -20,14 +20,14 @@ import com.diffplug.common.base.Converter
 import com.diffplug.common.base.Either
 import com.diffplug.common.collect.ImmutableSet
 import com.diffplug.common.collect.Immutables
-import io.reactivex.subjects.PublishSubject
 import java.util.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 /** Manages a selection based on a a MouseOver / Selection combination. */
 class MultiSelectModel<T>(
 		val mouseOver: RxBox<Optional<T>> = RxBox.of(Optional.empty()),
 		val selection: RxBox<ImmutableSet<T>> = RxBox.of(ImmutableSet.of()),
-		val clicked: PublishSubject<T> = PublishSubject.create()
+		val clicked: MutableSharedFlow<T> = Rx.createEventStream()
 ) {
 	var isCtrl = false
 
@@ -125,10 +125,7 @@ class MultiSelectModel<T>(
 									Either.createRight(u)
 								}
 							})
-
-			val mouseOver: RxBox<Optional<T>> = this.mouseOver.map(convOpt)
-			val selection = this.selection.map(convSet)
-			return MultiSelectModel(mouseOver, selection, PublishSubject.create())
+			return MultiSelectModel(mouseOver.map(convOpt), selection.map(convSet))
 		}
 	}
 

@@ -30,6 +30,7 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
+import java.lang.IllegalStateException
 import java.lang.SafeVarargs
 import java.util.*
 import java.util.concurrent.CompletionStage
@@ -111,6 +112,14 @@ import kotlinx.coroutines.flow.merge
 object Rx {
 	fun <T> createEventStream() =
 			MutableSharedFlow<T>(replay = 0, extraBufferCapacity = 1, BufferOverflow.SUSPEND)
+
+	@JvmStatic
+	fun <T> emit(flow: MutableSharedFlow<T>, value: T) {
+		if (!flow.tryEmit(value)) {
+			throw IllegalStateException("Failed to emit $value on $flow")
+		}
+	}
+
 
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever a value is received. Any
