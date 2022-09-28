@@ -16,8 +16,10 @@
 package com.diffplug.common.rx
 
 import com.diffplug.common.base.Box
+import com.diffplug.common.base.Converter
 import com.diffplug.common.base.Either
 import com.diffplug.common.collect.ImmutableSet
+import com.diffplug.common.collect.Immutables
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
@@ -92,7 +94,46 @@ class MultiSelectModel<T>(
 	class Trumped<T, U>(
 			val mouseOver: RxBox<Either<Optional<T>, Optional<U>>>,
 			val selection: RxBox<Either<ImmutableSet<T>, ImmutableSet<U>>>
-	)
+	) {
+		fun merge(
+				isReallySecondary: (T) -> U?,
+				wrap: (U) -> T
+		): MultiSelectModel<T> {
+			fun toEither(t: T): Either<T, U> =
+					isReallySecondary(t)?.let { Either.createRight(it) } ?: Either.createLeft(t)
+			val convOpt =
+					Converter.from<Either<Optional<T>, Optional<U>>, Optional<T>>(
+							{ either -> either.fold({ t -> t }, { opt -> opt.map(wrap) }) },
+							{ optT ->
+								if (optT.isPresent) {
+									val either = toEither(optT.get())
+									either.mapLeft { Optional.of(it) }.mapRight { Optional.of(it) }
+								} else {
+									Either.createLeft(Optional.empty())
+								}
+							})
+
+			val convSet =
+					Converter.from<Either<ImmutableSet<T>, ImmutableSet<U>>, ImmutableSet<T>>(
+							{ either ->
+								either.fold({ t -> t }, { set -> Immutables.perElementMutateSet(set, wrap) })
+							},
+							{ setT ->
+								val builder = ImmutableSet.builder<U>(setT.size)
+								setT.forEach { isReallySecondary(it)?.let { builder.add(it) } }
+								val u = builder.build()
+								if (u.isEmpty()) {
+									Either.createLeft(setT)
+								} else {
+									Either.createRight(u)
+								}
+							})
+
+			val mouseOver: RxBox<Optional<T>> = this.mouseOver.map(convOpt)
+			val selection = this.selection.map(convSet)
+			return MultiSelectModel(mouseOver, selection, PublishSubject.create())
+		}
+	}
 
 	/** Separate from selectionExclusive to avoid infinite loop. */
 	private fun <V> selectionExclusive(other: MultiSelectModel<V>) {

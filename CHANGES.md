@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Added
+* Add `merge` function to `MultiSelectModel.Trumped` 
 ### Changed (important)
 * **BREAKING** `RxBox`, `RxGetter`, and `IObservable` are now based on kotlin `Flow` rather than `RxJava`.
 ### Changed (but probably doesn't affect you)
