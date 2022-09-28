@@ -37,7 +37,10 @@ import java.util.concurrent.CompletionStage
 import java.util.concurrent.Executor
 import java.util.concurrent.Future
 import java.util.function.Consumer
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -337,7 +340,7 @@ object Rx {
 		} else if (executor is RxExecutor.Has) {
 			executor.rxExecutor
 		} else {
-			RxExecutor(executor, Schedulers.from(executor))
+			RxExecutor(executor, Schedulers.from(executor), executor.asCoroutineDispatcher())
 		}
 	}
 
@@ -347,7 +350,12 @@ object Rx {
 	 */
 	@JvmStatic
 	fun callbackOn(executor: Executor, scheduler: Scheduler): RxExecutor {
-		return RxExecutor(executor, scheduler)
+		return callbackOn(executor, scheduler, executor.asCoroutineDispatcher())
+	}
+
+	@JvmStatic
+	fun callbackOn(executor: Executor, scheduler: Scheduler, dispatcher: CoroutineDispatcher): RxExecutor {
+		return RxExecutor(executor, scheduler, dispatcher)
 	}
 
 	@JvmStatic
@@ -363,7 +371,7 @@ object Rx {
 		// that getSameThreadExecutor() might return different instances (which each have the
 		// same behavior), rather than to incur the cost of some type of synchronization.
 		if (_sameThread == null) {
-			_sameThread = RxExecutor(MoreExecutors.directExecutor(), Schedulers.trampoline())
+			_sameThread = RxExecutor(MoreExecutors.directExecutor(), Schedulers.trampoline(), MoreExecutors.directExecutor().asCoroutineDispatcher())
 		}
 		return _sameThread!!
 	}

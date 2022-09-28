@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 ### Added
-* Add `merge` function to `MultiSelectModel.Trumped` 
+* Add `merge` function to `MultiSelectModel.Trumped`
+* `RxExecutor` now includes a `dispatcher: CoroutineDispatcher` field
 ### Changed (important)
 * **BREAKING** `RxBox`, `RxGetter`, and `IObservable` are now based on kotlin `Flow` rather than `RxJava`.
 ### Changed (but probably doesn't affect you)

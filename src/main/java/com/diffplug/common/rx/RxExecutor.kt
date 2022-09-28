@@ -26,9 +26,9 @@ import java.util.concurrent.CompletionException
 import java.util.concurrent.CompletionStage
 import java.util.concurrent.Executor
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
@@ -40,9 +40,11 @@ import kotlinx.coroutines.launch
  * It has methods which match the signatures of Rx's static methods, which allows users to
  */
 class RxExecutor
-internal constructor(private val executor: Executor, private val scheduler: Scheduler) :
+internal constructor(private val executor: Executor,
+					 private val scheduler: Scheduler,
+					 val dispatcher: CoroutineDispatcher) :
 		RxSubscriber {
-	val coroutineScope = CoroutineScope(executor.asCoroutineDispatcher())
+
 
 	/** * Marker interface which allows an Executor to specify its own Scheduler. */
 	interface Has : Executor {
@@ -50,7 +52,6 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 	}
 
 	fun executor() = executor
-	fun scheduler() = scheduler
 
 	override fun <T> subscribe(flow: Flow<T>, listener: RxListener<T>) {
 		subscribeDisposable(flow, listener)
@@ -123,7 +124,7 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 								listener.onError(it)
 							} else listener.onComplete()
 						}
-						.launchIn(coroutineScope)
+						.launchIn(CoroutineScope(dispatcher))
 		return Disposables.fromRunnable(job::cancel)
 	}
 
@@ -132,8 +133,7 @@ internal constructor(private val executor: Executor, private val scheduler: Sche
 			untracedListener: RxListener<T>
 	): Disposable {
 		val listener = Rx.tracingPolicy.hook(deferred, untracedListener)
-		val job =
-				coroutineScope.launch {
+		val job = CoroutineScope(dispatcher).launch {
 					try {
 						listener.onSuccess(deferred.await())
 					} catch (e: Throwable) {
