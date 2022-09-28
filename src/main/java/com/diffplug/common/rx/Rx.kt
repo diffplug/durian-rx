@@ -37,7 +37,9 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Future
 import java.util.function.Consumer
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.merge
 
 /**
@@ -107,6 +109,9 @@ import kotlinx.coroutines.flow.merge
  * (https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html)
  */
 object Rx {
+	fun <T> createEventStream() =
+			MutableSharedFlow<T>(replay = 0, extraBufferCapacity = 1, BufferOverflow.SUSPEND)
+
 	/**
 	 * Creates an Rx instance which will call the given consumer whenever a value is received. Any
 	 * errors are sent to ErrorHandler.log().
