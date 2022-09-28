@@ -6,6 +6,8 @@
 ### Changed (but probably doesn't affect you)
 * **BREAKING** `Chit.Settable` no longer implements `io.reactivex.disposables.Disposable`.
 * **BREAKING** Removed `RxGetter.fromVolatile`, `Breaker`, and `RateProbe`.
+* **BREAKING** Removed `RxavaCompat`.
+- **BREAKING** Removed OSGi metadata.
 
 ## [3.1.2] - 2021-10-21
 ### Fixed
