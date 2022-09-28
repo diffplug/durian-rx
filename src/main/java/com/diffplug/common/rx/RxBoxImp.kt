@@ -24,19 +24,11 @@ import kotlinx.coroutines.flow.map
 
 internal open class RxBoxImp<T> private constructor(initial: T, subject: MutableStateFlow<T>) :
 		RxBox<T> {
-	private var value: T
-	private val subject: MutableStateFlow<T>
+	private var value: T = initial
+	private val subject: MutableStateFlow<T> = subject
 
-	/** Creates a Holder which holds the given value. */
 	constructor(initial: T) : this(initial, MutableStateFlow(initial)) {}
 
-	/** The constructor for implementing these selection models. */
-	init {
-		value = Objects.requireNonNull(initial)
-		this.subject = Objects.requireNonNull(subject)
-	}
-
-	/** Sets the value. */
 	override fun set(newValue: T) {
 		if (newValue != value) {
 			value = newValue
@@ -44,26 +36,13 @@ internal open class RxBoxImp<T> private constructor(initial: T, subject: Mutable
 		}
 	}
 
-	/** Returns the value. */
-	override fun get(): T {
-		return value
-	}
-
-	override fun asObservable(): Flow<T> {
-		return subject
-	}
+	override fun get(): T = value
+	override fun asObservable(): Flow<T> = subject
 
 	internal class Mapped<T, R>(delegate: RxBox<T>, converter: Converter<T, R>) :
 			MappedImp<T, R, RxBox<T>>(delegate, converter), RxBox<R> {
-		val observable: Flow<R>
-
-		init {
-			val mapped = delegate.asObservable().map { a: T -> converter.convertNonNull(a) }
-			observable = mapped.distinctUntilChanged()
-		}
-
-		override fun asObservable(): Flow<R> {
-			return observable
-		}
+		val observable: Flow<R> =
+				delegate.asObservable().map { a: T -> converter.convertNonNull(a) }.distinctUntilChanged()
+		override fun asObservable(): Flow<R> = observable
 	}
 }
