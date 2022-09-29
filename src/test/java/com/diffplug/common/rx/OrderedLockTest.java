@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ package com.diffplug.common.rx;
 
 
 import com.diffplug.common.base.Errors;
-import com.diffplug.common.collect.ImmutableList;
-import com.diffplug.common.collect.Immutables;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -36,36 +34,36 @@ public class OrderedLockTest {
 		int maxNumIncrements = 1000;
 		Random random = new Random(0);
 
-		ImmutableList<Object> locks = Stream.generate(Object::new)
+		List<Object> locks = Stream.generate(Object::new)
 				.limit(numLocks)
-				.collect(Immutables.toList());
+				.collect(Collectors.toList());
 
 		AtomicInteger numIncrements = new AtomicInteger();
 
 		List<Thread> threads = Stream.generate(() -> {
-			Thread thread = new Thread(() -> {
-				int numIncrementsNow;
-				do {
-					// take a number of locks, up to (2 * numLocks)
-					// possible to take a single lock multiple times
-					int locksToTake = random.nextInt(2 * numLocks);
-					List<Object> ourLocks = new ArrayList<>(locksToTake);
-					for (int i = 0; i < locksToTake; ++i) {
-						ourLocks.add(locks.get(random.nextInt(numLocks)));
-					}
+					Thread thread = new Thread(() -> {
+						int numIncrementsNow;
+						do {
+							// take a number of locks, up to (2 * numLocks)
+							// possible to take a single lock multiple times
+							int locksToTake = random.nextInt(2 * numLocks);
+							List<Object> ourLocks = new ArrayList<>(locksToTake);
+							for (int i = 0; i < locksToTake; ++i) {
+								ourLocks.add(locks.get(random.nextInt(numLocks)));
+							}
 
-					// take the locks, and sleep a random amount before incrementing the count
-					numIncrementsNow = OrderedLock.on(ourLocks).takeAndGet(() -> {
-						Errors.rethrow().run(() -> {
-							Thread.sleep(random.nextInt(maxSinglePauseMs));
-						});
-						return numIncrements.incrementAndGet();
-					});
-				} while (numIncrementsNow < maxNumIncrements);
-			}, "TestThread");
-			thread.start();
-			return thread;
-		})
+							// take the locks, and sleep a random amount before incrementing the count
+							numIncrementsNow = OrderedLock.on(ourLocks).takeAndGet(() -> {
+								Errors.rethrow().run(() -> {
+									Thread.sleep(random.nextInt(maxSinglePauseMs));
+								});
+								return numIncrements.incrementAndGet();
+							});
+						} while (numIncrementsNow < maxNumIncrements);
+					}, "TestThread");
+					thread.start();
+					return thread;
+				})
 				.limit(numThreads)
 				.collect(Collectors.toList());
 
