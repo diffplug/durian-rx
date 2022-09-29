@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,46 +18,46 @@ package com.diffplug.common.rx;
 
 import com.diffplug.common.base.Preconditions;
 import com.diffplug.common.base.Unhandled;
-import com.diffplug.common.collect.ImmutableList;
-import com.diffplug.common.collect.Immutables;
-import com.diffplug.common.collect.Lists;
-import com.diffplug.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * <code>{@link RxBox}&lt;{@link ImmutableList}&lt;T&gt;&gt;</code>
+ * <code>{@link RxBox}&lt;{@link List}&lt;T&gt;&gt;</code>
  * which promises to exclude duplicates.
  *
  * We dont' actually want it to be this - we actually want it to be a
  * stateful wrapper around calls to `set`, but we'll settle for this
  * for now.
  */
-public class RxOrderedSet<T> extends ForwardingBox.Rx<ImmutableList<T>> {
+public class RxOrderedSet<T> extends ForwardingBox.Rx<List<T>> {
 	/** Creates an RxList with an initially empty value. */
+
 	public static <T> RxOrderedSet<T> ofEmpty() {
-		return of(ImmutableList.of());
+		return of(Collections.emptyList());
 	}
 
 	/** Creates an RxList with an initially empty value. */
 	public static <T> RxOrderedSet<T> ofEmpty(OnDuplicate duplicatePolicy) {
-		return of(ImmutableList.of(), duplicatePolicy);
+		return of(Collections.emptyList(), duplicatePolicy);
 	}
 
 	/** Creates an RxList with the given initial value. */
-	public static <T> RxOrderedSet<T> of(ImmutableList<T> initial) {
+	public static <T> RxOrderedSet<T> of(List<T> initial) {
 		return of(initial, OnDuplicate.ERROR);
 	}
 
 	/** Creates an RxList with the given initial value. */
-	public static <T> RxOrderedSet<T> of(ImmutableList<T> initial, OnDuplicate duplicatePolicy) {
+	public static <T> RxOrderedSet<T> of(List<T> initial, OnDuplicate duplicatePolicy) {
 		return new RxOrderedSet<T>(initial, duplicatePolicy);
 	}
 
 	/** Initally holds the given collection. */
-	protected RxOrderedSet(ImmutableList<T> initial, OnDuplicate duplicatePolicy) {
+	protected RxOrderedSet(List<T> initial, OnDuplicate duplicatePolicy) {
 		super(RxBox.of(filter(initial, duplicatePolicy)));
 		this.policy = duplicatePolicy;
 	}
@@ -83,7 +83,7 @@ public class RxOrderedSet<T> extends ForwardingBox.Rx<ImmutableList<T>> {
 
 	/** Sets the selection. */
 	@Override
-	public void set(ImmutableList<T> newSelection) {
+	public void set(List<T> newSelection) {
 		Preconditions.checkNotNull(newSelection);
 		if (!get().equals(newSelection)) {
 			// the selection changed, so we will check it for duplicates
@@ -93,9 +93,9 @@ public class RxOrderedSet<T> extends ForwardingBox.Rx<ImmutableList<T>> {
 		}
 	}
 
-	private static <T> ImmutableList<T> filter(ImmutableList<T> newList, OnDuplicate policy) {
+	private static <T> List<T> filter(List<T> newList, OnDuplicate policy) {
 		Objects.requireNonNull(policy);
-		Map<T, Integer> indexToTake = Maps.newHashMap();
+		Map<T, Integer> indexToTake = new HashMap<>();
 
 		// put all of the new values into the newList
 		boolean hasDuplicate = false;
@@ -126,7 +126,7 @@ public class RxOrderedSet<T> extends ForwardingBox.Rx<ImmutableList<T>> {
 			// if there wasn't a duplicate, then there's no change necessary
 			return newList;
 		} else {
-			List<T> noDuplicates = Lists.newArrayListWithCapacity(indexToTake.size());
+			List<T> noDuplicates = new ArrayList<>(indexToTake.size());
 			for (int i = 0; i < newList.size(); ++i) {
 				T value = newList.get(i);
 				if (indexToTake.get(value) == i) {
@@ -135,13 +135,14 @@ public class RxOrderedSet<T> extends ForwardingBox.Rx<ImmutableList<T>> {
 				}
 			}
 			// returns the filtered list
-			return ImmutableList.copyOf(noDuplicates);
+			return noDuplicates;
 		}
 	}
 
 	/** Mutates this set. */
-	public ImmutableList<T> mutate(Consumer<List<T>> mutator) {
-		ImmutableList<T> mutated = Immutables.mutateList(get(), mutator);
+	public List<T> mutate(Consumer<List<T>> mutator) {
+		List<T> mutated = new ArrayList<>(get());
+		mutator.accept(mutated);
 		set(mutated);
 		return mutated;
 	}
