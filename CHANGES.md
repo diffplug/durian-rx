@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+
+## [4.0.0] - 2022-09-29
 ### Added
 * Add `merge` function to `MultiSelectModel.Trumped`
 * `RxExecutor` now includes a `dispatcher: CoroutineDispatcher` field
