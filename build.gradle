@@ -21,7 +21,6 @@ def VER_JUNIT='4.12'
 
 dependencies {
 	implementation "com.diffplug.durian:durian-core:${VER_DURIAN}"
-	implementation "com.diffplug.durian:durian-collect:${VER_DURIAN}"
 	implementation "com.diffplug.durian:durian-concurrent:${VER_DURIAN}"
 	api "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2"
 	api "io.reactivex.rxjava2:rxjava:${VER_RXJAVA}"
