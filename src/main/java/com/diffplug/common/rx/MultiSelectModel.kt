@@ -18,15 +18,13 @@ package com.diffplug.common.rx
 import com.diffplug.common.base.Box
 import com.diffplug.common.base.Converter
 import com.diffplug.common.base.Either
-import com.diffplug.common.collect.ImmutableSet
-import com.diffplug.common.collect.Immutables
 import java.util.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /** Manages a selection based on a a MouseOver / Selection combination. */
 class MultiSelectModel<T>(
 		val mouseOver: RxBox<Optional<T>> = RxBox.of(Optional.empty()),
-		val selection: RxBox<ImmutableSet<T>> = RxBox.of(ImmutableSet.of()),
+		val selection: RxBox<List<T>> = RxBox.of(listOf()),
 		val clicked: MutableSharedFlow<T> = Rx.createEmitFlow()
 ) {
 	var isCtrl = false
@@ -38,12 +36,9 @@ class MultiSelectModel<T>(
 		other.selectionExclusive(this)
 
 		// maintain the combined selection
-		val lastSelection =
-				Box.ofVolatile(Either.createLeft<ImmutableSet<T>, ImmutableSet<U>>(ImmutableSet.of()))
+		val lastSelection = Box.ofVolatile(Either.createLeft<List<T>, List<U>>(listOf()))
 		val getterSelection =
-				RxGetter.combineLatest(selection, other.selection) {
-						left: ImmutableSet<T>,
-						right: ImmutableSet<U> ->
+				RxGetter.combineLatest(selection, other.selection) { left: List<T>, right: List<U> ->
 					if (!left.isEmpty() && !right.isEmpty()) {
 						// if both are present, we'll keep what we've got, while the two work it out amongst
 						// themselves
@@ -51,15 +46,15 @@ class MultiSelectModel<T>(
 					} else {
 						val newValue =
 								if (left.isEmpty()) Either.createRight(right)
-								else Either.createLeft<ImmutableSet<T>, ImmutableSet<U>>(left)
+								else Either.createLeft<List<T>, List<U>>(left)
 						lastSelection.set(newValue)
 						newValue
 					}
 				}
 		// when someone sets the combined selection, carry that over to the constituent selections
 		val valueSelection =
-				RxBox.from(getterSelection) { either: Either<ImmutableSet<T>, ImmutableSet<U>> ->
-					either.acceptBoth(selection, other.selection, ImmutableSet.of(), ImmutableSet.of())
+				RxBox.from(getterSelection) { either: Either<List<T>, List<U>> ->
+					either.acceptBoth(selection, other.selection, listOf(), listOf())
 				}
 
 		// make the mouseOvers impose exclusivity on themselves
@@ -93,7 +88,7 @@ class MultiSelectModel<T>(
 	/** A MultiSelectModel-ish which represents two trumped selections. */
 	class Trumped<T, U>(
 			val mouseOver: RxBox<Either<Optional<T>, Optional<U>>>,
-			val selection: RxBox<Either<ImmutableSet<T>, ImmutableSet<U>>>
+			val selection: RxBox<Either<List<T>, List<U>>>
 	) {
 		fun merge(isReallySecondary: (T) -> U?, wrap: (U) -> T): MultiSelectModel<T> {
 			fun toEither(t: T): Either<T, U> =
@@ -111,18 +106,15 @@ class MultiSelectModel<T>(
 							})
 
 			val convSet =
-					Converter.from<Either<ImmutableSet<T>, ImmutableSet<U>>, ImmutableSet<T>>(
-							{ either ->
-								either.fold({ t -> t }, { set -> Immutables.perElementMutateSet(set, wrap) })
-							},
+					Converter.from<Either<List<T>, List<U>>, List<T>>(
+							{ either -> either.fold({ t -> t }, { set -> set.map(wrap) }) },
 							{ setT ->
-								val builder = ImmutableSet.builder<U>(setT.size)
+								val builder = mutableListOf<U>()
 								setT.forEach { isReallySecondary(it)?.let { builder.add(it) } }
-								val u = builder.build()
-								if (u.isEmpty()) {
+								if (builder.isEmpty()) {
 									Either.createLeft(setT)
 								} else {
-									Either.createRight(u)
+									Either.createRight(builder)
 								}
 							})
 			return MultiSelectModel(mouseOver.map(convOpt), selection.map(convSet))
@@ -131,7 +123,7 @@ class MultiSelectModel<T>(
 
 	/** Separate from selectionExclusive to avoid infinite loop. */
 	private fun <V> selectionExclusive(other: MultiSelectModel<V>) {
-		Rx.subscribe(selection) { newSelection: ImmutableSet<T> ->
+		Rx.subscribe(selection) { newSelection: List<T> ->
 			// our selection has changed
 			if (newSelection.isEmpty() || other.selection.get().isEmpty()) {
 				return@subscribe
@@ -141,10 +133,10 @@ class MultiSelectModel<T>(
 			if (isCtrl) {
 				// if we're in the middle of trying to set the selection using ctrl,
 				// then we'll let our friend keep their selection and we'll sacrifice our own
-				selection.set(ImmutableSet.of())
+				selection.set(listOf())
 			} else {
 				// otherwise, we'll sabotage our friend
-				other.selection.set(ImmutableSet.of())
+				other.selection.set(listOf())
 			}
 		}
 	}
