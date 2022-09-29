@@ -1,6 +1,16 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Added
+* Add `merge` function to `MultiSelectModel.Trumped`
+* `RxExecutor` now includes a `dispatcher: CoroutineDispatcher` field
+### Changed (important)
+* **BREAKING** `RxBox`, `RxGetter`, and `IObservable` are now based on kotlin `Flow` rather than `RxJava`.
+### Changed (but probably doesn't affect you)
+* **BREAKING** `Chit.Settable` no longer implements `io.reactivex.disposables.Disposable`.
+* **BREAKING** Removed `RxGetter.fromVolatile`, `Breaker`, and `RateProbe`.
+* **BREAKING** Removed `RxavaCompat`.
+- **BREAKING** Removed OSGi metadata.
 
 ## [3.1.2] - 2021-10-21
 ### Fixed

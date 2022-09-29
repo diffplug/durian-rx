@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.diffplug.common.rx;
 
 
-import io.reactivex.disposables.Disposable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,12 +66,11 @@ public interface Chit {
 	}
 
 	/** The standard implementation of DisposableEar. */
-	public final class Settable implements Chit, Disposable {
+	public final class Settable implements Chit {
 		ArrayList<Runnable> runWhenDisposed = new ArrayList<>();
 
 		private Settable() {}
 
-		@Override
 		public void dispose() {
 			List<Runnable> toDispose;
 			synchronized (this) {
@@ -84,12 +82,10 @@ public interface Chit {
 			}
 		}
 
-		@Override
 		public synchronized boolean isDisposed() {
 			return runWhenDisposed == null;
 		}
 
-		@Override
 		public synchronized void runWhenDisposed(Runnable whenDisposed) {
 			if (runWhenDisposed != null) {
 				runWhenDisposed.add(whenDisposed);

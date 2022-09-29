@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package com.diffplug.common.rx;
 
 import static java.util.Objects.requireNonNull;
 
-import com.diffplug.common.collect.Ordering;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.function.Supplier;
 
 /**
@@ -87,7 +87,7 @@ public class OrderedLock {
 	private final boolean needsTieBreaker;
 
 	private OrderedLock(Object[] locks) {
-		Arrays.sort(locks, Ordering.natural().onResultOf(System::identityHashCode));
+		Arrays.sort(locks, Comparator.comparing(System::identityHashCode));
 		boolean needsTieBreaker = false;
 		// if any of the locks have the same identity hashCode, then we're going to need a tiebreaker
 		for (int i = 0; i < locks.length - 1; ++i) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ package com.diffplug.common.rx;
 
 
 import com.diffplug.common.base.Errors;
-import com.diffplug.common.collect.ImmutableList;
-import com.diffplug.common.collect.Immutables;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -36,9 +34,9 @@ public class OrderedLockTest {
 		int maxNumIncrements = 1000;
 		Random random = new Random(0);
 
-		ImmutableList<Object> locks = Stream.generate(Object::new)
+		List<Object> locks = Stream.generate(Object::new)
 				.limit(numLocks)
-				.collect(Immutables.toList());
+				.collect(Collectors.toList());
 
 		AtomicInteger numIncrements = new AtomicInteger();
 

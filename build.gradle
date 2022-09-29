@@ -1,7 +1,6 @@
 plugins {
 	id 'com.diffplug.blowdryer'
 	id 'com.diffplug.spotless-changelog'
-	id 'org.jetbrains.kotlin.jvm'
 }
 
 spotlessChangelog {
@@ -11,18 +10,9 @@ spotlessChangelog {
 apply from: 干.file('base/changelog.gradle')
 apply plugin: 'java-library'
 apply from: 干.file('base/java8.gradle')
-apply from: 干.file('base/osgi.gradle')
+apply from: 干.file('base/kotlin.gradle')
 apply from: 干.file('spotless/freshmark.gradle')
 apply from: 干.file('spotless/java.gradle')
-
-spotless {
-	kotlin {
-		toggleOffOn()
-		licenseHeaderFile 干.file("spotless/license-${license}.java")
-		ktfmt('0.25')
-		indentWithTabs(2)
-	}
-}
 
 def VER_DURIAN='1.2.0'
 def VER_DURIAN_DEBUG='1.0.0'
@@ -31,9 +21,8 @@ def VER_JUNIT='4.12'
 
 dependencies {
 	implementation "com.diffplug.durian:durian-core:${VER_DURIAN}"
-	implementation "com.diffplug.durian:durian-collect:${VER_DURIAN}"
 	implementation "com.diffplug.durian:durian-concurrent:${VER_DURIAN}"
-	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2"
+	api "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2"
 	api "io.reactivex.rxjava2:rxjava:${VER_RXJAVA}"
 	testImplementation "junit:junit:${VER_JUNIT}"
 	testImplementation "com.diffplug.durian:durian-testlib:${VER_DURIAN}"

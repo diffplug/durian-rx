@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,17 @@ package com.diffplug.common.rx;
 
 
 import com.diffplug.common.base.Consumers;
-import com.diffplug.common.collect.ImmutableSet;
 import com.diffplug.common.testing.AbstractPackageSanityTests;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+import java.util.Collections;
 
 public class PackageSanityTests extends AbstractPackageSanityTests {
 	public PackageSanityTests() {
 		publicApiOnly();
-		ignoreClasses(ImmutableSet.of(RxExample.class)::contains);
+		ignoreClasses(Collections.singleton(RxExample.class)::contains);
 		setDefault(Scheduler.class, Schedulers.trampoline());
 		setDefault(RxListener.class, Rx.onValue(Consumers.doNothing()));
 		setDefault(Observable.class, Observable.just(""));
