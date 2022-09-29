@@ -16,14 +16,14 @@
 package com.diffplug.common.rx;
 
 
-import com.diffplug.common.collect.ImmutableSet;
-import com.diffplug.common.collect.Immutables;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import javax.swing.JComponent;
@@ -57,7 +57,7 @@ public class RxExample extends JFrame {
 		/** The cell which the mouse is over. */
 		private RxGetter<Optional<Integer>> rxMouseOver;
 		/** The selected cells. */
-		private RxBox<ImmutableSet<Integer>> rxSelection;
+		private RxBox<Set<Integer>> rxSelection;
 
 		RxGrid() {
 			// maintain the position of the mouse
@@ -81,12 +81,13 @@ public class RxExample extends JFrame {
 			});
 
 			// maintain the selection state
-			rxSelection = RxBox.of(ImmutableSet.of());
+			rxSelection = RxBox.of(new HashSet<>());
 			addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					rxMouseOver.get().ifPresent(cell -> {
-						rxSelection.modify(Immutables.mutatorSet(selection -> {
+						rxSelection.modify(set -> {
+							HashSet<Integer> selection = new LinkedHashSet<>(set);
 							if (e.isControlDown()) {
 								// control => toggle mouseOver item in selection
 								if (selection.contains(cell)) {
@@ -99,7 +100,8 @@ public class RxExample extends JFrame {
 								selection.clear();
 								selection.add(cell);
 							}
-						}));
+							return selection;
+						});
 					});
 				}
 			});

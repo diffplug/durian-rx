@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2022 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package com.diffplug.common.rx;
 
 
-import com.diffplug.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class RxGetterTest {
 		Asserter<Optional<String>> assertOriginal = new Asserter<>(original);
 		Asserter<Boolean> mappedOriginal = new Asserter<>(mapped);
 
-		// we shoudl get the initial values 
+		// we shoudl get the initial values
 		assertOriginal.check(Optional.empty());
 		mappedOriginal.check(false);
 
@@ -58,7 +58,7 @@ public class RxGetterTest {
 	}
 
 	private static class Asserter<T> {
-		private List<T> newValues = Lists.newArrayList();
+		private List<T> newValues = new ArrayList<>();
 
 		public Asserter(RxGetter<T> getter) {
 			Rx.subscribe(getter, newValues::add);
