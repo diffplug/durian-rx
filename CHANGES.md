@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Fixed
+- Generics on `MultiSelectModel` have changed from `T` to `T : Any` to play nicely with Kotlin's new stricter generic nullability bounds. ([#8](https://github.com/diffplug/durian-rx/pull/8))
 
 ## [4.0.0] - 2022-09-29
 ### Added

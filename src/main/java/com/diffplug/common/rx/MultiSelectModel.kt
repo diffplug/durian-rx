@@ -22,7 +22,7 @@ import java.util.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /** Manages a selection based on a a MouseOver / Selection combination. */
-class MultiSelectModel<T>(
+class MultiSelectModel<T : Any>(
 		val mouseOver: RxBox<Optional<T>> = RxBox.of(Optional.empty()),
 		val selection: RxBox<List<T>> = RxBox.of(listOf()),
 		val clicked: MutableSharedFlow<T> = Rx.createEmitFlow()
@@ -30,7 +30,7 @@ class MultiSelectModel<T>(
 	var isCtrl = false
 
 	/** Mouseover and selection in this model will trump whatever is in the other. */
-	fun <U> trump(other: MultiSelectModel<U>): Trumped<T, U> {
+	fun <U : Any> trump(other: MultiSelectModel<U>): Trumped<T, U> {
 		// make the selections impose exclusivity on themselves
 		selectionExclusive(other)
 		other.selectionExclusive(this)
@@ -86,7 +86,7 @@ class MultiSelectModel<T>(
 	}
 
 	/** A MultiSelectModel-ish which represents two trumped selections. */
-	class Trumped<T, U>(
+	class Trumped<T : Any, U : Any>(
 			val mouseOver: RxBox<Either<Optional<T>, Optional<U>>>,
 			val selection: RxBox<Either<List<T>, List<U>>>
 	) {
@@ -122,7 +122,7 @@ class MultiSelectModel<T>(
 	}
 
 	/** Separate from selectionExclusive to avoid infinite loop. */
-	private fun <V> selectionExclusive(other: MultiSelectModel<V>) {
+	private fun <V : Any> selectionExclusive(other: MultiSelectModel<V>) {
 		Rx.subscribe(selection) { newSelection: List<T> ->
 			// our selection has changed
 			if (newSelection.isEmpty() || other.selection.get().isEmpty()) {
@@ -145,7 +145,7 @@ class MultiSelectModel<T>(
 	 * Enforces that non-empty mouseOver on this MultiSelectManager will force mouseOver on the other
 	 * MultiSelectManager to be empty.
 	 */
-	private fun <V> mouseOverTrumps(multiSelect: MultiSelectModel<V>) {
+	private fun <V : Any> mouseOverTrumps(multiSelect: MultiSelectModel<V>) {
 		class EmptyEnforcer(private val single: RxBox<Optional<V>>) {
 			private var enabled = false
 
