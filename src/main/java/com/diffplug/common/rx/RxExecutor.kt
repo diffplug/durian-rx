@@ -20,6 +20,7 @@ import com.diffplug.common.util.concurrent.ListenableFuture
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
 import java.lang.Error
+import java.util.*
 import java.util.concurrent.CompletionException
 import java.util.concurrent.CompletionStage
 import java.util.concurrent.Executor
@@ -109,11 +110,11 @@ internal constructor(private val executor: Executor, val dispatcher: CoroutineDi
 		val listener = Rx.tracingPolicy.hook(flow, untracedListener)
 		val job =
 				flow
-						.onEach(listener::onNext)
+						.onEach(listener.onValue::accept)
 						.onCompletion {
 							if (it != null && it !is CancellationException) {
-								listener.onError(it)
-							} else listener.onComplete()
+								listener.onTerminate.accept(Optional.of(it))
+							} else listener.onTerminate.accept(Optional.empty())
 						}
 						.launchIn(CoroutineScope(dispatcher))
 		return Disposables.fromRunnable(job::cancel)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2025 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,55 +19,34 @@ import static java.util.Objects.requireNonNull;
 
 import com.diffplug.common.base.Errors;
 import com.diffplug.common.util.concurrent.FutureCallback;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 import java.util.Optional;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
-public final class RxListener<T> implements Observer<T>, FutureCallback<T> {
-	private final Consumer<T> onValue;
-	private final Consumer<Optional<Throwable>> onTerminate;
+public final class RxListener<T> implements FutureCallback<T> {
+	final Consumer<T> onValue;
+	final Consumer<Optional<Throwable>> onTerminate;
 
 	RxListener(Consumer<T> onValue, Consumer<Optional<Throwable>> onTerminate) {
 		this.onValue = requireNonNull(onValue);
 		this.onTerminate = requireNonNull(onTerminate);
 	}
 
-	//////////////
-	// Observer //
-	//////////////
-	@Override
-	public void onSubscribe(Disposable d) {
-		requireNonNull(d);
-	}
-
-	@Override
-	public final void onNext(@Nullable T t) {
-		onValue.accept(t);
-	}
-
-	@Override
-	public void onComplete() {
-		onTerminate.accept(Optional.empty());
-	}
-
-	@Override
-	public final void onError(Throwable e) {
-		onTerminate.accept(Optional.of(e));
+	public void onValue(T value) {
+		onValue.accept(value);
 	}
 
 	/////////////
 	// Futures //
 	/////////////
 	@Override
-	public final void onSuccess(@Nullable T result) {
+	public void onSuccess(@Nullable T result) {
 		onValue.accept(result);
 		onTerminate.accept(Optional.empty());
 	}
 
 	@Override
-	public final void onFailure(Throwable e) {
+	public void onFailure(Throwable e) {
 		onTerminate.accept(Optional.of(e));
 	}
 

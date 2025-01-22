@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2025 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.diffplug.common.rx;
-
 
 import com.diffplug.common.base.DurianPlugins;
 import com.diffplug.common.base.Errors;
@@ -88,15 +87,15 @@ public interface RxTracingPolicy {
 				// capture the stack at the time of the subscription
 				List<StackTraceElement> subscriptionTrace = StackDumper.captureStackBelow(LogSubscriptionTrace.class, RxExecutor.class, Rx.class);
 				// create a new Rx which passes values unchanged, but instruments exceptions with the subscription stack
-				return Rx.onValueOnTerminate(listener::onNext, new RxJavaOnTerminateBridge(listener, subscriptionTrace));
+				return Rx.onValueOnTerminate(listener::onValue, new KotlinOnTerminateBridge(listener, subscriptionTrace));
 			}
 		}
 
-		static class RxJavaOnTerminateBridge implements Consumer<Optional<Throwable>> {
+		static class KotlinOnTerminateBridge implements Consumer<Optional<Throwable>> {
 			final RxListener<?> listener;
 			final List<StackTraceElement> subscriptionTrace;
 
-			public RxJavaOnTerminateBridge(RxListener<?> listener, List<StackTraceElement> subscriptionTrace) {
+			public KotlinOnTerminateBridge(RxListener<?> listener, List<StackTraceElement> subscriptionTrace) {
 				this.listener = listener;
 				this.subscriptionTrace = subscriptionTrace;
 			}
@@ -104,18 +103,18 @@ public interface RxTracingPolicy {
 			@Override
 			public void accept(Optional<Throwable> error) {
 				if (error.isPresent()) {
-					// if there is an error, wrap it in a DisposableException and log it
+					// if there is an error, wrap it in a SubscriptionException and log it
 					SubscriptionException subException = new SubscriptionException(error.get(), subscriptionTrace);
 					Errors.log().accept(subException);
 					// if the original listener was just logging exceptions, there's no need to notify it, as this would be a double-log
 					if (!listener.isLogging()) {
 						// the listener isn't a simple logger, so we should pass the original exception
 						// to ensure that our logging doesn't change the program's behavior
-						listener.onError(error.get());
+						listener.onTerminate.accept(Optional.of(error.get()));
 					}
 				} else {
 					// pass clean terminations unchanged
-					listener.onComplete();
+					listener.onTerminate.accept(Optional.empty());
 				}
 			}
 		}
