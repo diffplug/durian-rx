@@ -16,7 +16,6 @@
 package com.diffplug.common.rx
 
 import com.diffplug.common.util.concurrent.ListenableFuture
-import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
 import java.util.*
@@ -62,13 +61,6 @@ open class GuardedExecutor(val delegate: RxExecutor, val guard: Chit) : Executor
 	}
 
 	override fun <T> subscribeDisposable(
-			observable: Observable<out T>,
-			listener: RxListener<T>
-	): Disposable {
-		return subscribe { delegate.subscribeDisposable(observable, listener) }
-	}
-
-	override fun <T> subscribeDisposable(
 			future: ListenableFuture<out T>,
 			listener: RxListener<T>
 	): Disposable {
@@ -88,10 +80,6 @@ open class GuardedExecutor(val delegate: RxExecutor, val guard: Chit) : Executor
 
 	override fun <T> subscribe(deferred: Deferred<T>, listener: RxListener<T>) {
 		subscribeDisposable(deferred, listener)
-	}
-
-	override fun <T> subscribe(observable: Observable<out T>, listener: RxListener<T>) {
-		subscribeDisposable(observable, listener)
 	}
 
 	override fun <T> subscribe(future: ListenableFuture<out T>, listener: RxListener<T>) {

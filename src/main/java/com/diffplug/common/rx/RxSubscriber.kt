@@ -19,7 +19,6 @@ import com.diffplug.common.rx.Rx.TrackCancelled
 import com.diffplug.common.rx.Rx.onValue
 import com.diffplug.common.rx.Rx.onValueOnTerminate
 import com.diffplug.common.util.concurrent.ListenableFuture
-import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.CompletionStage
 import java.util.function.Consumer
@@ -29,20 +28,19 @@ import kotlinx.coroutines.flow.Flow
 /** An object which can subscribe observables to [RxListener] listeners. */
 interface RxSubscriber {
 	fun <T> subscribe(flow: Flow<T>, listener: RxListener<T>)
+
 	fun <T> subscribe(deferred: Deferred<T>, listener: RxListener<T>)
-	fun <T> subscribe(observable: Observable<out T>, listener: RxListener<T>)
+
 	fun <T> subscribe(future: ListenableFuture<out T>, listener: RxListener<T>)
+
 	fun <T> subscribe(future: CompletionStage<out T>, listener: RxListener<T>)
+
 	fun <T> subscribe(observable: Flow<T>, listener: Consumer<T>) {
 		subscribe(observable, onValue(listener))
 	}
 
 	fun <T> subscribe(deferred: Deferred<T>, listener: Consumer<T>) {
 		subscribe(deferred, onValue(listener))
-	}
-
-	fun <T> subscribe(observable: Observable<out T>, listener: Consumer<T>) {
-		subscribe(observable, onValue(listener))
 	}
 
 	fun <T> subscribe(observable: IObservable<out T>, listener: RxListener<T>) {
@@ -62,20 +60,19 @@ interface RxSubscriber {
 	}
 
 	fun <T> subscribeDisposable(flow: Flow<T>, listener: RxListener<T>): Disposable
+
 	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: RxListener<T>): Disposable
-	fun <T> subscribeDisposable(observable: Observable<out T>, listener: RxListener<T>): Disposable
+
 	fun <T> subscribeDisposable(future: ListenableFuture<out T>, listener: RxListener<T>): Disposable
+
 	fun <T> subscribeDisposable(future: CompletionStage<out T>, listener: RxListener<T>): Disposable
+
 	fun <T> subscribeDisposable(flow: Flow<T>, listener: Consumer<T>): Disposable {
 		return subscribeDisposable(flow, onValue(listener))
 	}
 
 	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: Consumer<T>): Disposable {
 		return subscribeDisposable(deferred, onValue(listener))
-	}
-
-	fun <T> subscribeDisposable(observable: Observable<out T>, listener: Consumer<T>): Disposable {
-		return subscribeDisposable(observable, onValue(listener))
 	}
 
 	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: RxListener<T>): Disposable {

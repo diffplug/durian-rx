@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2025 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.diffplug.common.rx;
-
 
 import com.diffplug.common.util.concurrent.FutureCallback;
 import com.diffplug.common.util.concurrent.Futures;
@@ -48,7 +47,6 @@ public class RxApiJustification {
 		// listener.subscribe(observable, executor);
 		// listener.subscribe(future, executor);
 		// which is why we only have these static methods
-		Rx.callbackOn(executor).subscribe(observable, listener);
 		Rx.callbackOn(executor).subscribe(future, listener);
 	}
 

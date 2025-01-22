@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2025 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package com.diffplug.common.rx;
 
-
 import com.diffplug.common.util.concurrent.ListenableFuture;
-import io.reactivex.Observable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
+import kotlinx.coroutines.flow.Flow;
 import org.junit.Assert;
 
 final class RxAsserter<T> {
@@ -38,7 +37,7 @@ final class RxAsserter<T> {
 		}
 	});
 
-	public static <T> RxAsserter<T> on(Observable<? extends T> observable) {
+	public static <T> RxAsserter<T> on(Flow<? extends T> observable) {
 		RxAsserter<T> asserter = new RxAsserter<>();
 		Rx.subscribe(observable, asserter.listener);
 		return asserter;

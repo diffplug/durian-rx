@@ -17,7 +17,6 @@ package com.diffplug.common.rx
 
 import com.diffplug.common.base.Errors
 import com.diffplug.common.util.concurrent.ListenableFuture
-import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
@@ -59,11 +58,6 @@ internal constructor(
 
 	override fun <T> subscribe(deferred: Deferred<T>, listener: RxListener<T>) {
 		subscribeDisposable(deferred, listener)
-	}
-
-	override fun <T> subscribe(observable: Observable<out T>, untracedListener: RxListener<T>) {
-		val listener = Rx.tracingPolicy.hook(observable, untracedListener)
-		observable.observeOn(scheduler).subscribe(listener)
 	}
 
 	override fun <T> subscribe(future: ListenableFuture<out T>, untracedListener: RxListener<T>) {
@@ -118,7 +112,8 @@ internal constructor(
 	): Disposable {
 		val listener = Rx.tracingPolicy.hook(flow, untracedListener)
 		val job =
-				flow.onEach(listener::onNext)
+				flow
+						.onEach(listener::onNext)
 						.onCompletion {
 							if (it != null && it !is CancellationException) {
 								listener.onError(it)
@@ -142,17 +137,6 @@ internal constructor(
 					}
 				}
 		return Disposables.fromRunnable(job::cancel)
-	}
-
-	override fun <T> subscribeDisposable(
-			observable: Observable<out T>,
-			untracedListener: RxListener<T>
-	): Disposable {
-		val listener = Rx.tracingPolicy.hook(observable, untracedListener)
-		return observable.observeOn(scheduler).subscribe(
-						{ t: T -> listener.onNext(t) }, { e: Throwable -> listener.onError(e) }) {
-			listener.onComplete()
-		}
 	}
 
 	override fun <T> subscribeDisposable(
