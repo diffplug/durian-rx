@@ -17,7 +17,6 @@ package com.diffplug.common.rx
 
 import com.diffplug.common.base.Errors
 import com.diffplug.common.util.concurrent.ListenableFuture
-import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
 import java.lang.Error
@@ -39,11 +38,8 @@ import kotlinx.coroutines.launch
  * It has methods which match the signatures of Rx's static methods, which allows users to
  */
 class RxExecutor
-internal constructor(
-		private val executor: Executor,
-		private val scheduler: Scheduler,
-		val dispatcher: CoroutineDispatcher
-) : RxSubscriber {
+internal constructor(private val executor: Executor, val dispatcher: CoroutineDispatcher) :
+		RxSubscriber {
 
 	/** * Marker interface which allows an Executor to specify its own Scheduler. */
 	interface Has : Executor {

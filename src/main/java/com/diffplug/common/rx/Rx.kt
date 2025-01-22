@@ -24,9 +24,7 @@ import com.diffplug.common.rx.RxListener.DefaultTerminate
 import com.diffplug.common.util.concurrent.ListenableFuture
 import com.diffplug.common.util.concurrent.MoreExecutors
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
-import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import java.lang.IllegalStateException
 import java.lang.SafeVarargs
 import java.util.*
@@ -308,26 +306,13 @@ object Rx {
 		} else if (executor is RxExecutor.Has) {
 			executor.rxExecutor
 		} else {
-			RxExecutor(executor, Schedulers.from(executor), executor.asCoroutineDispatcher())
+			RxExecutor(executor, executor.asCoroutineDispatcher())
 		}
 	}
 
-	/**
-	 * Mechanism for specifying a specific Executor (for ListenableFuture) and Scheduler (for
-	 * Observable).
-	 */
 	@JvmStatic
-	fun callbackOn(executor: Executor, scheduler: Scheduler): RxExecutor {
-		return callbackOn(executor, scheduler, executor.asCoroutineDispatcher())
-	}
-
-	@JvmStatic
-	fun callbackOn(
-			executor: Executor,
-			scheduler: Scheduler,
-			dispatcher: CoroutineDispatcher
-	): RxExecutor {
-		return RxExecutor(executor, scheduler, dispatcher)
+	fun callbackOn(executor: Executor, dispatcher: CoroutineDispatcher): RxExecutor {
+		return RxExecutor(executor, dispatcher)
 	}
 
 	@JvmStatic
@@ -346,7 +331,6 @@ object Rx {
 			_sameThread =
 					RxExecutor(
 							MoreExecutors.directExecutor(),
-							Schedulers.trampoline(),
 							MoreExecutors.directExecutor().asCoroutineDispatcher())
 		}
 		return _sameThread!!
