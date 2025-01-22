@@ -9,7 +9,7 @@ spotlessChangelog {
 
 apply from: 干.file('base/changelog.gradle')
 apply plugin: 'java-library'
-apply from: 干.file('base/java8.gradle')
+apply from: 干.file('base/java.gradle')
 apply from: 干.file('base/kotlin.gradle')
 apply from: 干.file('spotless/freshmark.gradle')
 apply from: 干.file('spotless/java.gradle')
