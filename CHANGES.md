@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Changed
+- Bump required java from 11 to 17.
 
 ## [4.0.1] - 2022-12-20
 ### Fixed
