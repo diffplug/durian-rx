@@ -24,7 +24,6 @@ import com.diffplug.common.rx.RxListener.DefaultTerminate
 import com.diffplug.common.util.concurrent.ListenableFuture
 import com.diffplug.common.util.concurrent.MoreExecutors
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
-import io.reactivex.disposables.Disposable
 import java.lang.IllegalStateException
 import java.lang.SafeVarargs
 import java.util.*
@@ -34,6 +33,7 @@ import java.util.concurrent.Future
 import java.util.function.Consumer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -242,55 +242,52 @@ object Rx {
 
 	// Static versions
 	@JvmStatic
-	fun <T> subscribeDisposable(flow: Flow<T>, listener: RxListener<T>): Disposable {
+	fun <T> subscribeDisposable(flow: Flow<T>, listener: RxListener<T>): Job {
 		return sameThreadExecutor().subscribeDisposable(flow, listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(flow: Flow<T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(flow: Flow<T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(flow, onValue(listener))
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: RxListener<T>): Disposable {
+	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: RxListener<T>): Job {
 		return sameThreadExecutor().subscribeDisposable(deferred, listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(deferred, onValue(listener))
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: RxListener<T>): Disposable {
+	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: RxListener<T>): Job {
 		return subscribeDisposable(observable.asObservable(), listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(observable.asObservable(), listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(
-			future: ListenableFuture<out T>,
-			listener: RxListener<T>
-	): Disposable {
+	fun <T> subscribeDisposable(future: ListenableFuture<out T>, listener: RxListener<T>): Job {
 		return sameThreadExecutor().subscribeDisposable(future, listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(future: ListenableFuture<out T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(future: ListenableFuture<out T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(future, onValueOnTerminate(listener, TrackCancelled(future)))
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(future: CompletionStage<out T>, listener: RxListener<T>): Disposable {
+	fun <T> subscribeDisposable(future: CompletionStage<out T>, listener: RxListener<T>): Job {
 		return sameThreadExecutor().subscribeDisposable(future, listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(future: CompletionStage<out T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(future: CompletionStage<out T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(
 				future, onValueOnTerminate(listener, TrackCancelled(future.toCompletableFuture())))
 	}
