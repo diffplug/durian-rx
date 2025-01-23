@@ -62,7 +62,7 @@ interface RxBox<T> : RxGetter<T>, Box<T> {
 		// this must be a plain-old observable, because it needs to fire
 		// every time an invariant is violated, not only when a violation
 		// of the invariant causes a change in the output
-		val mapped = asObservable().map { t: T -> enforcer.apply(t) }
+		val mapped = asFlow().map { t: T -> enforcer.apply(t) }
 		subscribe(mapped) { value: T -> this.set(value) }
 		// now we can return the RxBox
 		return map(Converter.from(enforcer, enforcer))
@@ -82,8 +82,8 @@ interface RxBox<T> : RxGetter<T>, Box<T> {
 		@JvmStatic
 		fun <T> from(getter: RxGetter<T>, setter: Consumer<T>): RxBox<T> {
 			return object : RxBox<T> {
-				override fun asObservable(): Flow<T> {
-					return getter.asObservable()
+				override fun asFlow(): Flow<T> {
+					return getter.asFlow()
 				}
 
 				override fun get(): T {

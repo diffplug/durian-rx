@@ -17,7 +17,6 @@ package com.diffplug.common.rx
 
 import com.diffplug.common.base.Errors
 import com.diffplug.common.rx.Rx.onValueOnTerminate
-import com.diffplug.common.rx.RxTracingPolicy.LogSubscriptionTrace
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import java.util.*
 import java.util.function.BiPredicate
@@ -41,7 +40,7 @@ interface RxTracingPolicy {
 	 * Given an observable, and an [Rx] which is about to be subscribed to this observable, return a
 	 * (possibly instrumented) `Rx`.
 	 *
-	 * @param observable The [IObservable], [Observable], or [ListenableFuture] which is about to be
+	 * @param observable The [IFlowable], [Observable], or [ListenableFuture] which is about to be
 	 *   subscribed to.
 	 * @param listener The [Rx] which is about to be subscribed.
 	 * @return An [Rx] which may (or may not) be instrumented. To ensure that the program's behavior

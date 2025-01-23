@@ -42,11 +42,11 @@ interface RxSubscriber {
 		subscribe(deferred, onValue(listener))
 	}
 
-	fun <T> subscribe(observable: IObservable<out T>, listener: RxListener<T>) {
-		subscribe(observable.asObservable(), listener)
+	fun <T> subscribe(observable: IFlowable<out T>, listener: RxListener<T>) {
+		subscribe(observable.asFlow(), listener)
 	}
 
-	fun <T> subscribe(observable: IObservable<out T>, listener: Consumer<T>) {
+	fun <T> subscribe(observable: IFlowable<out T>, listener: Consumer<T>) {
 		subscribe(observable, onValue(listener))
 	}
 
@@ -74,11 +74,11 @@ interface RxSubscriber {
 		return subscribeDisposable(deferred, onValue(listener))
 	}
 
-	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: RxListener<T>): Job {
-		return subscribeDisposable(observable.asObservable(), listener)
+	fun <T> subscribeDisposable(observable: IFlowable<out T>, listener: RxListener<T>): Job {
+		return subscribeDisposable(observable.asFlow(), listener)
 	}
 
-	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: Consumer<T>): Job {
+	fun <T> subscribeDisposable(observable: IFlowable<out T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(observable, onValue(listener))
 	}
 

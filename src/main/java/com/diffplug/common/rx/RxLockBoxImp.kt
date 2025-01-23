@@ -43,7 +43,7 @@ internal class RxLockBoxImp<T> : LockBoxImp<T>, RxLockBox<T> {
 		}
 	}
 
-	override fun asObservable(): Flow<T> {
+	override fun asFlow(): Flow<T> {
 		return subject
 	}
 
@@ -56,7 +56,7 @@ internal class RxLockBoxImp<T> : LockBoxImp<T>, RxLockBox<T> {
 		val observable: Flow<R>
 
 		init {
-			val mapped = delegate.asObservable().map { a: T -> converter.convertNonNull(a) }
+			val mapped = delegate.asFlow().map { a: T -> converter.convertNonNull(a) }
 			observable = mapped.distinctUntilChanged()
 		}
 
@@ -64,7 +64,7 @@ internal class RxLockBoxImp<T> : LockBoxImp<T>, RxLockBox<T> {
 			return delegate.lock()
 		}
 
-		override fun asObservable(): Flow<R> {
+		override fun asFlow(): Flow<R> {
 			return observable
 		}
 

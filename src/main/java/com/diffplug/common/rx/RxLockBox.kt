@@ -32,7 +32,7 @@ interface RxLockBox<T> : LockBox<T>, RxBox<T> {
 		// this must be a plain-old observable, because it needs to fire
 		// every time an invariant is violated, not only when a violation
 		// of the invariant causes a change in the output
-		val mapped: Flow<T> = asObservable().map { t: T -> enforcer.apply(t) }
+		val mapped: Flow<T> = asFlow().map { t: T -> enforcer.apply(t) }
 		subscribe(mapped) { value: T -> this.set(value) }
 		// now we can return the RxBox
 		return map(Converter.from(enforcer, enforcer))
