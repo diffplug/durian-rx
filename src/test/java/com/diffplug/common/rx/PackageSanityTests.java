@@ -17,8 +17,6 @@ package com.diffplug.common.rx;
 
 import com.diffplug.common.base.Consumers;
 import com.diffplug.common.testing.AbstractPackageSanityTests;
-import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
 import java.util.Collections;
 
 public class PackageSanityTests extends AbstractPackageSanityTests {
@@ -26,8 +24,6 @@ public class PackageSanityTests extends AbstractPackageSanityTests {
 		publicApiOnly();
 		ignoreClasses(Collections.singleton(RxExample.class)::contains);
 		setDefault(RxListener.class, Rx.onValue(Consumers.doNothing()));
-		setDefault(Observable.class, Observable.just(""));
 		setDefault(RxExecutor.class, Rx.sameThreadExecutor());
-		setDefault(PublishSubject.class, PublishSubject.create());
 	}
 }
