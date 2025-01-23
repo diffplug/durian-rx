@@ -1,6 +1,9 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Changed
+- Bump required java from 11 to 17. ([#9](https://github.com/diffplug/durian-rx/pull/9))
+- Replace `RxJava Disposable` with `Kotlin Job`, and remove `rxjava` completely. ([#10](https://github.com/diffplug/durian-rx/pull/10))
 
 ## [4.0.1] - 2022-12-20
 ### Fixed

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 DiffPlug
+ * Copyright (C) 2020-2025 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  */
 package com.diffplug.common.rx;
 
-
 import com.diffplug.common.util.concurrent.SettableFuture;
-import io.reactivex.subjects.AsyncSubject;
-import io.reactivex.subjects.BehaviorSubject;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import kotlinx.coroutines.flow.MutableStateFlow;
+import kotlinx.coroutines.flow.StateFlowKt;
 import org.junit.Test;
 
 /**
@@ -31,34 +30,14 @@ public class RxAndListenableFutureSemantics {
 	@Test
 	public void testBehaviorSubjectSubscribe() {
 		// create an behavior subject, subscribe pre, and pump test through
-		BehaviorSubject<String> testSubject = BehaviorSubject.createDefault("initial");
+		MutableStateFlow<String> testSubject = StateFlowKt.MutableStateFlow("initial");
 		RxAsserter<String> observer = RxAsserter.on(testSubject);
 		// the observer gets the value immediately
 		observer.assertValues("initial");
 
 		// call on next, and the observer gets the new value immediately
-		testSubject.onNext("value");
+		testSubject.setValue("value");
 		observer.assertValues("initial", "value");
-	}
-
-	@Test
-	public void testAsyncSubjectSubscribeAfterComplete() {
-		// create an async subject, subscribe pre, and pump test through
-		AsyncSubject<String> testSubject = AsyncSubject.create();
-		RxAsserter<String> preObserver = RxAsserter.on(testSubject);
-		testSubject.onNext("test");
-
-		// make sure that no one has observed anything yet
-		preObserver.assertValues();
-
-		// when the subject completes, pre should observe but not post
-		testSubject.onComplete();
-		preObserver.assertValues("test");
-
-		// and if we subscribe after the fact, everyone should get it
-		RxAsserter<String> postObserver = RxAsserter.on(testSubject);
-		preObserver.assertValues("test");
-		postObserver.assertValues("test");
 	}
 
 	@Test

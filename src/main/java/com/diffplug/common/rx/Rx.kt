@@ -24,12 +24,6 @@ import com.diffplug.common.rx.RxListener.DefaultTerminate
 import com.diffplug.common.util.concurrent.ListenableFuture
 import com.diffplug.common.util.concurrent.MoreExecutors
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
-import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.Scheduler
-import io.reactivex.disposables.Disposable
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 import java.lang.IllegalStateException
 import java.lang.SafeVarargs
 import java.util.*
@@ -39,6 +33,7 @@ import java.util.concurrent.Future
 import java.util.function.Consumer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -60,47 +55,40 @@ import kotlinx.coroutines.flow.merge
  * Rx.subscribe(listenableOrObservable, val -> doSomething); </pre> * Long version: `Rx` implements
  * both the [io.reactivex.Observer] and [com.diffplug.common.util.concurrent.FutureCallback]
  * interfaces by mapping them to two `Consumer`s:
- *
  * * `Consumer<T> onValue`</T>
  * * `Consumer<Optional></Optional><Throwable>> onTerminate`</Throwable>
  *
  * Which are mapped as follows:
- *
  * * `Observable.onNext(T value) -> onValue.accept(value)`
  * * `Observable.onCompleted() -> onTerminate.accept(Optional.empty())`
  * * `Observable.onError(Throwable error) -> onTerminate.accept(Optional.of(error))`
  * * `FutureCallback.onSuccess(T value) -> onValue.accept(value);
- * onTerminate.accept(Optional.empty());`
+ *   onTerminate.accept(Optional.empty());`
  * * `FutureCallback.onError(Throwable error) -> onTerminate.accept(Optional.of(error))`
  *
  * An instance of Rx is created by calling one of Rx's static creator methods:
- *
  * * [onValue(Consumer&amp;lt;T&amp;gt;)][.onValue]
  * * [onTerminate(Consumer&amp;lt;Optional&amp;lt;Throwable&amp;gt;&amp;gt;)][.onTerminate]
  * * [onFailure(Consumer&amp;lt;Throwable&amp;gt;)][.onFailure]
  * * [onValueOrTerminate(Consumer&amp;lt;T&amp;gt;,
- * Consumer&amp;lt;Optional&amp;lt;Throwable&amp;gt;&amp;gt;)][.onValueOnTerminate]
+ *   Consumer&amp;lt;Optional&amp;lt;Throwable&amp;gt;&amp;gt;)][.onValueOnTerminate]
  * * [onValueOrFailure(Consumer&amp;lt;T&amp;gt;,
- * Consumer&amp;lt;Throwable&amp;gt;)][.onValueOnFailure]
+ *   Consumer&amp;lt;Throwable&amp;gt;)][.onValueOnFailure]
  *
  * Once you have an instance of Rx, you can subscribe it using the normal RxJava or Guava calls:
- *
  * * `rxObservable.subscribe(Rx.onValue(val -> doSomething(val));`
  * * `Futures.addCallback(listenableFuture, Rx.onValue(val -> doSomething(val));`
  *
  * But the recommended way to subscribe is to use:
- *
  * * `Rx.subscribe(listenableOrObservable, Rx.onValue(val -> doSomething(val)));`
  * * `Rx.subscribe(listenableOrObservable, val -> doSomething(val)); // automatically uses
- * Rx.onValue()`
+ *   Rx.onValue()`
  *
  * The advantage of this latter method is that it returns [io.reactivex.disposables.Disposable]
  * instances which allow you to unsubscribe from futures in the same manner as for observables.
- *
  * * `subscription = Rx.subscribe( ... )`
  *
  * If you wish to receive callbacks on a specific thread, you can use:
- *
  * * `Rx.on(someExecutor).subscribe( ... )`
  *
  * Because RxJava's Observables use [io.reactivex.Scheduler]s rather than
@@ -109,7 +97,7 @@ import kotlinx.coroutines.flow.merge
  * executor which implements [RxExecutor.Has].
  *
  * @see [SwtExec]
- * (https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html)
+ *   (https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html)
  */
 object Rx {
 	fun <T> createEmitFlow() =
@@ -223,16 +211,6 @@ object Rx {
 	}
 
 	@JvmStatic
-	fun <T> subscribe(observable: Observable<out T>, listener: RxListener<T>) {
-		sameThreadExecutor().subscribe(observable, listener)
-	}
-
-	@JvmStatic
-	fun <T> subscribe(observable: Observable<out T>, listener: Consumer<T>) {
-		subscribe(observable, onValue(listener))
-	}
-
-	@JvmStatic
 	fun <T> subscribe(observable: IObservable<out T>, listener: RxListener<T>) {
 		subscribe(observable.asObservable(), listener)
 	}
@@ -264,65 +242,52 @@ object Rx {
 
 	// Static versions
 	@JvmStatic
-	fun <T> subscribeDisposable(flow: Flow<T>, listener: RxListener<T>): Disposable {
+	fun <T> subscribeDisposable(flow: Flow<T>, listener: RxListener<T>): Job {
 		return sameThreadExecutor().subscribeDisposable(flow, listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(flow: Flow<T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(flow: Flow<T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(flow, onValue(listener))
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: RxListener<T>): Disposable {
+	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: RxListener<T>): Job {
 		return sameThreadExecutor().subscribeDisposable(deferred, listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(deferred: Deferred<T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(deferred, onValue(listener))
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(observable: Observable<out T>, listener: RxListener<T>): Disposable {
-		return sameThreadExecutor().subscribeDisposable(observable, listener)
-	}
-
-	@JvmStatic
-	fun <T> subscribeDisposable(observable: Observable<out T>, listener: Consumer<T>): Disposable {
-		return subscribeDisposable(observable, onValue(listener))
-	}
-
-	@JvmStatic
-	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: RxListener<T>): Disposable {
+	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: RxListener<T>): Job {
 		return subscribeDisposable(observable.asObservable(), listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(observable.asObservable(), listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(
-			future: ListenableFuture<out T>,
-			listener: RxListener<T>
-	): Disposable {
+	fun <T> subscribeDisposable(future: ListenableFuture<out T>, listener: RxListener<T>): Job {
 		return sameThreadExecutor().subscribeDisposable(future, listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(future: ListenableFuture<out T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(future: ListenableFuture<out T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(future, onValueOnTerminate(listener, TrackCancelled(future)))
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(future: CompletionStage<out T>, listener: RxListener<T>): Disposable {
+	fun <T> subscribeDisposable(future: CompletionStage<out T>, listener: RxListener<T>): Job {
 		return sameThreadExecutor().subscribeDisposable(future, listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(future: CompletionStage<out T>, listener: Consumer<T>): Disposable {
+	fun <T> subscribeDisposable(future: CompletionStage<out T>, listener: Consumer<T>): Job {
 		return subscribeDisposable(
 				future, onValueOnTerminate(listener, TrackCancelled(future.toCompletableFuture())))
 	}
@@ -338,26 +303,13 @@ object Rx {
 		} else if (executor is RxExecutor.Has) {
 			executor.rxExecutor
 		} else {
-			RxExecutor(executor, Schedulers.from(executor), executor.asCoroutineDispatcher())
+			RxExecutor(executor, executor.asCoroutineDispatcher())
 		}
 	}
 
-	/**
-	 * Mechanism for specifying a specific Executor (for ListenableFuture) and Scheduler (for
-	 * Observable).
-	 */
 	@JvmStatic
-	fun callbackOn(executor: Executor, scheduler: Scheduler): RxExecutor {
-		return callbackOn(executor, scheduler, executor.asCoroutineDispatcher())
-	}
-
-	@JvmStatic
-	fun callbackOn(
-			executor: Executor,
-			scheduler: Scheduler,
-			dispatcher: CoroutineDispatcher
-	): RxExecutor {
-		return RxExecutor(executor, scheduler, dispatcher)
+	fun callbackOn(executor: Executor, dispatcher: CoroutineDispatcher): RxExecutor {
+		return RxExecutor(executor, dispatcher)
 	}
 
 	@JvmStatic
@@ -376,7 +328,6 @@ object Rx {
 			_sameThread =
 					RxExecutor(
 							MoreExecutors.directExecutor(),
-							Schedulers.trampoline(),
 							MoreExecutors.directExecutor().asCoroutineDispatcher())
 		}
 		return _sameThread!!
@@ -397,46 +348,12 @@ object Rx {
 			if (_tracingPolicy == null) {
 				_tracingPolicy = DurianPlugins.get(RxTracingPolicy::class.java, RxTracingPolicy.NONE)
 				if (_tracingPolicy !== RxTracingPolicy.NONE) {
-					RxJavaPlugins.setOnObservableSubscribe { observable: Observable<*>, observer: Observer<*>
-						->
-						if (observer is RxListener<*>) {
-							// if it's an RxListener, then _tracingPolicy handled it already
-							return@setOnObservableSubscribe observer
-						} else {
-							// if it isn't an RxListener, then we'll apply _tracing policy
-							val listener =
-									onValueOnTerminate({ value: Any -> (observer as Observer<Any>).onNext(value) }) {
-											errorOpt: Optional<Throwable> ->
-										if (errorOpt.isPresent) {
-											observer.onError(errorOpt.get())
-										} else {
-											observer.onComplete()
-										}
-									}
-							val traced = _tracingPolicy!!.hook(observable, listener)
-							return@setOnObservableSubscribe object : Observer<Any?> {
-								override fun onSubscribe(d: Disposable) {
-									observer.onSubscribe(d)
-								}
-
-								override fun onNext(value: Any?) {
-									traced.onNext(value)
-								}
-
-								override fun onError(e: Throwable) {
-									traced.onError(e)
-								}
-
-								override fun onComplete() {
-									traced.onComplete()
-								}
-							}
-						}
-					}
+					// TODO: setup tracing
 				}
 			}
 			return _tracingPolicy!!
 		}
+
 	private var _tracingPolicy: RxTracingPolicy? = null
 
 	/** Package-private for testing - resets all of the static member variables. */

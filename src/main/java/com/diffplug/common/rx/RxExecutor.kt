@@ -17,11 +17,8 @@ package com.diffplug.common.rx
 
 import com.diffplug.common.base.Errors
 import com.diffplug.common.util.concurrent.ListenableFuture
-import io.reactivex.Observable
-import io.reactivex.Scheduler
-import io.reactivex.disposables.Disposable
-import io.reactivex.disposables.Disposables
 import java.lang.Error
+import java.util.*
 import java.util.concurrent.CompletionException
 import java.util.concurrent.CompletionStage
 import java.util.concurrent.Executor
@@ -29,24 +26,17 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-/**
- * This class holds an instance of Executor (for ListenableFuture) and Scheduler (for Observable).
- * It has methods which match the signatures of Rx's static methods, which allows users to
- */
 class RxExecutor
-internal constructor(
-		private val executor: Executor,
-		private val scheduler: Scheduler,
-		val dispatcher: CoroutineDispatcher
-) : RxSubscriber {
+internal constructor(private val executor: Executor, val dispatcher: CoroutineDispatcher) :
+		RxSubscriber {
 
-	/** * Marker interface which allows an Executor to specify its own Scheduler. */
 	interface Has : Executor {
 		val rxExecutor: RxExecutor
 	}
@@ -61,14 +51,8 @@ internal constructor(
 		subscribeDisposable(deferred, listener)
 	}
 
-	override fun <T> subscribe(observable: Observable<out T>, untracedListener: RxListener<T>) {
-		val listener = Rx.tracingPolicy.hook(observable, untracedListener)
-		observable.observeOn(scheduler).subscribe(listener)
-	}
-
 	override fun <T> subscribe(future: ListenableFuture<out T>, untracedListener: RxListener<T>) {
 		val listener = Rx.tracingPolicy.hook(future, untracedListener)
-		// add a callback that guards on whether it is still subscribed
 		future.addListener(
 				{
 					try {
@@ -112,97 +96,77 @@ internal constructor(
 				executor)
 	}
 
-	override fun <T : Any?> subscribeDisposable(
-			flow: Flow<T>,
-			untracedListener: RxListener<T>
-	): Disposable {
+	override fun <T : Any?> subscribeDisposable(flow: Flow<T>, untracedListener: RxListener<T>): Job {
 		val listener = Rx.tracingPolicy.hook(flow, untracedListener)
-		val job =
-				flow.onEach(listener::onNext)
-						.onCompletion {
-							if (it != null && it !is CancellationException) {
-								listener.onError(it)
-							} else listener.onComplete()
-						}
-						.launchIn(CoroutineScope(dispatcher))
-		return Disposables.fromRunnable(job::cancel)
+		return flow
+				.onEach(listener.onValue::accept)
+				.onCompletion {
+					if (it != null && it !is CancellationException) {
+						listener.onTerminate.accept(Optional.of(it))
+					} else listener.onTerminate.accept(Optional.empty())
+				}
+				.launchIn(CoroutineScope(dispatcher))
 	}
 
 	override fun <T : Any?> subscribeDisposable(
 			deferred: Deferred<T>,
 			untracedListener: RxListener<T>
-	): Disposable {
+	): Job {
 		val listener = Rx.tracingPolicy.hook(deferred, untracedListener)
-		val job =
-				CoroutineScope(dispatcher).launch {
-					try {
-						listener.onSuccess(deferred.await())
-					} catch (e: Throwable) {
-						listener.onFailure(e)
-					}
-				}
-		return Disposables.fromRunnable(job::cancel)
-	}
-
-	override fun <T> subscribeDisposable(
-			observable: Observable<out T>,
-			untracedListener: RxListener<T>
-	): Disposable {
-		val listener = Rx.tracingPolicy.hook(observable, untracedListener)
-		return observable.observeOn(scheduler).subscribe(
-						{ t: T -> listener.onNext(t) }, { e: Throwable -> listener.onError(e) }) {
-			listener.onComplete()
+		return CoroutineScope(dispatcher).launch {
+			try {
+				listener.onSuccess(deferred.await())
+			} catch (e: Throwable) {
+				listener.onFailure(e)
+			}
 		}
 	}
 
 	override fun <T> subscribeDisposable(
 			future: ListenableFuture<out T>,
 			untracedListener: RxListener<T>
-	): Disposable {
+	): Job {
 		val listener = Rx.tracingPolicy.hook(future, untracedListener)
-		// when we're unsubscribed, set the flag to false
-		val sub = Disposables.empty()
-		// add a callback that guards on whether it is still subscribed
+		val job = Job()
+
 		future.addListener(
 				{
 					try {
-						val value =
-								try {
-									future.get()
-								} catch (error: Throwable) {
-									if (!sub.isDisposed) {
+						if (!job.isCancelled) {
+							val value =
+									try {
+										future.get()
+									} catch (error: Throwable) {
 										listener.onFailure(error)
+										return@addListener
 									}
-									return@addListener
+							try {
+								if (!job.isCancelled) {
+									listener.onSuccess(value)
 								}
-						try {
-							if (!sub.isDisposed) {
-								listener.onSuccess(value)
+							} catch (error: Throwable) {
+								listener.onFailure(CompletionException(error))
 							}
-						} catch (error: Throwable) {
-							listener.onFailure(CompletionException(error))
 						}
 					} catch (t: Throwable) {
 						failedInErrorHandler(t)
 					}
 				},
 				executor)
-		// return the subscription
-		return sub
+		return job
 	}
 
 	override fun <T> subscribeDisposable(
 			future: CompletionStage<out T>,
 			untracedListener: RxListener<T>
-	): Disposable {
+	): Job {
 		val listener = Rx.tracingPolicy.hook(future, untracedListener)
+		val job = Job()
 
-		// when we're unsubscribed, set the flag to false
-		val sub = Disposables.empty()
 		future.whenCompleteAsync(
 				{ value: T, exception: Throwable? ->
 					try {
-						if (!sub.isDisposed) {
+						if (!job.isCancelled) {
 							if (exception == null) {
 								try {
 									listener.onSuccess(value)
@@ -218,8 +182,7 @@ internal constructor(
 					}
 				},
 				executor)
-		// return the subscription
-		return sub
+		return job
 	}
 
 	private fun failedInErrorHandler(t: Throwable) {
