@@ -43,7 +43,7 @@ final class RxAsserter<T> {
 		return asserter;
 	}
 
-	public static <T> RxAsserter<T> on(IObservable<? extends T> observable) {
+	public static <T> RxAsserter<T> on(IFlowable<? extends T> observable) {
 		RxAsserter<T> asserter = new RxAsserter<>();
 		Rx.subscribe(observable, asserter.listener);
 		return asserter;

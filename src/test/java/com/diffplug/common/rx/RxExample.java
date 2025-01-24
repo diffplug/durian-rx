@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2022 DiffPlug
+ * Copyright (C) 2020-2025 DiffPlug
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.diffplug.common.rx;
-
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -107,7 +106,7 @@ public class RxExample extends JFrame {
 			});
 
 			// trigger a repaint on any change
-			Rx.subscribe(FlowKt.merge(rxMouseOver.asObservable(), rxSelection.asObservable()), anyChange -> {
+			Rx.subscribe(FlowKt.merge(rxMouseOver.asFlow(), rxSelection.asFlow()), anyChange -> {
 				this.repaint();
 			});
 		}

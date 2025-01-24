@@ -16,7 +16,6 @@
 package com.diffplug.common.rx
 
 import com.diffplug.common.base.Converter
-import java.util.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -37,12 +36,14 @@ internal open class RxBoxImp<T> private constructor(initial: T, subject: Mutable
 	}
 
 	override fun get(): T = value
-	override fun asObservable(): Flow<T> = subject
+
+	override fun asFlow(): Flow<T> = subject
 
 	internal class Mapped<T, R>(delegate: RxBox<T>, converter: Converter<T, R>) :
 			MappedImp<T, R, RxBox<T>>(delegate, converter), RxBox<R> {
-		val observable: Flow<R> =
-				delegate.asObservable().map { a: T -> converter.convertNonNull(a) }.distinctUntilChanged()
-		override fun asObservable(): Flow<R> = observable
+		val flow: Flow<R> =
+				delegate.asFlow().map { a: T -> converter.convertNonNull(a) }.distinctUntilChanged()
+
+		override fun asFlow(): Flow<R> = flow
 	}
 }

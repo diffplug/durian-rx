@@ -17,7 +17,6 @@ package com.diffplug.common.rx
 
 import com.diffplug.common.base.Errors
 import com.diffplug.common.rx.Rx.onValueOnTerminate
-import com.diffplug.common.rx.RxTracingPolicy.LogSubscriptionTrace
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import java.util.*
 import java.util.function.BiPredicate
@@ -41,14 +40,14 @@ interface RxTracingPolicy {
 	 * Given an observable, and an [Rx] which is about to be subscribed to this observable, return a
 	 * (possibly instrumented) `Rx`.
 	 *
-	 * @param observable The [IObservable], [Observable], or [ListenableFuture] which is about to be
+	 * @param observable The [IFlowable], [Observable], or [ListenableFuture] which is about to be
 	 *   subscribed to.
 	 * @param listener The [Rx] which is about to be subscribed.
 	 * @return An [Rx] which may (or may not) be instrumented. To ensure that the program's behavior
 	 *   is not changed, implementors should ensure that all method calls are delegated unchanged to
 	 *   the original listener eventually.
 	 */
-	fun <T> hook(observable: Any, listener: RxListener<T>): RxListener<T>
+	fun <T> hook(flow: Any, listener: RxListener<T>): RxListener<T>
 
 	/**
 	 * An [RxTracingPolicy] which logs the stack trace of every subscription, so that it can decorate
@@ -70,8 +69,8 @@ interface RxTracingPolicy {
 	 * @see DurianPlugins
 	 */
 	class LogSubscriptionTrace : RxTracingPolicy {
-		override fun <T> hook(observable: Any, listener: RxListener<T>): RxListener<T> {
-			if (!shouldLog.test(observable, listener)) {
+		override fun <T> hook(flow: Any, listener: RxListener<T>): RxListener<T> {
+			if (!shouldLog.test(flow, listener)) {
 				// we're not logging, so pass the listener unchanged
 				return listener
 			} else {
@@ -133,7 +132,7 @@ interface RxTracingPolicy {
 					value = ["MS_SHOULD_BE_FINAL"],
 					justification = "This is public on purpose, and is only functional in a debug mode.")
 			var shouldLog: BiPredicate<Any, RxListener<*>> =
-					BiPredicate { observable: Any?, listener: RxListener<*> ->
+					BiPredicate { flow: Any?, listener: RxListener<*> ->
 						listener.isLogging
 					}
 		}
@@ -143,7 +142,7 @@ interface RxTracingPolicy {
 		/** An `RxTracingPolicy` which performs no tracing, and has very low overhead. */
 		val NONE: RxTracingPolicy =
 				object : RxTracingPolicy {
-					override fun <T> hook(observable: Any, listener: RxListener<T>): RxListener<T> = listener
+					override fun <T> hook(flow: Any, listener: RxListener<T>): RxListener<T> = listener
 				}
 	}
 }

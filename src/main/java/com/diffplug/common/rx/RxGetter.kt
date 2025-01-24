@@ -36,23 +36,22 @@ import kotlinx.coroutines.flow.map
  * not change (e.g. a field is set to its current value, which produces no change) then the
  * `Observable` will not fire.
  */
-interface RxGetter<T> : IObservable<T>, Supplier<T> {
+interface RxGetter<T> : IFlowable<T>, Supplier<T> {
 	/**
 	 * Maps an `RxGetter` to a new `RxGetter` by applying the `mapper` function to all of its values.
 	 *
 	 * If the `Observable` of the source `RxGetter` changes, but the `Function<T></T>, R> mapper`
 	 * collapses these values to produce no change, then the mapped `Observable` shall not emit a new
 	 * value.
-	 *
 	 * * Incorrect: `("A", "B", "C") -> map(String::length) = (1, 1, 1)`
 	 * * Correct: `("A", "B", "C") -> map(String::length) = (1)`
 	 */
 	fun <R> map(mapper: Function<in T, out R>): RxGetter<R> {
 		val src = this
-		val mapped = src.asObservable().map { t: T -> mapper.apply(t) }
+		val mapped = src.asFlow().map { t: T -> mapper.apply(t) }
 		val observable = mapped.distinctUntilChanged()
 		return object : RxGetter<R> {
-			override fun asObservable(): Flow<R> {
+			override fun asFlow(): Flow<R> {
 				return observable
 			}
 
@@ -75,7 +74,7 @@ interface RxGetter<T> : IObservable<T>, Supplier<T> {
 			val box = Box.of(initialValue)
 			subscribe(observable) { value: T -> box.set(value) }
 			return object : RxGetter<T> {
-				override fun asObservable(): Flow<T> {
+				override fun asFlow(): Flow<T> {
 					return observable
 				}
 
@@ -96,8 +95,7 @@ interface RxGetter<T> : IObservable<T>, Supplier<T> {
 				u: RxGetter<out T2>,
 				combine: BiFunction<in T1, in T2, out R>
 		): RxGetter<R> {
-			val result: Flow<R> =
-					t.asObservable().combine(u.asObservable()) { a, b -> combine.apply(a, b) }
+			val result: Flow<R> = t.asFlow().combine(u.asFlow()) { a, b -> combine.apply(a, b) }
 			return from(result.distinctUntilChanged(), combine.apply(t.get(), u.get()))
 		}
 	}

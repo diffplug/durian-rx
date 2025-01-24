@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * Utility class for wrapping one kind of box with another.
- *
  * - For wrapping a [CasBox], use [ForwardingBox.Cas].
  * - For wrapping an [RxBox], use [ForwardingBox.Rx].
  * - For wrapping a [LockBox], use [ForwardingBox.Lock].
@@ -58,8 +57,8 @@ protected constructor(protected val delegate: BoxType) : Box<T> {
 
 	open class Rx<T> protected constructor(delegate: RxBox<T>) :
 			ForwardingBox<T, RxBox<T>>(delegate), RxBox<T> {
-		override fun asObservable(): Flow<T> {
-			return delegate.asObservable()
+		override fun asFlow(): Flow<T> {
+			return delegate.asFlow()
 		}
 	}
 
@@ -69,8 +68,8 @@ protected constructor(protected val delegate: BoxType) : Box<T> {
 			return delegate.lock()
 		}
 
-		override fun asObservable(): Flow<T> {
-			return delegate.asObservable()
+		override fun asFlow(): Flow<T> {
+			return delegate.asFlow()
 		}
 	}
 }

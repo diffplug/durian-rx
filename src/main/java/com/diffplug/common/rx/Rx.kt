@@ -211,13 +211,13 @@ object Rx {
 	}
 
 	@JvmStatic
-	fun <T> subscribe(observable: IObservable<out T>, listener: RxListener<T>) {
-		subscribe(observable.asObservable(), listener)
+	fun <T> subscribe(flow: IFlowable<out T>, listener: RxListener<T>) {
+		subscribe(flow.asFlow(), listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribe(observable: IObservable<out T>, listener: Consumer<T>) {
-		subscribe(observable.asObservable(), listener)
+	fun <T> subscribe(flow: IFlowable<out T>, listener: Consumer<T>) {
+		subscribe(flow.asFlow(), listener)
 	}
 
 	@JvmStatic
@@ -262,13 +262,13 @@ object Rx {
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: RxListener<T>): Job {
-		return subscribeDisposable(observable.asObservable(), listener)
+	fun <T> subscribeDisposable(flow: IFlowable<out T>, listener: RxListener<T>): Job {
+		return subscribeDisposable(flow.asFlow(), listener)
 	}
 
 	@JvmStatic
-	fun <T> subscribeDisposable(observable: IObservable<out T>, listener: Consumer<T>): Job {
-		return subscribeDisposable(observable.asObservable(), listener)
+	fun <T> subscribeDisposable(flow: IFlowable<out T>, listener: Consumer<T>): Job {
+		return subscribeDisposable(flow.asFlow(), listener)
 	}
 
 	@JvmStatic
@@ -362,13 +362,11 @@ object Rx {
 		_tracingPolicy = null
 	}
 
-	/**
-	 * Merges a bunch of [IObservable]s into a single [Observable] containing the most-recent value.
-	 */
+	/** Merges a bunch of [IFlowable]s into a single [Flow] containing the most-recent value. */
 	@JvmStatic
 	@SafeVarargs
-	fun <T> merge(vararg toMerge: IObservable<out T>): Flow<T> {
-		return toMerge.map { it.asObservable() }.merge()
+	fun <T> merge(vararg toMerge: IFlowable<out T>): Flow<T> {
+		return toMerge.map { it.asFlow() }.merge()
 	}
 
 	/** Reliable way to sync two RxBox to each other. */
@@ -382,9 +380,9 @@ object Rx {
 	 * changes
 	 */
 	@JvmStatic
-	fun <T> sync(subscriber: RxSubscriber?, left: RxBox<T>, right: RxBox<T>) {
+	fun <T> sync(subscriber: RxSubscriber, left: RxBox<T>, right: RxBox<T>) {
 		val firstChange = Box.Nullable.ofNull<Either<T, T>?>()
-		subscriber!!.subscribe(left) { leftVal: T ->
+		subscriber.subscribe(left) { leftVal: T ->
 			// the left changed before we could acknowledge it
 			if (leftVal != left.get()) {
 				return@subscribe
@@ -450,4 +448,6 @@ object Rx {
 			}
 		}
 	}
+
+	val sentinelJob: Job = Job().apply { cancel() }
 }
