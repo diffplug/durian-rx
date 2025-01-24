@@ -3,17 +3,17 @@ plugins {
 	id 'com.diffplug.spotless-changelog'
 }
 
-spotlessChangelog {
-	changelogFile 'CHANGES.md'
-	branch 'main'
-}
-
 apply from: 干.file('base/changelog.gradle')
 apply plugin: 'java-library'
 apply from: 干.file('base/java.gradle')
 apply from: 干.file('base/kotlin.gradle')
 apply from: 干.file('spotless/freshmark.gradle')
 apply from: 干.file('spotless/java.gradle')
+
+spotlessChangelog {
+	changelogFile 'CHANGES.md'
+	branch 'main'
+}
 
 def VER_DURIAN='1.2.0'
 def VER_DURIAN_DEBUG='1.0.0'
