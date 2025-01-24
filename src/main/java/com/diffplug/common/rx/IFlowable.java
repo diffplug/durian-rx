@@ -27,7 +27,7 @@ public interface IFlowable<T> {
 	Flow<T> asFlow();
 
 	/** Wraps an actual observable as an IObservable. */
-	static <T> IFlowable<T> wrap(Flow<T> observable) {
-		return () -> observable;
+	static <T> IFlowable<T> wrap(Flow<T> flow) {
+		return () -> flow;
 	}
 }

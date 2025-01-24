@@ -47,7 +47,7 @@ interface RxTracingPolicy {
 	 *   is not changed, implementors should ensure that all method calls are delegated unchanged to
 	 *   the original listener eventually.
 	 */
-	fun <T> hook(observable: Any, listener: RxListener<T>): RxListener<T>
+	fun <T> hook(flow: Any, listener: RxListener<T>): RxListener<T>
 
 	/**
 	 * An [RxTracingPolicy] which logs the stack trace of every subscription, so that it can decorate
@@ -69,8 +69,8 @@ interface RxTracingPolicy {
 	 * @see DurianPlugins
 	 */
 	class LogSubscriptionTrace : RxTracingPolicy {
-		override fun <T> hook(observable: Any, listener: RxListener<T>): RxListener<T> {
-			if (!shouldLog.test(observable, listener)) {
+		override fun <T> hook(flow: Any, listener: RxListener<T>): RxListener<T> {
+			if (!shouldLog.test(flow, listener)) {
 				// we're not logging, so pass the listener unchanged
 				return listener
 			} else {
@@ -132,7 +132,7 @@ interface RxTracingPolicy {
 					value = ["MS_SHOULD_BE_FINAL"],
 					justification = "This is public on purpose, and is only functional in a debug mode.")
 			var shouldLog: BiPredicate<Any, RxListener<*>> =
-					BiPredicate { observable: Any?, listener: RxListener<*> ->
+					BiPredicate { flow: Any?, listener: RxListener<*> ->
 						listener.isLogging
 					}
 		}
@@ -142,7 +142,7 @@ interface RxTracingPolicy {
 		/** An `RxTracingPolicy` which performs no tracing, and has very low overhead. */
 		val NONE: RxTracingPolicy =
 				object : RxTracingPolicy {
-					override fun <T> hook(observable: Any, listener: RxListener<T>): RxListener<T> = listener
+					override fun <T> hook(flow: Any, listener: RxListener<T>): RxListener<T> = listener
 				}
 	}
 }

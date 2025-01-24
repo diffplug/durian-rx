@@ -41,9 +41,9 @@ internal open class RxBoxImp<T> private constructor(initial: T, subject: Mutable
 
 	internal class Mapped<T, R>(delegate: RxBox<T>, converter: Converter<T, R>) :
 			MappedImp<T, R, RxBox<T>>(delegate, converter), RxBox<R> {
-		val observable: Flow<R> =
+		val flow: Flow<R> =
 				delegate.asFlow().map { a: T -> converter.convertNonNull(a) }.distinctUntilChanged()
 
-		override fun asFlow(): Flow<R> = observable
+		override fun asFlow(): Flow<R> = flow
 	}
 }

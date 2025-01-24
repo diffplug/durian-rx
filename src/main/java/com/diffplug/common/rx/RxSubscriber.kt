@@ -34,20 +34,20 @@ interface RxSubscriber {
 
 	fun <T> subscribe(future: CompletionStage<out T>, listener: RxListener<T>)
 
-	fun <T> subscribe(observable: Flow<T>, listener: Consumer<T>) {
-		subscribe(observable, onValue(listener))
+	fun <T> subscribe(flow: Flow<T>, listener: Consumer<T>) {
+		subscribe(flow, onValue(listener))
 	}
 
 	fun <T> subscribe(deferred: Deferred<T>, listener: Consumer<T>) {
 		subscribe(deferred, onValue(listener))
 	}
 
-	fun <T> subscribe(observable: IFlowable<out T>, listener: RxListener<T>) {
-		subscribe(observable.asFlow(), listener)
+	fun <T> subscribe(flow: IFlowable<out T>, listener: RxListener<T>) {
+		subscribe(flow.asFlow(), listener)
 	}
 
-	fun <T> subscribe(observable: IFlowable<out T>, listener: Consumer<T>) {
-		subscribe(observable, onValue(listener))
+	fun <T> subscribe(flow: IFlowable<out T>, listener: Consumer<T>) {
+		subscribe(flow, onValue(listener))
 	}
 
 	fun <T> subscribe(future: ListenableFuture<out T>, listener: Consumer<T>) {
@@ -74,12 +74,12 @@ interface RxSubscriber {
 		return subscribeDisposable(deferred, onValue(listener))
 	}
 
-	fun <T> subscribeDisposable(observable: IFlowable<out T>, listener: RxListener<T>): Job {
-		return subscribeDisposable(observable.asFlow(), listener)
+	fun <T> subscribeDisposable(flow: IFlowable<out T>, listener: RxListener<T>): Job {
+		return subscribeDisposable(flow.asFlow(), listener)
 	}
 
-	fun <T> subscribeDisposable(observable: IFlowable<out T>, listener: Consumer<T>): Job {
-		return subscribeDisposable(observable, onValue(listener))
+	fun <T> subscribeDisposable(flow: IFlowable<out T>, listener: Consumer<T>): Job {
+		return subscribeDisposable(flow, onValue(listener))
 	}
 
 	fun <T> subscribeDisposable(future: ListenableFuture<out T>, listener: Consumer<T>): Job {
