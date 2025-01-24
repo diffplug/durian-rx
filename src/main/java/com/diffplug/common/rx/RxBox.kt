@@ -24,14 +24,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /** [RxGetter] and [Box] combined in one: a value you can set, get, and subscribe to. */
-interface RxBox<T> : RxGetter<T>, Box<T> {
+interface RxBox<T : Any> : RxGetter<T>, Box<T> {
 	/** Returns a read-only version of this `RxBox`. */
-	fun readOnly(): RxGetter<T> {
-		return this
-	}
+	fun readOnly(): RxGetter<T> = this
 
 	/** Maps one `RxBox` to another `RxBox`. */
-	override fun <R> map(converter: Converter<T, R>): RxBox<R> {
+	override fun <R : Any> map(converter: Converter<T, R>): RxBox<R> {
 		return RxBoxImp.Mapped(this, converter)
 	}
 
@@ -70,30 +68,26 @@ interface RxBox<T> : RxGetter<T>, Box<T> {
 
 	companion object {
 		/** Creates an `RxBox` with the given initial value. */
-		@JvmStatic
-		fun <T> of(initial: T): RxBox<T> {
-			return RxBoxImp(initial)
-		}
+		@JvmStatic fun <T : Any> of(initial: T): RxBox<T> = RxBoxImp(initial)
 
 		/**
 		 * Creates an `RxBox` which implements the "getter" part with `RxGetter`, and the setter part
 		 * with `Consumer`.
 		 */
 		@JvmStatic
-		fun <T> from(getter: RxGetter<T>, setter: Consumer<T>): RxBox<T> {
-			return object : RxBox<T> {
-				override fun asFlow(): Flow<T> {
-					return getter.asFlow()
-				}
+		fun <T : Any> from(getter: RxGetter<T>, setter: Consumer<T>): RxBox<T> =
+				object : RxBox<T> {
+					override fun asFlow(): Flow<T> {
+						return getter.asFlow()
+					}
 
-				override fun get(): T {
-					return getter.get()
-				}
+					override fun get(): T {
+						return getter.get()
+					}
 
-				override fun set(value: T) {
-					setter.accept(value)
+					override fun set(value: T) {
+						setter.accept(value)
+					}
 				}
-			}
-		}
 	}
 }

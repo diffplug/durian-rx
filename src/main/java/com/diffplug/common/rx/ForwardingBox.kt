@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.Flow
  *
  * Especially useful for overridding set().
  */
-open class ForwardingBox<T, BoxType : Box<T>>
+open class ForwardingBox<T : Any, BoxType : Box<T>>
 protected constructor(protected val delegate: BoxType) : Box<T> {
 	override fun get(): T {
 		return delegate.get()
@@ -37,7 +37,7 @@ protected constructor(protected val delegate: BoxType) : Box<T> {
 		delegate.set(value)
 	}
 
-	class Cas<T> protected constructor(delegate: CasBox<T>) :
+	class Cas<T : Any> protected constructor(delegate: CasBox<T>) :
 			ForwardingBox<T, CasBox<T>>(delegate), CasBox<T> {
 		override fun compareAndSet(expect: T, update: T): Boolean {
 			return delegate.compareAndSet(expect, update)
@@ -48,21 +48,21 @@ protected constructor(protected val delegate: BoxType) : Box<T> {
 		}
 	}
 
-	class Lock<T> protected constructor(delegate: LockBox<T>) :
+	class Lock<T : Any> protected constructor(delegate: LockBox<T>) :
 			ForwardingBox<T, LockBox<T>>(delegate), LockBox<T> {
 		override fun lock(): Any {
 			return delegate.lock()
 		}
 	}
 
-	open class Rx<T> protected constructor(delegate: RxBox<T>) :
+	open class Rx<T : Any> protected constructor(delegate: RxBox<T>) :
 			ForwardingBox<T, RxBox<T>>(delegate), RxBox<T> {
 		override fun asFlow(): Flow<T> {
 			return delegate.asFlow()
 		}
 	}
 
-	class RxLock<T> protected constructor(delegate: RxLockBox<T>) :
+	class RxLock<T : Any> protected constructor(delegate: RxLockBox<T>) :
 			ForwardingBox<T, RxLockBox<T>>(delegate), RxLockBox<T> {
 		override fun lock(): Any {
 			return delegate.lock()

@@ -100,6 +100,7 @@ import kotlinx.coroutines.flow.merge
  *   (https://diffplug.github.io/durian-swt/javadoc/snapshot/com/diffplug/common/swt/SwtExec.html)
  */
 object Rx {
+	@JvmStatic
 	fun <T> createEmitFlow() =
 			MutableSharedFlow<T>(replay = 0, extraBufferCapacity = 1, BufferOverflow.SUSPEND)
 
@@ -132,6 +133,7 @@ object Rx {
 	 * Creates an Rx instance which will call the given consumer whenever the followed stream or
 	 * future completes, whether with an error or not, and the error (if present) will be logged.
 	 */
+	@JvmStatic
 	fun <T> onTerminateLogError(onTerminate: Consumer<Optional<Throwable>>): RxListener<T> {
 		return RxListener(Consumers.doNothing(), DefaultTerminate(onTerminate))
 	}
@@ -371,7 +373,7 @@ object Rx {
 
 	/** Reliable way to sync two RxBox to each other. */
 	@JvmStatic
-	fun <T> sync(left: RxBox<T>, right: RxBox<T>) {
+	fun <T : Any> sync(left: RxBox<T>, right: RxBox<T>) {
 		sync(sameThreadExecutor(), left, right)
 	}
 
@@ -380,7 +382,7 @@ object Rx {
 	 * changes
 	 */
 	@JvmStatic
-	fun <T> sync(subscriber: RxSubscriber, left: RxBox<T>, right: RxBox<T>) {
+	fun <T : Any> sync(subscriber: RxSubscriber, left: RxBox<T>, right: RxBox<T>) {
 		val firstChange = Box.Nullable.ofNull<Either<T, T>?>()
 		subscriber.subscribe(left) { leftVal: T ->
 			// the left changed before we could acknowledge it
@@ -449,5 +451,5 @@ object Rx {
 		}
 	}
 
-	val sentinelJob: Job = Job().apply { cancel() }
+	@JvmStatic val sentinelJob: Job = Job().apply { cancel() }
 }

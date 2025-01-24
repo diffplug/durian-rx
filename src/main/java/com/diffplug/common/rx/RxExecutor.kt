@@ -33,15 +33,12 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class RxExecutor
-internal constructor(private val executor: Executor, val dispatcher: CoroutineDispatcher) :
+class RxExecutor internal constructor(val executor: Executor, val dispatcher: CoroutineDispatcher) :
 		RxSubscriber {
 
 	interface Has : Executor {
 		val rxExecutor: RxExecutor
 	}
-
-	fun executor() = executor
 
 	override fun <T> subscribe(flow: Flow<T>, listener: RxListener<T>) {
 		subscribeDisposable(flow, listener)

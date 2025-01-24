@@ -22,11 +22,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /** [RxBox] and [LockBox] in one. */
-interface RxLockBox<T> : LockBox<T>, RxBox<T> {
+interface RxLockBox<T : Any> : LockBox<T>, RxBox<T> {
 	/** RxLockBox must map to another kind of LockBox. */
-	override fun <R> map(converter: Converter<T, R>): RxLockBox<R> {
-		return RxLockBoxImp.Mapped(this, converter)
-	}
+	override fun <R : Any> map(converter: Converter<T, R>): RxLockBox<R> =
+			RxLockBoxImp.Mapped(this, converter)
 
 	override fun enforce(enforcer: Function<in T, out T>): RxLockBox<T> {
 		// this must be a plain-old observable, because it needs to fire
@@ -40,15 +39,9 @@ interface RxLockBox<T> : LockBox<T>, RxBox<T> {
 
 	companion object {
 		/** Creates an `RxLockBox` containing the given value, which uses itself as the lock. */
-		@JvmStatic
-		fun <T> of(value: T): RxLockBox<T> {
-			return RxLockBoxImp(value)
-		}
+		@JvmStatic fun <T : Any> of(value: T): RxLockBox<T> = RxLockBoxImp(value)
 
 		/** Creates an `RxLockBox` containing the given value, which uses `lock` as the lock. */
-		@JvmStatic
-		fun <T> of(value: T, lock: Any): RxLockBox<T> {
-			return RxLockBoxImp(value, lock)
-		}
+		@JvmStatic fun <T : Any> of(value: T, lock: Any): RxLockBox<T> = RxLockBoxImp(value, lock)
 	}
 }
