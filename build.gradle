@@ -5,6 +5,7 @@ plugins {
 
 spotlessChangelog {
 	changelogFile 'CHANGES.md'
+	branch 'main'
 }
 
 apply from: 干.file('base/changelog.gradle')
