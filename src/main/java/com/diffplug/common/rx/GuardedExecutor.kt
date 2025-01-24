@@ -22,7 +22,6 @@ import java.util.concurrent.Executor
 import java.util.function.Supplier
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -33,12 +32,11 @@ import kotlinx.coroutines.flow.Flow
  */
 open class GuardedExecutor(val delegate: RxExecutor, val guard: Chit) : Executor, RxSubscriber {
 	override fun execute(command: Runnable) {
-		delegate.executor().execute(guard.guard(command))
+		delegate.executor.execute(guard.guard(command))
 	}
 
 	/** Creates a runnable which runs on this Executor iff the guard widget is not disposed. */
 	fun wrap(delegate: Runnable): Runnable {
-		Objects.requireNonNull(delegate)
 		return Runnable { execute(guard.guard(delegate)) }
 	}
 
@@ -48,7 +46,7 @@ open class GuardedExecutor(val delegate: RxExecutor, val guard: Chit) : Executor
 			guard.runWhenDisposed { job.cancel() }
 			job
 		} else {
-			SupervisorJob().apply { cancel() }
+			Rx.sentinelJob
 		}
 	}
 
