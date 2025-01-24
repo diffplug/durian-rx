@@ -171,10 +171,14 @@ class MultiSelectModel<T : Any>(
 
 	companion object {
 		/** Creates an Optional<Either> from an Either<Optional>. </Optional></Either> */
-		fun <T, U> optEitherFrom(either: Either<Optional<T>, Optional<U>>): Optional<Either<T, U>> {
+		fun <T : Any, U : Any> optEitherFrom(
+				either: Either<Optional<T>, Optional<U>>
+		): Optional<Either<T, U>> {
 			return either.fold({ leftOpt: Optional<T> ->
 				leftOpt.map { l: T -> Either.createLeft(l) }
-			}) { rightOpt: Optional<U> -> rightOpt.map { r: U -> Either.createRight(r) } }
+			}) { rightOpt: Optional<U> ->
+				rightOpt.map { r: U -> Either.createRight(r) }
+			}
 		}
 	}
 }

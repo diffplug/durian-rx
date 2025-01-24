@@ -23,35 +23,31 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
-internal class RxLockBoxImp<T> : LockBoxImp<T>, RxLockBox<T> {
-	val subject: MutableStateFlow<T>
+internal class RxLockBoxImp<T : Any> : LockBoxImp<T>, RxLockBox<T> {
+	val flow: MutableStateFlow<T>
 
 	constructor(value: T) : super(value) {
-		subject = MutableStateFlow(value)
+		flow = MutableStateFlow(value)
 	}
 
 	constructor(value: T, lock: Any) : super(value, lock) {
-		subject = MutableStateFlow(value)
+		flow = MutableStateFlow(value)
 	}
 
 	override fun set(newValue: T) {
 		synchronized(lock()) {
 			if (newValue != value) {
 				value = newValue
-				subject.value = newValue
+				flow.value = newValue
 			}
 		}
 	}
 
-	override fun asFlow(): Flow<T> {
-		return subject
-	}
+	override fun asFlow(): Flow<T> = flow
 
-	override fun toString(): String {
-		return "RxLockBox.of[" + get() + "]"
-	}
+	override fun toString(): String = "RxLockBox.of[" + get() + "]"
 
-	internal class Mapped<T, R>(delegate: RxLockBox<T>, converter: Converter<T, R>) :
+	internal class Mapped<T : Any, R : Any>(delegate: RxLockBox<T>, converter: Converter<T, R>) :
 			MappedImp<T, R, RxLockBox<T>>(delegate, converter), RxLockBox<R> {
 		val flow: Flow<R>
 
@@ -60,13 +56,9 @@ internal class RxLockBoxImp<T> : LockBoxImp<T>, RxLockBox<T> {
 			flow = mapped.distinctUntilChanged()
 		}
 
-		override fun lock(): Any {
-			return delegate.lock()
-		}
+		override fun lock(): Any = delegate.lock()
 
-		override fun asFlow(): Flow<R> {
-			return flow
-		}
+		override fun asFlow(): Flow<R> = flow
 
 		override fun modify(mutator: Function<in R, out R>): R {
 			val result = Box.Nullable.ofNull<R>()

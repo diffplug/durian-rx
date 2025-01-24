@@ -21,28 +21,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
-internal open class RxBoxImp<T> private constructor(initial: T, subject: MutableStateFlow<T>) :
-		RxBox<T> {
-	private var value: T = initial
-	private val subject: MutableStateFlow<T> = subject
-
-	constructor(initial: T) : this(initial, MutableStateFlow(initial)) {}
+internal open class RxBoxImp<T : Any>(initial: T) : RxBox<T> {
+	private val subject = MutableStateFlow(initial)
 
 	override fun set(newValue: T) {
-		if (newValue != value) {
-			value = newValue
+		if (subject.value != newValue) {
 			subject.value = newValue
 		}
 	}
 
-	override fun get(): T = value
+	override fun get(): T = subject.value
 
 	override fun asFlow(): Flow<T> = subject
 
-	internal class Mapped<T, R>(delegate: RxBox<T>, converter: Converter<T, R>) :
+	internal class Mapped<T : Any, R : Any>(delegate: RxBox<T>, converter: Converter<T, R>) :
 			MappedImp<T, R, RxBox<T>>(delegate, converter), RxBox<R> {
-		val flow: Flow<R> =
-				delegate.asFlow().map { a: T -> converter.convertNonNull(a) }.distinctUntilChanged()
+		val flow: Flow<R> = delegate.asFlow().map(converter::convertNonNull).distinctUntilChanged()
 
 		override fun asFlow(): Flow<R> = flow
 	}

@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.map
  * not change (e.g. a field is set to its current value, which produces no change) then the
  * `Observable` will not fire.
  */
-interface RxGetter<T> : IFlowable<T>, Supplier<T> {
+interface RxGetter<T : Any> : IFlowable<T>, Supplier<T> {
 	/**
 	 * Maps an `RxGetter` to a new `RxGetter` by applying the `mapper` function to all of its values.
 	 *
@@ -46,7 +46,7 @@ interface RxGetter<T> : IFlowable<T>, Supplier<T> {
 	 * * Incorrect: `("A", "B", "C") -> map(String::length) = (1, 1, 1)`
 	 * * Correct: `("A", "B", "C") -> map(String::length) = (1)`
 	 */
-	fun <R> map(mapper: Function<in T, out R>): RxGetter<R> {
+	fun <R : Any> map(mapper: Function<in T, out R>): RxGetter<R> {
 		val src = this
 		val mapped = src.asFlow().map { t: T -> mapper.apply(t) }
 		val observable = mapped.distinctUntilChanged()
@@ -70,7 +70,7 @@ interface RxGetter<T> : IFlowable<T>, Supplier<T> {
 		 * recorded by a non-volatile field.
 		 */
 		@JvmStatic
-		fun <T> from(observable: Flow<T>, initialValue: T): RxGetter<T> {
+		fun <T : Any> from(observable: Flow<T>, initialValue: T): RxGetter<T> {
 			val box = Box.of(initialValue)
 			subscribe(observable) { value: T -> box.set(value) }
 			return object : RxGetter<T> {
@@ -90,7 +90,7 @@ interface RxGetter<T> : IFlowable<T>, Supplier<T> {
 		 * As with [.map], the observable only emits a new value if its value has changed.
 		 */
 		@JvmStatic
-		fun <T1, T2, R> combineLatest(
+		fun <T1 : Any, T2 : Any, R : Any> combineLatest(
 				t: RxGetter<out T1>,
 				u: RxGetter<out T2>,
 				combine: BiFunction<in T1, in T2, out R>

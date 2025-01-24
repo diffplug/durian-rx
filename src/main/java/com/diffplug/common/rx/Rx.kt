@@ -371,7 +371,7 @@ object Rx {
 
 	/** Reliable way to sync two RxBox to each other. */
 	@JvmStatic
-	fun <T> sync(left: RxBox<T>, right: RxBox<T>) {
+	fun <T : Any> sync(left: RxBox<T>, right: RxBox<T>) {
 		sync(sameThreadExecutor(), left, right)
 	}
 
@@ -380,7 +380,7 @@ object Rx {
 	 * changes
 	 */
 	@JvmStatic
-	fun <T> sync(subscriber: RxSubscriber, left: RxBox<T>, right: RxBox<T>) {
+	fun <T : Any> sync(subscriber: RxSubscriber, left: RxBox<T>, right: RxBox<T>) {
 		val firstChange = Box.Nullable.ofNull<Either<T, T>?>()
 		subscriber.subscribe(left) { leftVal: T ->
 			// the left changed before we could acknowledge it
