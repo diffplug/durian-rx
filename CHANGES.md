@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+
+## [5.0.0] - 2025-01-24
 ### Changed
 - **BREAKING** Replace `RxJava Disposable` with `Kotlin Job`, and remove `rxjava` completely. ([#10](https://github.com/diffplug/durian-rx/pull/10))
 - Add strict nullability to RxBox and improve efficiency. ([#12](https://github.com/diffplug/durian-rx/pull/12))
