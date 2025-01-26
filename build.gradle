@@ -24,7 +24,7 @@ def VER_JUNIT='4.12'
 dependencies {
 	implementation "com.diffplug.durian:durian-core:${VER_DURIAN}"
 	implementation "com.diffplug.durian:durian-concurrent:${VER_DURIAN}"
-	api "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.2"
+	api "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0"
 	testImplementation "junit:junit:${VER_JUNIT}"
 	testImplementation "com.diffplug.durian:durian-testlib:${VER_DURIAN}"
 	testImplementation "com.diffplug.durian:durian-debug:${VER_DURIAN_DEBUG}"

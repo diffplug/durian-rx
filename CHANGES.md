@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Changed
+- Downgrade from Kotlin `2.1.0` to `2.0.21`
 
 ## [5.0.0] - 2025-01-24
 ### Changed
