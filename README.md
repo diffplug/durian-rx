@@ -14,8 +14,8 @@ output = [
 [![Maven central](https://img.shields.io/badge/mavencentral-com.diffplug.durian%3Adurian--rx-blue.svg)](https://search.maven.org/artifact/com.diffplug.durian/durian-rx)
 [![Apache 2.0](https://img.shields.io/badge/license-apache--2.0-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 
-[![Changelog](https://img.shields.io/badge/changelog-4.0.1-brightgreen.svg)](CHANGES.md)
-[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug.durian/durian-rx/4.0.1/)
+[![Changelog](https://img.shields.io/badge/changelog-5.0.0-brightgreen.svg)](CHANGES.md)
+[![Javadoc](https://img.shields.io/badge/javadoc-yes-brightgreen.svg)](https://javadoc.io/doc/com.diffplug.durian/durian-rx/5.0.0/)
 [![Live chat](https://img.shields.io/badge/gitter-chat-brightgreen.svg)](https://gitter.im/diffplug/durian)
 [![JitCI](https://jitci.com/gh/diffplug/durian-rx/svg)](https://jitci.com/gh/diffplug/durian-rx)
 <!---freshmark /shields -->
