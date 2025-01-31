@@ -36,6 +36,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.merge
@@ -102,7 +103,8 @@ import kotlinx.coroutines.flow.merge
 object Rx {
 	@JvmStatic
 	fun <T> createEmitFlow() =
-			MutableSharedFlow<T>(replay = 0, extraBufferCapacity = 1, BufferOverflow.SUSPEND)
+			MutableSharedFlow<T>(
+					replay = 0, extraBufferCapacity = Channel.UNLIMITED, BufferOverflow.SUSPEND)
 
 	@JvmStatic
 	fun <T> emit(flow: MutableSharedFlow<T>, value: T) {

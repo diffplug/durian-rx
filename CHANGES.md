@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+### Fixed
+- `Rx.createEmitFlow()` now creates a flow with unlimited buffer, same as RxJava's `PublishSubject`.
 
 ## [5.0.1] - 2025-01-26
 ### Changed
