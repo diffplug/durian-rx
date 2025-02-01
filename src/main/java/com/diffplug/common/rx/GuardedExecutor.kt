@@ -20,9 +20,13 @@ import java.util.*
 import java.util.concurrent.CompletionStage
 import java.util.concurrent.Executor
 import java.util.function.Supplier
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 /**
  * GuardedExecutor is an [Executor] and [RxSubscriber] which promises to cancel its subscriptions
@@ -31,6 +35,14 @@ import kotlinx.coroutines.flow.Flow
  * Useful for tying asynchronous tasks to gui elements.
  */
 open class GuardedExecutor(val delegate: RxExecutor, val guard: Chit) : Executor, RxSubscriber {
+	val scope: CoroutineScope by lazy {
+		CoroutineScope(SupervisorJob() + delegate.dispatcher).apply {
+			guard.runWhenDisposed { cancel() }
+		}
+	}
+
+	fun launch(block: suspend CoroutineScope.() -> Unit): Job = scope.launch(block = block)
+
 	override fun execute(command: Runnable) {
 		delegate.executor.execute(guard.guard(command))
 	}
