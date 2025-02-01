@@ -1,6 +1,8 @@
 # DurianRx releases
 
 ## [Unreleased]
+
+## [5.1.0] - 2025-02-01
 ### Added
 - `RxExecutor.launch` lets a user run `suspend` functions within that executor.
 - `GuardedExecutor` now has a lazily populated scope which cancels when its guard disposes, as well as a `launch` method.
