@@ -36,6 +36,9 @@ import kotlinx.coroutines.launch
 class RxExecutor internal constructor(val executor: Executor, val dispatcher: CoroutineDispatcher) :
 		RxSubscriber {
 
+	fun launch(block: suspend CoroutineScope.() -> Unit): Job =
+			CoroutineScope(Job() + dispatcher).launch(block = block)
+
 	interface Has : Executor {
 		val rxExecutor: RxExecutor
 	}
